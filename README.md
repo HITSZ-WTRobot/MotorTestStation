@@ -52,10 +52,14 @@
 
 ### 1. 运行方式
 
-本上位机采用纯静态标准 Web 技术构建：
+当前发布入口是 **`串口.html` 单文件版**，CSS 和四个 JavaScript 已全部内嵌，界面及通信逻辑不变。
 
-- **直接双击**：在文件资源管理器中直接双击打开 `index.html`（或拖拽到 Chrome / Edge 浏览器窗口中）。
-- **静态服务器**（可选）：在当前目录下运行 `python -m http.server 8080`，然后在浏览器访问 `http://localhost:8080`。
+- **分享**：只发送 `串口.html` 即可，不再需要附带 `css` 或 `js` 文件夹。若压缩发送，对方先解压，不要在聊天软件预览中运行。
+- **打开**：用电脑上的 Chrome / Edge 直接打开 `串口.html`。连接真实串口仍需浏览器支持 Web Serial、安装 USB 串口驱动并授权；内嵌不会绕过这些要求。
+- **静态服务器**（可选）：在本目录运行 `python -m http.server 8080`，访问 `http://localhost:8080/串口.html`。
+- **维护**：以后以 `串口.html` 内嵌代码为运行版本；保留的 `css/`、`js/` 是内嵌前的源码备份，修改它们不会影响当前页面。原 `串口.zip` 未更新，重新发布时请使用最新 HTML。
+
+已将 HTML 单独复制到无其他资源的临时目录，用 Chrome 打开并验证：样式、示波器、仿真接收及 5 V 控制指令可运行。真实 USB 串口硬件未在本次验证中连接。
 
 > **浏览器要求**：连接真实串口硬件需要浏览器支持 **Web Serial API**，推荐使用 **Google Chrome**、**Microsoft Edge** 或 **Opera**（版本 89+）。
 > 若使用 Firefox 或 Safari，仍可使用内置的【仿真模式】体验完整的控制与示波器绘制功能。
@@ -81,12 +85,12 @@
 D:\omp\motor test debug/
 ├── .gitignore          # Git 忽略配置
 ├── README.md           # 使用与协议技术文档
-├── index.html          # 主界面结构 (语义化布局)
+├── 串口.html           # 可单独发送的运行入口，内嵌样式与全部脚本
 ├── css/
-│   └── style.css       # 工业级深色主题样式系统
-└── js/
-    ├── protocol.js     # CRC-16 查表算子、帧打包/解包、流式解包器
-    ├── serial.js       # Web Serial API 驱动封装与虚拟电机物理模拟器
-    ├── chart.js        # 高性能双通道实时 Canvas 示波器
-    └── app.js          # UI 事件流、数据绑定与生命周期交互控制
+│   └── style.css       # 内嵌前的样式源码备份，当前 HTML 不再加载
+└── js/                 # 内嵌前的脚本源码备份，当前 HTML 不再加载
+    ├── protocol.js
+    ├── serial.js
+    ├── chart.js
+    └── app.js
 ```
