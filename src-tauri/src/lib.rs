@@ -111,7 +111,7 @@ fn open_serial_port(
     port_name: String,
     baud_rate: u32,
 ) -> Result<(), String> {
-    // 若已有打开的串口，先安全关闭
+    // 1. 若已有打开的串口连接，先安全通知停止
     {
         let mut guard = state
             .active
@@ -119,19 +119,38 @@ fn open_serial_port(
             .map_err(|_| "串口状态互斥锁异常".to_string())?;
         if let Some(conn) = guard.take() {
             conn.stop_flag.store(true, Ordering::SeqCst);
-            thread::sleep(Duration::from_millis(25));
         }
     }
 
-    let mut port = serialport::new(&port_name, baud_rate)
-        .data_bits(DataBits::Eight)
-        .stop_bits(StopBits::One)
-        .parity(Parity::None)
-        .flow_control(FlowControl::None)
-        .timeout(Duration::from_millis(15))
-        .open()
-        .map_err(|e| format!("无法打开串口 {} ({} bps): {}", port_name, baud_rate, e))?;
+    // 2. 将物理串口打开操作放到独立工作线程，并设置 2000ms 硬超时保护
+    // 彻底防止用户选错到非预期设备（如蓝牙串口 BTHENUM）导致 Windows 系统调用无限挂起造成界面未响应
+    let port_name_for_thread = port_name.clone();
+    let (tx_chan, rx_chan) = std::sync::mpsc::channel();
 
+    thread::spawn(move || {
+        let open_result = serialport::new(&port_name_for_thread, baud_rate)
+            .data_bits(DataBits::Eight)
+            .stop_bits(StopBits::One)
+            .parity(Parity::None)
+            .flow_control(FlowControl::None)
+            .timeout(Duration::from_millis(20))
+            .open();
+
+        let _ = tx_chan.send(open_result);
+    });
+
+    let mut port = match rx_chan.recv_timeout(Duration::from_millis(2000)) {
+        Ok(Ok(p)) => p,
+        Ok(Err(e)) => {
+            return Err(format!("无法打开串口 {}: {}", port_name, e));
+        }
+        Err(_) => {
+            return Err(format!(
+                "打开串口 {} 失败 (连接超时 2 秒未响应)！请检查是否选错了串口号（如蓝牙/未知设备）或该端口已被其他软件占用。",
+                port_name
+            ));
+        }
+    };
     // 主动置位 DTR / RTS，确保 CH340 / CP2102 / FT232 及隔离模块处于激活唤醒态
     let _ = port.write_data_terminal_ready(true);
     let _ = port.write_request_to_send(true);

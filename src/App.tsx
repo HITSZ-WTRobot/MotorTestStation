@@ -361,16 +361,21 @@ export function App() {
     appendLog('info', `扫描完成: 发现 ${ports.length} 个串口设备`);
   };
 
+  const [isConnecting, setIsConnecting] = React.useState(false);
+
   const handleConnectHardware = async () => {
+    if (isConnecting) return;
     const transport = transportRef.current;
     if (!transport) return;
+
+    setIsConnecting(true);
     try {
       if (platformInfo.isTauri) {
         if (!selectedPort) {
           const ports = await listNativeSerialPorts();
           setSerialPorts(ports);
           if (ports.length === 0) {
-            alert('未检测到物理串口，请插入 USB-TTL 适配器或点击【仿真模式】按钮测试。');
+            alert('未检测到物理串口，请检查 USB-TTL 适配器是否插入，或点击【仿真模式】按钮测试。');
             return;
           }
           await transport.connectNative(ports[0].portName, baudRate);
@@ -381,7 +386,12 @@ export function App() {
       } else {
         await transport.connectWebSerial(baudRate);
       }
-    } catch {}
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      alert(`连接串口失败: ${msg}`);
+    } finally {
+      setIsConnecting(false);
+    }
   };
 
   const handleDisconnect = async () => {
@@ -943,10 +953,20 @@ export function App() {
               <button
                 type="button"
                 onClick={handleConnectHardware}
-                className="flex h-8 items-center gap-1 rounded-lg bg-gradient-to-b from-sky-500 to-sky-600 px-3 text-xs font-bold text-white shadow-xs hover:from-sky-600 hover:to-sky-700 cursor-pointer"
+                disabled={isConnecting}
+                className="flex h-8 items-center gap-1 rounded-lg bg-gradient-to-b from-sky-500 to-sky-600 px-3 text-xs font-bold text-white shadow-xs hover:from-sky-600 hover:to-sky-700 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <Zap className="h-3.5 w-3.5" />
-                连接串口
+                {isConnecting ? (
+                  <>
+                    <RefreshCw className="h-3.5 w-3.5 animate-spin" />
+                    连接中...
+                  </>
+                ) : (
+                  <>
+                    <Zap className="h-3.5 w-3.5" />
+                    连接串口
+                  </>
+                )}
               </button>
             ) : (
               <button

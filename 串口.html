@@ -4154,13 +4154,23 @@ select:focus, input:focus {
             });
         });
 
-        // 串口连接/断开
+        // 串口连接/断开 (防重复点击与连接失败友好提示)
         if (el.btnConnect) {
             el.btnConnect.addEventListener('click', async () => {
                 const baud = parseInt(el.baudSelect.value, 10) || 115200;
+                el.btnConnect.disabled = true;
+                const origHtml = el.btnConnect.innerHTML;
+                el.btnConnect.innerHTML = '连接中...';
                 try {
                     await serial.connect(baud);
-                } catch (_) {}
+                } catch (err) {
+                    if (err.name !== 'NotFoundError') {
+                        alert('连接串口失败: ' + (err.message || err));
+                    }
+                } finally {
+                    el.btnConnect.disabled = false;
+                    el.btnConnect.innerHTML = origHtml;
+                }
             });
         }
 
