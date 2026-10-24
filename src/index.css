@@ -2,15 +2,15 @@
 
 @layer base {
   :root {
-    --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", "Helvetica Neue", Arial, sans-serif;
-    --font-mono: "JetBrains Mono", "SF Mono", "Fira Code", Menlo, Consolas, monospace;
+    --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", sans-serif;
+    --font-mono: "JetBrains Mono", "SF Mono", "Fira Code", "Cascadia Mono", Consolas, monospace;
   }
 
   body {
     font-family: var(--font-sans);
-    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    user-select: none;
   }
 }
 
@@ -19,82 +19,89 @@
   font-feature-settings: "tnum", "zero";
 }
 
-/* Cleanroom Light Blue Blueprint Background */
-.bg-cleanroom-grid {
-  background-color: #f1f6fb;
-  background-image:
-    linear-gradient(rgba(2, 132, 199, 0.045) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(2, 132, 199, 0.045) 1px, transparent 1px),
-    radial-gradient(circle at 12% 8%, rgba(56, 189, 248, 0.12) 0%, transparent 45%),
-    radial-gradient(circle at 88% 92%, rgba(2, 132, 199, 0.08) 0%, transparent 45%);
-  background-size: 24px 24px, 24px 24px, 100% 100%, 100% 100%;
+/* Studio Brushed Ceramic & Technical Dot Matrix */
+.studio-surface-light {
+  background-color: #eef2f6;
+  background-image: radial-gradient(rgba(15, 23, 42, 0.08) 1px, transparent 1px);
+  background-size: 16px 16px;
 }
 
-/* Dark Mode Blueprint Background */
-.bg-dark-grid {
-  background-color: #07090e;
-  background-image:
-    linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px),
-    radial-gradient(circle at 12% 8%, rgba(56, 189, 248, 0.07) 0%, transparent 45%),
-    radial-gradient(circle at 88% 92%, rgba(245, 158, 11, 0.05) 0%, transparent 45%);
-  background-size: 24px 24px, 24px 24px, 100% 100%, 100% 100%;
+.studio-surface-dark {
+  background-color: #090b10;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-size: 16px 16px;
 }
 
-/* Custom Range Sliders */
-input[type="range"].slider-azure {
+/* Tactile Fader / Slider Track */
+input[type="range"].studio-fader-blue {
   -webkit-appearance: none;
   appearance: none;
-  height: 8px;
-  border-radius: 9999px;
+  height: 6px;
+  border-radius: 999px;
   outline: none;
 }
 
-input[type="range"].slider-azure::-webkit-slider-thumb {
+input[type="range"].studio-fader-blue::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: #0284c7;
-  border: 2.5px solid #ffffff;
-  box-shadow: 0 2px 6px rgba(2, 132, 199, 0.45);
-  cursor: pointer;
-  transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.15s;
+  width: 22px;
+  height: 14px;
+  border-radius: 4px;
+  background: linear-gradient(180deg, #0ea5e9 0%, #0284c7 100%);
+  border: 1.5px solid #ffffff;
+  box-shadow: 0 2px 5px rgba(2, 132, 199, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  cursor: grab;
+  transition: transform 0.1s ease, box-shadow 0.15s ease;
 }
 
-input[type="range"].slider-azure::-webkit-slider-thumb:hover {
-  transform: scale(1.18);
-  box-shadow: 0 2px 10px rgba(2, 132, 199, 0.65);
+input[type="range"].studio-fader-blue::-webkit-slider-thumb:active {
+  cursor: grabbing;
+  transform: scale(1.08);
+  box-shadow: 0 0 12px rgba(2, 132, 199, 0.7);
 }
 
-input[type="range"].slider-amber {
+input[type="range"].studio-fader-orange {
   -webkit-appearance: none;
   appearance: none;
-  height: 8px;
-  border-radius: 9999px;
+  height: 6px;
+  border-radius: 999px;
   outline: none;
 }
 
-input[type="range"].slider-amber::-webkit-slider-thumb {
+input[type="range"].studio-fader-orange::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: #d97706;
-  border: 2.5px solid #ffffff;
-  box-shadow: 0 2px 6px rgba(217, 119, 6, 0.45);
-  cursor: pointer;
-  transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.15s;
+  width: 22px;
+  height: 14px;
+  border-radius: 4px;
+  background: linear-gradient(180deg, #f59e0b 0%, #d97706 100%);
+  border: 1.5px solid #ffffff;
+  box-shadow: 0 2px 5px rgba(217, 119, 6, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  cursor: grab;
+  transition: transform 0.1s ease, box-shadow 0.15s ease;
 }
 
-input[type="range"].slider-amber::-webkit-slider-thumb:hover {
-  transform: scale(1.18);
-  box-shadow: 0 2px 10px rgba(217, 119, 6, 0.65);
+input[type="range"].studio-fader-orange::-webkit-slider-thumb:active {
+  cursor: grabbing;
+  transform: scale(1.08);
+  box-shadow: 0 0 12px rgba(217, 119, 6, 0.7);
 }
 
-input[type="range"]:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+/* Custom Slim Scrollbar */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(100, 116, 139, 0.28);
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 116, 139, 0.5);
 }
