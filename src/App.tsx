@@ -798,12 +798,12 @@ export function App() {
   const tCellsActive = Math.round((telemetry.torque / Math.max(0.1, torqueLimit)) * 16);
 
   return (
-    <div className="w-screen h-screen overflow-hidden studio-surface-bright flex flex-col text-slate-900 select-none">
+    <div className="w-screen h-screen min-w-0 min-h-0 overflow-hidden studio-surface-bright flex flex-col text-slate-900 select-none">
       {/* =====================================================================
           顶部精密仪表横梁：品牌铭牌 + 集成式双通道数字表头 + 串口与安全急停
          ===================================================================== */}
-      <header className="shrink-0 border-b border-sky-200/80 bg-white/95 backdrop-blur-md shadow-[0_2px_12px_rgba(2,132,199,0.06)]">
-        <div className="flex items-center justify-between gap-2.5 px-3 py-2 2xl:px-4 2xl:py-2.5 whitespace-nowrap overflow-x-auto overflow-y-hidden">
+      <header className="shrink-0 min-w-0 border-b border-sky-200/80 bg-white/95 backdrop-blur-md shadow-[0_2px_12px_rgba(2,132,199,0.06)]">
+        <div className="flex items-center justify-between gap-2.5 px-3 py-2 2xl:px-4 2xl:py-2.5 whitespace-nowrap overflow-x-auto overflow-y-hidden scrollbar-none min-w-0">
           {/* 1. 左侧品牌与平台标签 */}
           <div className="flex items-center gap-2.5 pr-1 shrink-0">
             <div className="flex h-9 w-9 xl:h-10 xl:w-10 items-center justify-center rounded-xl bg-gradient-to-br from-sky-400 to-sky-600 text-white shadow-sm border border-sky-300">
@@ -1063,13 +1063,13 @@ export function App() {
       {/* =====================================================================
           主工作台：中央全画幅示波器 + 底部参数/报文双舱 + 右侧推子主控舱
          ===================================================================== */}
-      <div className="flex-1 min-h-0 grid grid-cols-[1fr_360px] 2xl:grid-cols-[1fr_420px] overflow-hidden">
+      <div className="flex-1 min-h-0 min-w-0 grid grid-cols-[minmax(0,1fr)_360px] 2xl:grid-cols-[minmax(0,1fr)_420px] overflow-hidden">
         {/* -------------------------------------------------------------------
             左/中主舞台：全画幅示波器 + 底部参数与报文双联舱
            ------------------------------------------------------------------- */}
-        <div className="flex flex-col min-h-0 border-r border-sky-200/80">
+        <div className="flex flex-col min-h-0 min-w-0 border-r border-sky-200/80 overflow-hidden">
           {/* A. 中央舞台：双通道数字示波器 */}
-          <div className="flex-1 min-h-0 flex flex-col bg-white">
+          <div className="flex-1 min-h-0 min-w-0 flex flex-col bg-white overflow-hidden">
             {/* 示波器工具横条 */}
             <div className="flex items-center justify-between gap-2.5 border-b border-sky-100 bg-gradient-to-r from-sky-50/90 via-white to-sky-50/60 px-4 py-2 whitespace-nowrap overflow-hidden">
               <div className="flex items-center gap-2.5">
@@ -1168,7 +1168,7 @@ export function App() {
             </div>
 
             {/* 示波器画布 */}
-            <div className="flex-1 min-h-0 relative">
+            <div className="flex-1 min-h-0 min-w-0 relative overflow-hidden">
               <OscilloscopeCanvas
                 ref={scopeRef}
                 maxPoints={scopeConfig.maxPoints}
@@ -1184,7 +1184,7 @@ export function App() {
           </div>
 
           {/* B. 底部双联机架舱：6 参数调优 (RAM / Flash) + 14B 报文流 */}
-          <div className="shrink-0 h-[255px] border-t border-sky-200/80 bg-[#f4f8fc] flex flex-col">
+          <div className="shrink-0 h-[220px] 2xl:h-[250px] min-w-0 border-t border-sky-200/80 bg-[#f4f8fc] flex flex-col overflow-hidden">
             {/* 机架顶部切换与保存栏 */}
             <div className="flex items-center justify-between gap-2 border-b border-sky-100 bg-white px-3.5 py-1.5 whitespace-nowrap overflow-hidden">
               <div className="flex items-center gap-1.5">
@@ -1427,7 +1427,7 @@ export function App() {
         {/* -------------------------------------------------------------------
             右侧推子主控舱：二选一模式切换 + 双参数推子控制
            ------------------------------------------------------------------- */}
-        <aside className="flex flex-col min-h-0 bg-white overflow-y-auto">
+        <aside className="flex flex-col min-h-0 min-w-0 bg-white overflow-y-auto">
           {/* 1. 顶部模式二选一切换器 */}
           <div className="border-b border-sky-100 bg-gradient-to-b from-sky-50/60 to-white p-3.5">
             <div className="mb-2 flex items-center justify-between text-[11px] font-bold text-slate-500">

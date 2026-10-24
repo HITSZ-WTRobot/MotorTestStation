@@ -114,19 +114,21 @@ export const OscilloscopeCanvas = React.forwardRef<OscilloscopeHandle, Oscillosc
       const resizeCanvas = () => {
         dpr = window.devicePixelRatio || 1;
         const parent = canvas.parentElement;
-        const w = parent?.clientWidth || canvas.offsetWidth;
-        const h = parent?.clientHeight || canvas.offsetHeight;
+        if (!parent) return;
+        const rect = parent.getBoundingClientRect();
+        const w = rect.width;
+        const h = rect.height;
         if (w > 0 && h > 0) {
           canvas.width = Math.round(w * dpr);
           canvas.height = Math.round(h * dpr);
-          canvas.style.width = `${w}px`;
-          canvas.style.height = `${h}px`;
         }
       };
 
       resizeCanvas();
       const ro = new ResizeObserver(resizeCanvas);
-      ro.observe(canvas);
+      if (canvas.parentElement) {
+        ro.observe(canvas.parentElement);
+      }
       window.addEventListener('resize', resizeCanvas);
 
       let animId = 0;
@@ -525,12 +527,12 @@ export const OscilloscopeCanvas = React.forwardRef<OscilloscopeHandle, Oscillosc
     };
 
     return (
-      <div className="relative w-full h-full min-h-[260px] overflow-hidden bg-white">
+      <div className="relative w-full h-full min-w-0 min-h-0 overflow-hidden bg-white">
         <canvas
           ref={canvasRef}
           onMouseMove={handleMouseMove}
           onMouseLeave={handleMouseLeave}
-          className="w-full h-full block cursor-crosshair"
+          className="absolute inset-0 w-full h-full block cursor-crosshair"
         />
       </div>
     );
