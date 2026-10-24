@@ -184,7 +184,7 @@
             // 边距
             const padLeft = 58;
             const padRight = 58;
-            const padTop = 34;
+            const padTop = 76;
             const padBottom = 32;
 
             const plotW = w - padLeft - padRight;

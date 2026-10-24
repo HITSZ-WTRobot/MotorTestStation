@@ -157,7 +157,7 @@ export const OscilloscopeCanvas = React.forwardRef<OscilloscopeHandle, Oscillosc
 
           const padLeft = 58;
           const padRight = 58;
-          const padTop = 52;
+          const padTop = 76;
           const padBottom = 30;
           const plotW = w - padLeft - padRight;
           const plotH = h - padTop - padBottom;
@@ -243,27 +243,27 @@ export const OscilloscopeCanvas = React.forwardRef<OscilloscopeHandle, Oscillosc
 
             // 顶栏图例
             ctx.save();
-            ctx.font = '600 12px "JetBrains Mono", "PingFang SC", "Microsoft YaHei", sans-serif';
+            ctx.font = 'bold 13px "JetBrains Mono", "PingFang SC", "Microsoft YaHei", sans-serif';
             ctx.textAlign = 'left';
             ctx.textBaseline = 'top';
             ctx.fillStyle = palette.vLine;
-            ctx.fillRect(padLeft, 20, 9, 9);
-            ctx.fillStyle = '#334155';
-            ctx.fillText('CH-A: 实测电压 (0 ~ 20V)', padLeft + 14, 18);
+            ctx.fillRect(padLeft, 26, 11, 11);
+            ctx.fillStyle = '#1e293b';
+            ctx.fillText('CH-A: 实测电压 (0 ~ 20V)', padLeft + 18, 24);
 
             ctx.fillStyle = palette.tLine;
-            ctx.fillRect(padLeft + 195, 20, 9, 9);
-            ctx.fillStyle = '#334155';
+            ctx.fillRect(padLeft + 225, 26, 11, 11);
+            ctx.fillStyle = '#1e293b';
             ctx.fillText(
               `CH-B: 实测扭矩 (${tMin.toFixed(1)} ~ ${tMax.toFixed(1)} N·m)`,
-              padLeft + 209,
-              18
+              padLeft + 243,
+              24
             );
 
             if (p.isPaused) {
               ctx.fillStyle = '#dc2626';
               ctx.textAlign = 'right';
-              ctx.fillText('[ ⏸ HOLD / 已暂停 ]', w - padRight, 18);
+              ctx.fillText('[ ⏸ HOLD / 已暂停 ]', w - padRight, 24);
             }
             ctx.restore();
 
