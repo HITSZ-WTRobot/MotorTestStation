@@ -803,44 +803,43 @@ export function App() {
           顶部精密仪表横梁：品牌铭牌 + 集成式双通道数字表头 + 串口与安全急停
          ===================================================================== */}
       <header className="shrink-0 border-b border-sky-200/80 bg-white/95 backdrop-blur-md shadow-[0_2px_12px_rgba(2,132,199,0.06)]">
-        <div className="flex items-center justify-between gap-4 px-4 py-2.5 whitespace-nowrap overflow-hidden">
-            {/* 1. 左侧品牌与平台标签 */}
-            <div className="flex items-center gap-3 pr-2 shrink-0">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-sky-400 to-sky-600 text-white shadow-sm border border-sky-300">
-              <Cpu className="h-5.5 w-5.5" />
+        <div className="flex items-center justify-between gap-2.5 px-3 py-2 2xl:px-4 2xl:py-2.5 whitespace-nowrap overflow-x-auto overflow-y-hidden">
+          {/* 1. 左侧品牌与平台标签 */}
+          <div className="flex items-center gap-2.5 pr-1 shrink-0">
+            <div className="flex h-9 w-9 xl:h-10 xl:w-10 items-center justify-center rounded-xl bg-gradient-to-br from-sky-400 to-sky-600 text-white shadow-sm border border-sky-300">
+              <Cpu className="h-5 w-5" />
             </div>
             <div>
               <div className="flex items-center gap-1.5">
-                <span className="font-mono text-[15px] font-black tracking-wider uppercase text-slate-900">
+                <span className="font-mono text-sm xl:text-[15px] font-black tracking-wider uppercase text-slate-900">
                   MOTOR TEST STATION
                 </span>
-                <span className="rounded-md bg-sky-100 border border-sky-200 px-2 py-0.5 font-mono text-xs font-bold text-sky-700">
+                <span className="rounded-md bg-sky-100 border border-sky-200 px-1.5 py-0.5 font-mono text-[11px] font-bold text-sky-700">
                   {platformInfo.isTauri ? platformInfo.os.toUpperCase() : 'WEB'}
                 </span>
               </div>
-              <div className="font-mono text-xs font-semibold text-slate-500">
+              <div className="hidden 2xl:block font-mono text-xs font-semibold text-slate-500">
                 TIM3 100Hz · 14B CRC16 · Vmax = Vff + 1.5V
               </div>
             </div>
           </div>
-
           {/* 2. 中央集成式双通道数字表头与16段光柱 */}
-          <div className="flex items-center justify-center gap-3 shrink-0">
+          <div className="flex items-center justify-center gap-2 xl:gap-3 shrink-0">
             {/* CH-A：实测电压表头 */}
-            <div className="flex items-center gap-3.5 rounded-xl border border-sky-200/90 bg-gradient-to-br from-sky-50/90 via-white to-sky-50/40 px-4 py-2 shadow-2xs">
+            <div className="flex items-center gap-3 rounded-xl border border-sky-200/90 bg-gradient-to-br from-sky-50/90 via-white to-sky-50/40 px-3 py-1.5 xl:px-4 xl:py-2 shadow-2xs">
               <div>
                 <div className="flex items-center gap-1.5 font-mono text-xs font-black text-sky-700">
                   <span className="h-2.5 w-2.5 rounded-full bg-sky-500" />
                   CH-A · 实测电压
                 </div>
                 <div className="flex items-baseline gap-1 font-mono tnum">
-                  <span className="text-[30px] lg:text-[32px] leading-tight font-black tracking-tight text-sky-700">
+                  <span className="text-2xl 2xl:text-[30px] leading-tight font-black tracking-tight text-sky-700">
                     {telemetry.voltage.toFixed(3)}
                   </span>
                   <span className="text-base font-bold text-sky-500">V</span>
                 </div>
               </div>
-              <div className="hidden sm:flex flex-col gap-1.5 border-l border-sky-200/80 pl-3.5">
+              <div className="hidden 2xl:flex flex-col gap-1.5 border-l border-sky-200/80 pl-3.5">
                 <div className="flex gap-1">
                   {Array.from({ length: 16 }).map((_, idx) => (
                     <span
@@ -866,14 +865,14 @@ export function App() {
             </div>
 
             {/* CH-B：实测扭矩表头 */}
-            <div className="flex items-center gap-3.5 rounded-xl border border-amber-200/90 bg-gradient-to-br from-amber-50/90 via-white to-orange-50/40 px-4 py-2 shadow-2xs">
+            <div className="flex items-center gap-3 rounded-xl border border-amber-200/90 bg-gradient-to-br from-amber-50/90 via-white to-orange-50/40 px-3 py-1.5 xl:px-4 xl:py-2 shadow-2xs">
               <div>
                 <div className="flex items-center gap-1.5 font-mono text-xs font-black text-amber-700">
                   <span className="h-2.5 w-2.5 rounded-full bg-amber-500" />
                   CH-B · 实测扭矩
                 </div>
                 <div className="flex items-baseline gap-1 font-mono tnum">
-                  <span className="text-[30px] lg:text-[32px] leading-tight font-black tracking-tight text-amber-600">
+                  <span className="text-2xl 2xl:text-[30px] leading-tight font-black tracking-tight text-amber-600">
                     {telemetry.torque.toFixed(3)}
                   </span>
                   <span className="text-base font-bold text-amber-500">
@@ -881,7 +880,7 @@ export function App() {
                   </span>
                 </div>
               </div>
-              <div className="hidden sm:flex flex-col gap-1.5 border-l border-amber-200/80 pl-3.5">
+              <div className="hidden 2xl:flex flex-col gap-1.5 border-l border-amber-200/80 pl-3.5">
                 <div className="flex gap-1">
                   {Array.from({ length: 16 }).map((_, idx) => (
                     <span
@@ -911,7 +910,7 @@ export function App() {
             </div>
 
             {/* 通信统计胶囊 */}
-            <div className="hidden xl:grid grid-cols-2 gap-x-4 gap-y-1 rounded-xl border border-slate-200 bg-slate-50/90 px-4 py-2 font-mono text-xs tnum font-bold">
+            <div className="hidden 2xl:grid grid-cols-2 gap-x-4 gap-y-1 rounded-xl border border-slate-200 bg-slate-50/90 px-4 py-2 font-mono text-xs tnum font-bold">
               <span className="text-slate-500">
                 RX: <strong className="text-sm font-black text-emerald-600">{telemetry.rxFrames}</strong>
               </span>
@@ -928,12 +927,15 @@ export function App() {
                 </strong>
               </span>
             </div>
+            <div className="hidden lg:flex 2xl:hidden items-center gap-2 rounded-xl border border-slate-200 bg-slate-50/90 px-2.5 py-1.5 font-mono text-xs tnum font-bold text-slate-500">
+              <span>RX: <strong className="text-emerald-600">{telemetry.rxFrames}</strong></span>
+              <span>FPS: <strong className="text-slate-800">{telemetry.fps}Hz</strong></span>
+            </div>
           </div>
-
           {/* 3. 右侧硬件连接与安全急停操作台 */}
           <div className="flex items-center gap-1.5 shrink-0">
             <div
-              className={`flex items-center gap-2 rounded-lg border px-3.5 py-2 font-mono text-xs font-extrabold tnum ${
+              className={`flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 xl:px-3.5 xl:py-2 font-mono text-xs font-extrabold tnum ${
                 connStatus.warning
                   ? 'border-red-300 bg-red-50 text-red-700'
                   : connStatus.connected
@@ -942,7 +944,7 @@ export function App() {
               }`}
             >
               <span
-                className={`h-2.5 w-2.5 rounded-full ${
+                className={`h-2 w-2 rounded-full ${
                   !connStatus.connected
                     ? 'bg-red-500'
                     : connStatus.mode === 'mock'
@@ -950,7 +952,7 @@ export function App() {
                       : 'bg-emerald-500 animate-pulse'
                 }`}
               />
-              <span className="max-w-[170px] truncate">{connStatus.label}</span>
+              <span className="max-w-[95px] xl:max-w-[150px] truncate">{connStatus.label}</span>
             </div>
 
             {platformInfo.isTauri && (
@@ -960,7 +962,7 @@ export function App() {
                   onChange={(e) => setSelectedPort(e.target.value)}
                   disabled={connStatus.connected}
                   title="选择物理串口"
-                  className="h-9 rounded-lg border border-slate-200 bg-white px-2.5 font-mono text-xs font-semibold text-slate-800 outline-none focus:border-sky-500"
+                  className="h-8.5 xl:h-9 w-20 xl:w-28 rounded-lg border border-slate-200 bg-white px-2 font-mono text-xs font-semibold text-slate-800 outline-none focus:border-sky-500"
                 >
                   {serialPorts.length === 0 ? (
                     <option value="">无可用串口</option>
@@ -977,9 +979,9 @@ export function App() {
                   onClick={handleRefreshPorts}
                   disabled={connStatus.connected}
                   title="扫描系统串口"
-                  className="flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-600 hover:border-sky-400 hover:text-sky-600 cursor-pointer disabled:opacity-40"
+                  className="flex h-8.5 w-8.5 xl:h-9 xl:w-9 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-600 hover:border-sky-400 hover:text-sky-600 cursor-pointer disabled:opacity-40"
                 >
-                  <RefreshCw className="h-4 w-4" />
+                  <RefreshCw className="h-3.5 w-3.5" />
                 </button>
               </div>
             )}
@@ -989,7 +991,7 @@ export function App() {
               onChange={(e) => setBaudRate(Number(e.target.value))}
               disabled={connStatus.connected}
               title="波特率"
-              className="h-9 rounded-lg border border-slate-200 bg-white px-2.5 font-mono text-xs font-semibold tnum text-slate-800 outline-none focus:border-sky-500"
+              className="h-8.5 xl:h-9 w-20 xl:w-24 rounded-lg border border-slate-200 bg-white px-2 font-mono text-xs font-semibold tnum text-slate-800 outline-none focus:border-sky-500"
             >
               <option value={115200}>115200</option>
               <option value={921600}>921600</option>
@@ -1002,17 +1004,18 @@ export function App() {
                 type="button"
                 onClick={handleConnectHardware}
                 disabled={isConnecting}
-                className="flex h-9 items-center gap-1.5 rounded-lg bg-gradient-to-b from-sky-500 to-sky-600 px-3.5 text-xs font-extrabold text-white shadow-xs hover:from-sky-600 hover:to-sky-700 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex h-8.5 xl:h-9 items-center gap-1 rounded-lg bg-gradient-to-b from-sky-500 to-sky-600 px-2.5 xl:px-3.5 text-xs font-extrabold text-white shadow-xs hover:from-sky-600 hover:to-sky-700 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isConnecting ? (
                   <>
-                    <RefreshCw className="h-4 w-4 animate-spin" />
-                    连接中...
+                    <RefreshCw className="h-3.5 w-3.5 animate-spin" />
+                    <span className="hidden xl:inline">连接中...</span>
                   </>
                 ) : (
                   <>
-                    <Zap className="h-4 w-4" />
-                    连接串口
+                    <Zap className="h-3.5 w-3.5" />
+                    <span className="hidden xl:inline">连接串口</span>
+                    <span className="xl:hidden">连接</span>
                   </>
                 )}
               </button>
@@ -1020,23 +1023,25 @@ export function App() {
               <button
                 type="button"
                 onClick={handleDisconnect}
-                className="flex h-9 items-center gap-1.5 rounded-lg border border-red-300 bg-red-50 px-3.5 text-xs font-extrabold text-red-700 hover:bg-red-100 cursor-pointer"
+                className="flex h-8.5 xl:h-9 items-center gap-1 rounded-lg border border-red-300 bg-red-50 px-2.5 xl:px-3.5 text-xs font-extrabold text-red-700 hover:bg-red-100 cursor-pointer"
               >
-                断开
+                <span className="hidden xl:inline">断开连接</span>
+                <span className="xl:hidden">断开</span>
               </button>
             )}
 
             <button
               type="button"
               onClick={handleToggleMock}
-              className={`flex h-9 items-center gap-1.5 rounded-lg border px-3 text-xs font-extrabold cursor-pointer transition-colors ${
+              className={`flex h-8.5 xl:h-9 items-center gap-1 rounded-lg border px-2.5 xl:px-3 text-xs font-extrabold cursor-pointer transition-colors ${
                 connStatus.mode === 'mock'
                   ? 'border-amber-500 bg-amber-500 text-white shadow-xs'
                   : 'border-sky-200 bg-sky-50/70 text-sky-700 hover:bg-sky-100'
               }`}
             >
-              <Radio className="h-4 w-4" />
-              {connStatus.mode === 'mock' ? '停止仿真' : '仿真模式'}
+              <Radio className="h-3.5 w-3.5" />
+              <span className="hidden xl:inline">{connStatus.mode === 'mock' ? '停止仿真' : '仿真模式'}</span>
+              <span className="xl:hidden">{connStatus.mode === 'mock' ? '停止' : '仿真'}</span>
             </button>
 
             {/* 全局安全急停按钮 */}
@@ -1046,9 +1051,9 @@ export function App() {
                 updateVoltageDraft(0.0, true);
                 appendLog('warn', '【全局急停触发】发送 SetVoltage(0.0V) 停止输出并脱离闭环');
               }}
-              className="flex h-9 items-center gap-1.5 rounded-lg bg-gradient-to-b from-red-500 to-red-600 px-4 font-mono text-xs font-black tracking-wider text-white shadow-sm hover:from-red-600 hover:to-red-700 active:scale-95 cursor-pointer"
+              className="flex h-8.5 xl:h-9 items-center gap-1 rounded-lg bg-gradient-to-b from-red-500 to-red-600 px-3 xl:px-4 font-mono text-xs font-black tracking-wider text-white shadow-sm hover:from-red-600 hover:to-red-700 active:scale-95 cursor-pointer"
             >
-              <OctagonAlert className="h-4 w-4" />
+              <OctagonAlert className="h-3.5 w-3.5" />
               STOP 0V
             </button>
           </div>
@@ -1058,7 +1063,7 @@ export function App() {
       {/* =====================================================================
           主工作台：中央全画幅示波器 + 底部参数/报文双舱 + 右侧推子主控舱
          ===================================================================== */}
-      <div className="flex-1 min-h-0 grid grid-cols-[1fr_420px] overflow-hidden">
+      <div className="flex-1 min-h-0 grid grid-cols-[1fr_360px] 2xl:grid-cols-[1fr_420px] overflow-hidden">
         {/* -------------------------------------------------------------------
             左/中主舞台：全画幅示波器 + 底部参数与报文双联舱
            ------------------------------------------------------------------- */}
