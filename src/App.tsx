@@ -740,64 +740,64 @@ export function App() {
   const tCellsActive = Math.round((telemetry.torque / Math.max(0.1, torqueLimit)) * 16);
 
   return (
-    <div className="min-h-screen lg:h-screen lg:overflow-hidden flex flex-col studio-surface-bright text-slate-900">
+    <div className="min-h-screen lg:h-screen lg:overflow-hidden flex flex-col studio-surface-matte text-slate-900">
       {/* =====================================================================
-          顶部精密仪表横梁：品牌铭牌 + 集成式双通道数字表头 + 串口与安全急停
+          顶部精密仪表横梁 (色阶: #e4ebf2 冷灰铝底板 + #ffffff 独立内嵌表头模块)
          ===================================================================== */}
-      <header className="shrink-0 border-b border-sky-200/80 bg-white/95 backdrop-blur-md shadow-[0_2px_12px_rgba(2,132,199,0.05)]">
-        <div className="flex flex-wrap items-center justify-between gap-2 px-3 py-2">
-          {/* 1. 左侧品牌与平台标签 */}
-          <div className="flex items-center gap-2.5 pr-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-sky-400 to-sky-600 text-white shadow-sm border border-sky-300">
+      <header className="shrink-0 border-b border-slate-300 bg-[#e4ebf2] shadow-xs">
+        <div className="flex flex-wrap items-center justify-between gap-2.5 px-4 py-2.5">
+          {/* 1. 左侧品牌与平台标签 (字号放大) */}
+          <div className="flex items-center gap-3 pr-2">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-sky-500 to-sky-700 text-white shadow-sm border border-sky-400">
               <Cpu className="h-5 w-5" />
             </div>
             <div>
-              <div className="flex items-center gap-1.5">
-                <span className="font-mono text-xs font-black tracking-wider uppercase text-slate-900">
+              <div className="flex items-center gap-2">
+                <span className="font-mono text-base font-black tracking-wide uppercase text-slate-900">
                   MOTOR TEST STATION
                 </span>
-                <span className="rounded-md bg-sky-100 border border-sky-200 px-1.5 py-0.5 font-mono text-[9px] font-bold text-sky-700">
+                <span className="rounded-md bg-sky-600 px-2 py-0.5 font-mono text-[11px] font-bold text-white shadow-2xs">
                   {platformInfo.isTauri ? platformInfo.os.toUpperCase() : 'WEB'}
                 </span>
               </div>
-              <div className="font-mono text-[10px] text-slate-500">
+              <div className="font-mono text-xs font-medium text-slate-600">
                 TIM3 100Hz · 14B CRC16 · Vmax = Vff + 0.5V
               </div>
             </div>
           </div>
 
-          {/* 2. 中央集成式双通道数字表头与16段光柱 */}
-          <div className="flex flex-1 flex-wrap items-center justify-center gap-2 lg:gap-3">
+          {/* 2. 中央集成式双通道数字表头与16段光柱 (独立白底悬浮卡片 + 字号放大) */}
+          <div className="flex flex-1 flex-wrap items-center justify-center gap-3">
             {/* CH-A：实测电压表头 */}
-            <div className="flex items-center gap-3 rounded-xl border border-sky-200/90 bg-gradient-to-br from-sky-50/90 via-white to-sky-50/40 px-3.5 py-1.5 shadow-2xs">
+            <div className="flex items-center gap-3.5 rounded-xl border border-slate-300/90 bg-white px-4 py-2 shadow-xs">
               <div>
-                <div className="flex items-center gap-1.5 font-mono text-[10px] font-extrabold text-sky-700">
-                  <span className="h-1.5 w-1.5 rounded-full bg-sky-500" />
+                <div className="flex items-center gap-1.5 font-mono text-xs font-extrabold text-sky-700">
+                  <span className="h-2 w-2 rounded-full bg-sky-500" />
                   CH-A · 实测电压
                 </div>
                 <div className="flex items-baseline gap-1 font-mono tnum">
-                  <span className="text-2xl font-black tracking-tight text-sky-700">
+                  <span className="text-3xl font-black tracking-tight text-sky-700">
                     {telemetry.voltage.toFixed(3)}
                   </span>
-                  <span className="text-xs font-bold text-sky-500">V</span>
+                  <span className="text-sm font-bold text-sky-600">V</span>
                 </div>
               </div>
-              <div className="hidden sm:flex flex-col gap-1 border-l border-sky-100 pl-3">
-                <div className="flex gap-0.5">
+              <div className="hidden sm:flex flex-col gap-1.5 border-l border-slate-200 pl-3.5">
+                <div className="flex gap-1">
                   {Array.from({ length: 16 }).map((_, idx) => (
                     <span
                       key={idx}
-                      className={`h-2.5 w-1 rounded-[1px] transition-colors ${
+                      className={`h-3 w-1.5 rounded-[1px] transition-colors ${
                         idx < vCellsActive
                           ? idx > 13
                             ? 'bg-red-500'
                             : 'bg-sky-500'
-                          : 'bg-sky-100'
+                          : 'bg-slate-200'
                       }`}
                     />
                   ))}
                 </div>
-                <div className="flex gap-2 font-mono text-[9.5px] text-slate-500 tnum">
+                <div className="flex gap-2.5 font-mono text-xs font-semibold text-slate-600 tnum">
                   <span>MIN:{telemetry.vMin === null ? '--' : telemetry.vMin.toFixed(2)}</span>
                   <span>MAX:{telemetry.vMax === null ? '--' : telemetry.vMax.toFixed(2)}</span>
                   <span className="text-sky-700 font-bold">
@@ -808,42 +808,42 @@ export function App() {
             </div>
 
             {/* CH-B：实测扭矩表头 */}
-            <div className="flex items-center gap-3 rounded-xl border border-amber-200/90 bg-gradient-to-br from-amber-50/90 via-white to-orange-50/40 px-3.5 py-1.5 shadow-2xs">
+            <div className="flex items-center gap-3.5 rounded-xl border border-slate-300/90 bg-white px-4 py-2 shadow-xs">
               <div>
-                <div className="flex items-center gap-1.5 font-mono text-[10px] font-extrabold text-amber-700">
-                  <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
+                <div className="flex items-center gap-1.5 font-mono text-xs font-extrabold text-amber-700">
+                  <span className="h-2 w-2 rounded-full bg-amber-500" />
                   CH-B · 实测扭矩
                 </div>
                 <div className="flex items-baseline gap-1 font-mono tnum">
-                  <span className="text-2xl font-black tracking-tight text-amber-600">
+                  <span className="text-3xl font-black tracking-tight text-amber-600">
                     {telemetry.torque.toFixed(3)}
                   </span>
-                  <span className="text-xs font-bold text-amber-500">
+                  <span className="text-sm font-bold text-amber-600">
                     N·m
                   </span>
                 </div>
               </div>
-              <div className="hidden sm:flex flex-col gap-1 border-l border-amber-100 pl-3">
-                <div className="flex gap-0.5">
+              <div className="hidden sm:flex flex-col gap-1.5 border-l border-slate-200 pl-3.5">
+                <div className="flex gap-1">
                   {Array.from({ length: 16 }).map((_, idx) => (
                     <span
                       key={idx}
-                      className={`h-2.5 w-1 rounded-[1px] transition-colors ${
+                      className={`h-3 w-1.5 rounded-[1px] transition-colors ${
                         idx < tCellsActive
                           ? idx > 13
                             ? 'bg-red-500'
                             : 'bg-amber-500'
-                          : 'bg-amber-100'
+                          : 'bg-slate-200'
                       }`}
                     />
                   ))}
                 </div>
-                <div className="flex gap-2 font-mono text-[9.5px] text-slate-500 tnum">
+                <div className="flex gap-2.5 font-mono text-xs font-semibold text-slate-600 tnum">
                   <span>PEAK:{telemetry.tMax === null ? '--' : telemetry.tMax.toFixed(2)}</span>
                   <span>LIM:{torqueLimit.toFixed(2)}</span>
                   <span
                     className={`font-bold ${
-                      torqueEnabled ? 'text-emerald-600' : 'text-slate-400'
+                      torqueEnabled ? 'text-emerald-600' : 'text-slate-500'
                     }`}
                   >
                     {torqueEnabled ? 'LOOP:ON' : 'LOOP:OFF'}
@@ -852,39 +852,39 @@ export function App() {
               </div>
             </div>
 
-            {/* 通信统计胶囊 */}
-            <div className="hidden xl:grid grid-cols-2 gap-x-3 gap-y-0.5 rounded-xl border border-slate-200 bg-slate-50/80 px-3 py-1.5 font-mono text-[10px] tnum">
-              <span className="text-slate-500">
+            {/* 通信统计胶囊 (独立白底模块 + 字号放大至 12px) */}
+            <div className="hidden xl:grid grid-cols-2 gap-x-4 gap-y-1 rounded-xl border border-slate-300/90 bg-white px-3.5 py-2 font-mono text-xs font-semibold tnum shadow-xs">
+              <span className="text-slate-600">
                 RX: <strong className="text-emerald-600">{telemetry.rxFrames}</strong>
               </span>
-              <span className="text-slate-500">
+              <span className="text-slate-600">
                 TX: <strong className="text-sky-600">{telemetry.txFrames}</strong>
               </span>
-              <span className="text-slate-500">
-                FPS: <strong className="text-slate-800">{telemetry.fps}Hz</strong>
+              <span className="text-slate-600">
+                FPS: <strong className="text-slate-900">{telemetry.fps}Hz</strong>
               </span>
-              <span className="text-slate-500">
+              <span className="text-slate-600">
                 CRC:{' '}
-                <strong className={telemetry.crcErrors > 0 ? 'text-red-600' : 'text-slate-400'}>
+                <strong className={telemetry.crcErrors > 0 ? 'text-red-600' : 'text-slate-500'}>
                   {telemetry.crcErrors}
                 </strong>
               </span>
             </div>
           </div>
 
-          {/* 3. 右侧硬件连接与安全急停操作台 */}
-          <div className="flex flex-wrap items-center gap-1.5">
+          {/* 3. 右侧硬件连接与安全急停操作台 (字号与高度放大) */}
+          <div className="flex flex-wrap items-center gap-2">
             <div
-              className={`flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 font-mono text-[11px] font-bold tnum ${
+              className={`flex h-9 items-center gap-2 rounded-lg border px-3 font-mono text-xs font-bold tnum shadow-2xs ${
                 connStatus.warning
                   ? 'border-red-300 bg-red-50 text-red-700'
                   : connStatus.connected
                     ? 'border-emerald-300 bg-emerald-50 text-emerald-700'
-                    : 'border-slate-200 bg-slate-50 text-slate-500'
+                    : 'border-slate-300 bg-white text-slate-700'
               }`}
             >
               <span
-                className={`h-2 w-2 rounded-full ${
+                className={`h-2.5 w-2.5 rounded-full ${
                   !connStatus.connected
                     ? 'bg-red-500'
                     : connStatus.mode === 'mock'
@@ -892,17 +892,17 @@ export function App() {
                       : 'bg-emerald-500 animate-pulse'
                 }`}
               />
-              <span className="max-w-[160px] truncate">{connStatus.label}</span>
+              <span className="max-w-[175px] truncate">{connStatus.label}</span>
             </div>
 
             {platformInfo.isTauri && (
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-1.5">
                 <select
                   value={selectedPort}
                   onChange={(e) => setSelectedPort(e.target.value)}
                   disabled={connStatus.connected}
                   title="选择物理串口"
-                  className="h-8 rounded-lg border border-slate-200 bg-white px-2 font-mono text-xs text-slate-800 outline-none focus:border-sky-500"
+                  className="h-9 rounded-lg border border-slate-300 bg-white px-2.5 font-mono text-xs font-semibold text-slate-800 shadow-2xs outline-none focus:border-sky-500"
                 >
                   {serialPorts.length === 0 ? (
                     <option value="">无可用串口</option>
@@ -919,9 +919,9 @@ export function App() {
                   onClick={handleRefreshPorts}
                   disabled={connStatus.connected}
                   title="扫描系统串口"
-                  className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-600 hover:border-sky-400 hover:text-sky-600 cursor-pointer disabled:opacity-40"
+                  className="flex h-9 w-9 items-center justify-center rounded-lg border border-slate-300 bg-white text-slate-700 shadow-2xs hover:border-sky-500 hover:text-sky-600 cursor-pointer disabled:opacity-40"
                 >
-                  <RefreshCw className="h-3.5 w-3.5" />
+                  <RefreshCw className="h-4 w-4" />
                 </button>
               </div>
             )}
@@ -931,7 +931,7 @@ export function App() {
               onChange={(e) => setBaudRate(Number(e.target.value))}
               disabled={connStatus.connected}
               title="波特率"
-              className="h-8 rounded-lg border border-slate-200 bg-white px-2 font-mono text-xs tnum text-slate-800 outline-none focus:border-sky-500"
+              className="h-9 rounded-lg border border-slate-300 bg-white px-2.5 font-mono text-xs font-semibold tnum text-slate-800 shadow-2xs outline-none focus:border-sky-500"
             >
               <option value={115200}>115200</option>
               <option value={921600}>921600</option>
@@ -943,16 +943,16 @@ export function App() {
               <button
                 type="button"
                 onClick={handleConnectHardware}
-                className="flex h-8 items-center gap-1 rounded-lg bg-gradient-to-b from-sky-500 to-sky-600 px-3 text-xs font-bold text-white shadow-xs hover:from-sky-600 hover:to-sky-700 cursor-pointer"
+                className="flex h-9 items-center gap-1.5 rounded-lg bg-gradient-to-b from-sky-500 to-sky-600 px-3.5 text-[13px] font-bold text-white shadow-xs hover:from-sky-600 hover:to-sky-700 cursor-pointer"
               >
-                <Zap className="h-3.5 w-3.5" />
+                <Zap className="h-4 w-4" />
                 连接串口
               </button>
             ) : (
               <button
                 type="button"
                 onClick={handleDisconnect}
-                className="flex h-8 items-center gap-1 rounded-lg border border-red-300 bg-red-50 px-3 text-xs font-bold text-red-700 hover:bg-red-100 cursor-pointer"
+                className="flex h-9 items-center gap-1.5 rounded-lg border border-red-300 bg-red-50 px-3.5 text-[13px] font-bold text-red-700 hover:bg-red-100 cursor-pointer"
               >
                 断开
               </button>
@@ -961,13 +961,13 @@ export function App() {
             <button
               type="button"
               onClick={handleToggleMock}
-              className={`flex h-8 items-center gap-1 rounded-lg border px-2.5 text-xs font-bold cursor-pointer transition-colors ${
+              className={`flex h-9 items-center gap-1.5 rounded-lg border px-3 text-[13px] font-bold cursor-pointer transition-colors shadow-2xs ${
                 connStatus.mode === 'mock'
-                  ? 'border-amber-500 bg-amber-500 text-white shadow-xs'
-                  : 'border-sky-200 bg-sky-50/70 text-sky-700 hover:bg-sky-100'
+                  ? 'border-amber-500 bg-amber-500 text-white'
+                  : 'border-slate-300 bg-white text-slate-700 hover:border-sky-400 hover:text-sky-700'
               }`}
             >
-              <Radio className="h-3.5 w-3.5" />
+              <Radio className="h-4 w-4" />
               {connStatus.mode === 'mock' ? '停止仿真' : '仿真模式'}
             </button>
 
@@ -978,9 +978,9 @@ export function App() {
                 updateVoltageDraft(0.0, true);
                 appendLog('warn', '【全局急停触发】发送 SetVoltage(0.0V) 停止输出并脱离闭环');
               }}
-              className="flex h-8 items-center gap-1 rounded-lg bg-gradient-to-b from-red-500 to-red-600 px-3 font-mono text-xs font-black tracking-wider text-white shadow-xs hover:from-red-600 hover:to-red-700 active:scale-95 cursor-pointer"
+              className="flex h-9 items-center gap-1.5 rounded-lg bg-gradient-to-b from-red-500 to-red-600 px-3.5 font-mono text-[13px] font-black tracking-wider text-white shadow-xs hover:from-red-600 hover:to-red-700 active:scale-95 cursor-pointer"
             >
-              <OctagonAlert className="h-3.5 w-3.5" />
+              <OctagonAlert className="h-4 w-4" />
               STOP 0V
             </button>
           </div>
@@ -988,35 +988,35 @@ export function App() {
       </header>
 
       {/* =====================================================================
-          主工作台：中央全画幅示波器 + 底部参数/报文双舱 + 右侧推子主控舱
+          主工作台：模块间采用不同明度色阶区分 (#f1f5f9 / #e8eff7 / #dfe7f0 / #ffffff)
          ===================================================================== */}
-      <div className="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-[1fr_400px] xl:grid-cols-[1fr_430px] pb-14 lg:pb-0">
+      <div className="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-[1fr_410px] xl:grid-cols-[1fr_440px] pb-14 lg:pb-0">
         {/* -------------------------------------------------------------------
             左/中主舞台：全画幅示波器 + 底部参数与报文双联舱
            ------------------------------------------------------------------- */}
-        <div className="flex flex-col min-h-0 border-r border-sky-200/80">
-          {/* A. 中央舞台：双通道数字示波器 */}
+        <div className="flex flex-col min-h-0 border-r border-slate-300">
+          {/* A. 中央舞台：双通道数字示波器 (工具栏色阶 #edf2f7 + 画布色阶 #f1f5f9/#e8eff7) */}
           <div
-            className={`flex-1 min-h-[300px] flex flex-col bg-white ${
+            className={`flex-1 min-h-[290px] flex flex-col bg-[#f1f5f9] ${
               mobileTab === 'control' || mobileTab === 'params' || mobileTab === 'terminal'
                 ? 'hidden lg:flex'
                 : 'flex'
             }`}
           >
-            {/* 示波器工具横条 */}
-            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-sky-100 bg-gradient-to-r from-sky-50/80 via-white to-sky-50/50 px-3.5 py-1.5">
-              <div className="flex items-center gap-2">
+            {/* 示波器工具横条 (字号放大至 13px~14px) */}
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-300/90 bg-[#edf2f7] px-4 py-2">
+              <div className="flex items-center gap-2.5">
                 <Activity className="h-4 w-4 text-sky-600" />
-                <span className="text-xs font-extrabold tracking-wide text-slate-800">
+                <span className="text-sm font-extrabold tracking-wide text-slate-800">
                   双通道实时动态示波器
                 </span>
-                <span className="rounded-md bg-emerald-100 border border-emerald-200 px-1.5 py-0.5 font-mono text-[10px] font-bold text-emerald-700">
+                <span className="rounded-md bg-emerald-100 border border-emerald-300 px-2 py-0.5 font-mono text-xs font-bold text-emerald-800">
                   60 FPS
                 </span>
               </div>
 
-              <div className="flex flex-wrap items-center gap-1.5">
-                <div className="flex rounded-lg border border-sky-200 bg-sky-50/60 p-0.5">
+              <div className="flex flex-wrap items-center gap-2">
+                <div className="flex rounded-lg border border-slate-300 bg-white p-0.5 shadow-2xs">
                   {[250, 500, 1000, 2000].map((pts) => (
                     <button
                       key={pts}
@@ -1024,7 +1024,7 @@ export function App() {
                       onClick={() =>
                         setScopeConfig((prev) => ({ ...prev, maxPoints: pts }))
                       }
-                      className={`rounded-md px-2 py-0.5 font-mono text-[10px] font-bold cursor-pointer transition-colors ${
+                      className={`rounded-md px-2.5 py-1 font-mono text-xs font-bold cursor-pointer transition-colors ${
                         scopeConfig.maxPoints === pts
                           ? 'bg-sky-600 text-white shadow-2xs'
                           : 'text-slate-600 hover:text-sky-700'
@@ -1043,10 +1043,10 @@ export function App() {
                       showTargetRef: !prev.showTargetRef,
                     }))
                   }
-                  className={`rounded-lg border px-2.5 py-1 text-[11px] font-bold cursor-pointer transition-colors ${
+                  className={`rounded-lg border px-3 py-1 text-xs font-bold cursor-pointer transition-colors shadow-2xs ${
                     scopeConfig.showTargetRef
-                      ? 'border-sky-300 bg-sky-100/80 text-sky-800'
-                      : 'border-slate-200 bg-white text-slate-500'
+                      ? 'border-sky-400 bg-sky-100 text-sky-800'
+                      : 'border-slate-300 bg-white text-slate-600'
                   }`}
                 >
                   参考线: {scopeConfig.showTargetRef ? 'ON' : 'OFF'}
@@ -1057,19 +1057,19 @@ export function App() {
                   onClick={() =>
                     setScopeConfig((prev) => ({ ...prev, isPaused: !prev.isPaused }))
                   }
-                  className={`flex items-center gap-1 rounded-lg border px-2.5 py-1 text-[11px] font-bold cursor-pointer ${
+                  className={`flex items-center gap-1 rounded-lg border px-3 py-1 text-xs font-bold cursor-pointer shadow-2xs ${
                     scopeConfig.isPaused
-                      ? 'border-amber-400 bg-amber-500 text-white'
-                      : 'border-slate-200 bg-white text-slate-700 hover:border-sky-300 hover:text-sky-700'
+                      ? 'border-amber-500 bg-amber-500 text-white'
+                      : 'border-slate-300 bg-white text-slate-700 hover:border-sky-400 hover:text-sky-700'
                   }`}
                 >
                   {scopeConfig.isPaused ? (
                     <>
-                      <Play className="h-3 w-3" /> 继续
+                      <Play className="h-3.5 w-3.5" /> 继续
                     </>
                   ) : (
                     <>
-                      <Pause className="h-3 w-3" /> 暂停
+                      <Pause className="h-3.5 w-3.5" /> 暂停
                     </>
                   )}
                 </button>
@@ -1085,17 +1085,17 @@ export function App() {
                       tMax: null,
                     }));
                   }}
-                  className="flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-[11px] font-bold text-slate-600 hover:border-red-300 hover:text-red-600 cursor-pointer"
+                  className="flex items-center gap-1 rounded-lg border border-slate-300 bg-white px-3 py-1 text-xs font-bold text-slate-700 hover:border-red-300 hover:text-red-600 cursor-pointer shadow-2xs"
                 >
-                  <Trash2 className="h-3 w-3" /> 清空
+                  <Trash2 className="h-3.5 w-3.5" /> 清空
                 </button>
 
                 <button
                   type="button"
                   onClick={handleExportCsv}
-                  className="flex items-center gap-1 rounded-lg border border-sky-200 bg-sky-50/70 px-2.5 py-1 font-mono text-[11px] font-bold text-sky-700 hover:bg-sky-100 cursor-pointer"
+                  className="flex items-center gap-1 rounded-lg border border-sky-300 bg-white px-3 py-1 font-mono text-xs font-bold text-sky-700 hover:bg-sky-50 cursor-pointer shadow-2xs"
                 >
-                  <Download className="h-3 w-3" /> CSV
+                  <Download className="h-3.5 w-3.5" /> CSV
                 </button>
               </div>
             </div>
@@ -1116,68 +1116,68 @@ export function App() {
             </div>
           </div>
 
-          {/* B. 底部双联机架舱：6 参数调优 (RAM / Flash) + 14B 报文流 */}
+          {/* B. 底部双联机架舱 (高度增大至 290px，底部全部字号放大，色阶 #e2e8f0 / #eaeff5) */}
           <div
-            className={`shrink-0 lg:h-[255px] border-t border-sky-200/80 bg-[#f4f8fc] flex flex-col ${
+            className={`shrink-0 lg:h-[290px] border-t border-slate-300 bg-[#eaeff5] flex flex-col ${
               mobileTab === 'control' || mobileTab === 'scope'
                 ? 'hidden lg:flex'
                 : 'flex'
             }`}
           >
-            {/* 机架顶部切换与保存栏 */}
-            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-sky-100 bg-white px-3.5 py-1.5">
-              <div className="flex items-center gap-1.5">
+            {/* 机架顶部切换与保存栏 (色阶 #dfe6ee，字号 13px) */}
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-300 bg-[#dfe6ee] px-4 py-2">
+              <div className="flex items-center gap-2">
                 <button
                   type="button"
                   onClick={() => setBottomDock('split')}
-                  className={`hidden xl:inline-flex items-center gap-1 rounded-md px-2.5 py-1 text-[11px] font-bold cursor-pointer transition-colors ${
+                  className={`hidden xl:inline-flex items-center gap-1.5 rounded-lg px-3 py-1 text-xs font-bold cursor-pointer transition-colors ${
                     bottomDock === 'split'
-                      ? 'bg-sky-600 text-white shadow-2xs'
-                      : 'bg-slate-100 text-slate-600 hover:bg-sky-50 hover:text-sky-700'
+                      ? 'bg-sky-600 text-white shadow-xs'
+                      : 'bg-white/80 text-slate-700 hover:bg-white hover:text-sky-700'
                   }`}
                 >
-                  <Columns2 className="h-3 w-3" />
+                  <Columns2 className="h-3.5 w-3.5" />
                   分屏同显
                 </button>
                 <button
                   type="button"
                   onClick={() => setBottomDock('params')}
-                  className={`inline-flex items-center gap-1 rounded-md px-2.5 py-1 text-[11px] font-bold cursor-pointer transition-colors ${
+                  className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1 text-xs font-bold cursor-pointer transition-colors ${
                     bottomDock === 'params'
-                      ? 'bg-sky-600 text-white shadow-2xs'
-                      : 'bg-slate-100 text-slate-600 hover:bg-sky-50 hover:text-sky-700'
+                      ? 'bg-sky-600 text-white shadow-xs'
+                      : 'bg-white/80 text-slate-700 hover:bg-white hover:text-sky-700'
                   }`}
                 >
-                  <SlidersHorizontal className="h-3 w-3" />
+                  <SlidersHorizontal className="h-3.5 w-3.5" />
                   6 参数调优 (PID / EKF)
                 </button>
                 <button
                   type="button"
                   onClick={() => setBottomDock('bus')}
-                  className={`inline-flex items-center gap-1 rounded-md px-2.5 py-1 text-[11px] font-bold cursor-pointer transition-colors ${
+                  className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1 text-xs font-bold cursor-pointer transition-colors ${
                     bottomDock === 'bus'
-                      ? 'bg-sky-600 text-white shadow-2xs'
-                      : 'bg-slate-100 text-slate-600 hover:bg-sky-50 hover:text-sky-700'
+                      ? 'bg-sky-600 text-white shadow-xs'
+                      : 'bg-white/80 text-slate-700 hover:bg-white hover:text-sky-700'
                   }`}
                 >
-                  <Terminal className="h-3 w-3" />
+                  <Terminal className="h-3.5 w-3.5" />
                   通信报文 ({logs.length})
                 </button>
               </div>
 
-              {/* 参数读写与停机保存动作 */}
+              {/* 参数读写与停机保存动作 (字号放大至 12px~13px) */}
               <div className="flex items-center gap-2">
                 <span
-                  className={`rounded-md border px-2 py-0.5 font-mono text-[10px] font-bold ${
+                  className={`rounded-lg border px-2.5 py-1 font-mono text-xs font-bold ${
                     flashSaveStatus.tone === 'saved'
-                      ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
+                      ? 'border-emerald-300 bg-emerald-50 text-emerald-800'
                       : flashSaveStatus.tone === 'error'
-                        ? 'border-red-200 bg-red-50 text-red-700'
+                        ? 'border-red-300 bg-red-50 text-red-700'
                         : flashSaveStatus.tone === 'dirty' ||
                             flashSaveStatus.tone === 'saving' ||
                             flashSaveStatus.tone === 'unknown'
-                          ? 'border-amber-200 bg-amber-50 text-amber-700'
-                          : 'border-sky-200 bg-sky-50 text-sky-700'
+                          ? 'border-amber-300 bg-amber-50 text-amber-800'
+                          : 'border-slate-300 bg-white text-slate-700'
                   }`}
                 >
                   {flashSaveStatus.text}
@@ -1185,31 +1185,31 @@ export function App() {
                 <button
                   type="button"
                   onClick={syncDeviceState}
-                  className="flex items-center gap-1 rounded-md border border-slate-200 bg-white px-2.5 py-1 text-[11px] font-bold text-slate-700 hover:border-sky-400 hover:text-sky-600 cursor-pointer"
+                  className="flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3 py-1 text-xs font-bold text-slate-700 hover:border-sky-500 hover:text-sky-600 cursor-pointer shadow-2xs"
                 >
-                  <DownloadCloud className="h-3 w-3" /> 读取 RAM
+                  <DownloadCloud className="h-3.5 w-3.5" /> 读取 RAM
                 </button>
                 <button
                   type="button"
                   onClick={handleApplyParamsToRam}
-                  className="flex items-center gap-1 rounded-md bg-sky-600 px-2.5 py-1 text-[11px] font-bold text-white hover:bg-sky-700 cursor-pointer shadow-2xs"
+                  className="flex items-center gap-1.5 rounded-lg bg-sky-600 px-3 py-1 text-xs font-bold text-white hover:bg-sky-700 cursor-pointer shadow-xs"
                 >
-                  <Upload className="h-3 w-3" /> 写入 RAM
+                  <Upload className="h-3.5 w-3.5" /> 写入 RAM
                 </button>
                 <button
                   type="button"
                   onClick={handleSafeSaveFlash}
                   disabled={flashSaveStatus.tone === 'saving'}
-                  className="flex items-center gap-1 rounded-md border border-sky-500 bg-sky-50 px-2.5 py-1 text-[11px] font-extrabold text-sky-700 hover:bg-sky-600 hover:text-white cursor-pointer transition-colors"
+                  className="flex items-center gap-1.5 rounded-lg border border-sky-600 bg-white px-3 py-1 text-xs font-extrabold text-sky-700 hover:bg-sky-600 hover:text-white cursor-pointer transition-colors shadow-2xs"
                 >
-                  <Save className="h-3 w-3" /> 停机存 Flash
+                  <Save className="h-3.5 w-3.5" /> 停机存 Flash
                 </button>
               </div>
             </div>
 
             {/* 机架内容区 */}
             <div className="flex-1 min-h-0 grid grid-cols-1 xl:grid-cols-12 overflow-hidden">
-              {/* 1) 6通道合成器式参数条 */}
+              {/* 1) 6通道合成器式参数条 (底色 #eaeff5 + 卡片 #ffffff，字号全面放大至 12px~14px) */}
               <div
                 className={`${
                   bottomDock === 'bus'
@@ -1217,9 +1217,9 @@ export function App() {
                     : bottomDock === 'params'
                       ? 'xl:col-span-12'
                       : 'xl:col-span-7'
-                } p-2.5 overflow-y-auto border-r border-sky-100`}
+                } p-3 overflow-y-auto border-r border-slate-300`}
               >
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2 h-full">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2.5 h-full">
                   {PARAMETER_META_LIST.map((meta) => {
                     const currentRam = ramParams[meta.id] ?? meta.defaultVal;
                     const draftStr = draftParams[meta.id] ?? currentRam.toFixed(meta.decimals);
@@ -1230,33 +1230,33 @@ export function App() {
                     return (
                       <div
                         key={meta.id}
-                        className={`flex flex-col justify-between rounded-xl border p-2.5 transition-all shadow-2xs ${
+                        className={`flex flex-col justify-between rounded-xl border p-3 transition-all shadow-xs ${
                           isDirty
-                            ? 'border-amber-400 bg-amber-50/70'
-                            : 'border-sky-100 bg-white hover:border-sky-300'
+                            ? 'border-amber-400 bg-amber-50/90'
+                            : 'border-slate-300/90 bg-white hover:border-sky-400'
                         }`}
                       >
                         <div>
                           <div className="flex items-center justify-between">
-                            <span className="font-mono text-xs font-black text-slate-900">
+                            <span className="font-mono text-sm font-black text-slate-900">
                               {meta.shortName}
                             </span>
                             <span
-                              className={`h-2 w-2 rounded-full ${
+                              className={`h-2.5 w-2.5 rounded-full ${
                                 isDirty ? 'bg-amber-500 animate-pulse' : 'bg-emerald-500'
                               }`}
                               title={isDirty ? '已修改 (待写入 RAM)' : '与下位机 RAM 一致'}
                             />
                           </div>
-                          <div className="mt-1 text-[10px] text-slate-500 leading-tight line-clamp-2">
+                          <div className="mt-1.5 text-xs font-medium text-slate-600 leading-snug">
                             {meta.description}
                           </div>
                         </div>
 
-                        <div className="mt-2 space-y-1.5">
-                          <div className="flex items-center justify-between rounded-md bg-sky-50/90 border border-sky-100 px-1.5 py-0.5 font-mono text-[10px] tnum">
-                            <span className="text-slate-400">RAM</span>
-                            <strong className="text-sky-700">
+                        <div className="mt-2.5 space-y-1.5">
+                          <div className="flex items-center justify-between rounded-md bg-slate-100 border border-slate-200 px-2 py-1 font-mono text-xs tnum">
+                            <span className="font-semibold text-slate-500">RAM</span>
+                            <strong className="text-sky-700 font-bold">
                               {currentRam.toFixed(meta.decimals)}
                             </strong>
                           </div>
@@ -1270,7 +1270,7 @@ export function App() {
                               setDraftParams((prev) => ({ ...prev, [meta.id]: val }));
                               setFlashSaveStatus({ text: '● 待写入 RAM', tone: 'dirty' });
                             }}
-                            className="h-8 w-full rounded-md border border-slate-200 bg-slate-50/60 px-1.5 text-right font-mono text-xs font-black tnum text-slate-900 outline-none focus:border-sky-500 focus:bg-white"
+                            className="h-9 w-full rounded-lg border border-slate-300 bg-[#f8fafc] px-2 text-right font-mono text-sm font-black tnum text-slate-900 outline-none focus:border-sky-500 focus:bg-white"
                           />
                         </div>
                       </div>
@@ -1279,7 +1279,7 @@ export function App() {
                 </div>
               </div>
 
-              {/* 2) 14字节报文总线流 */}
+              {/* 2) 14字节报文总线流 (色阶 #f1f5f9，文字放大至 12px) */}
               <div
                 className={`${
                   bottomDock === 'params'
@@ -1287,35 +1287,35 @@ export function App() {
                     : bottomDock === 'bus'
                       ? 'xl:col-span-12'
                       : 'xl:col-span-5'
-                } flex flex-col min-h-0 bg-white`}
+                } flex flex-col min-h-0 bg-[#f1f5f9]`}
               >
-                <div className="flex items-center justify-between border-b border-slate-100 bg-sky-50/40 px-2.5 py-1 text-[10px]">
-                  <span className="font-mono font-bold text-slate-600">
+                <div className="flex items-center justify-between border-b border-slate-300 bg-[#e5ecf4] px-3 py-1.5 text-xs">
+                  <span className="font-mono font-bold text-slate-700">
                     报文监视器 (TX / 0x82 常显)
                   </span>
-                  <div className="flex items-center gap-2.5">
-                    <label className="flex items-center gap-1 text-slate-600 cursor-pointer">
+                  <div className="flex items-center gap-3">
+                    <label className="flex items-center gap-1.5 font-semibold text-slate-700 cursor-pointer">
                       <input
                         type="checkbox"
                         checked={showRaw0x81}
                         onChange={(e) => setShowRaw0x81(e.target.checked)}
-                        className="accent-sky-600"
+                        className="h-3.5 w-3.5 accent-sky-600"
                       />
                       <span>打印 0x81</span>
                     </label>
-                    <label className="flex items-center gap-1 text-slate-600 cursor-pointer">
+                    <label className="flex items-center gap-1.5 font-semibold text-slate-700 cursor-pointer">
                       <input
                         type="checkbox"
                         checked={pauseLogScroll}
                         onChange={(e) => setPauseLogScroll(e.target.checked)}
-                        className="accent-sky-600"
+                        className="h-3.5 w-3.5 accent-sky-600"
                       />
                       <span>暂停</span>
                     </label>
                     <button
                       type="button"
                       onClick={() => setLogs([])}
-                      className="text-slate-400 hover:text-red-500 cursor-pointer font-bold"
+                      className="text-slate-600 hover:text-red-600 cursor-pointer font-bold"
                     >
                       清空
                     </button>
@@ -1323,35 +1323,35 @@ export function App() {
                 </div>
                 <div
                   ref={logContainerRef}
-                  className="flex-1 overflow-y-auto p-2 font-mono text-[10.5px] leading-relaxed tnum bg-white"
+                  className="flex-1 overflow-y-auto p-2.5 font-mono text-xs leading-relaxed tnum bg-[#f4f7fb]"
                 >
                   {logs.length === 0 ? (
-                    <div className="text-slate-400">暂无报文记录...</div>
+                    <div className="text-slate-500">暂无报文记录...</div>
                   ) : (
                     logs.map((entry) => (
                       <div
                         key={entry.id}
-                        className="mb-1 flex items-baseline gap-1.5 border-b border-slate-100 pb-0.5"
+                        className="mb-1.5 flex items-baseline gap-2 border-b border-slate-200/80 pb-1"
                       >
-                        <span className="shrink-0 text-[9.5px] text-slate-400">
+                        <span className="shrink-0 text-[11px] font-medium text-slate-500">
                           {entry.time}
                         </span>
                         <span
-                          className={`shrink-0 rounded px-1 py-0.2 text-[9px] font-black ${
+                          className={`shrink-0 rounded px-1.5 py-0.5 text-[10px] font-black ${
                             entry.level === 'tx'
-                              ? 'bg-sky-100 text-sky-700'
+                              ? 'bg-sky-100 text-sky-800 border border-sky-200'
                               : entry.level === 'rx'
-                                ? 'bg-emerald-100 text-emerald-700'
+                                ? 'bg-emerald-100 text-emerald-800 border border-emerald-200'
                                 : entry.level === 'warn'
-                                  ? 'bg-amber-100 text-amber-800'
+                                  ? 'bg-amber-100 text-amber-900 border border-amber-200'
                                   : entry.level === 'error'
-                                    ? 'bg-red-100 text-red-700'
-                                    : 'bg-indigo-100 text-indigo-700'
+                                    ? 'bg-red-100 text-red-800 border border-red-200'
+                                    : 'bg-indigo-100 text-indigo-800 border border-indigo-200'
                           }`}
                         >
                           {entry.dir}
                         </span>
-                        <span className="break-all text-slate-700">
+                        <span className="break-all font-medium text-slate-800">
                           {entry.content}
                         </span>
                       </div>
@@ -1364,51 +1364,51 @@ export function App() {
         </div>
 
         {/* -------------------------------------------------------------------
-            右侧推子主控舱：二选一模式切换 + 双参数推子控制
+            右侧推子主控舱 (底色阶 #edf2f7 + 内部独立白卡片 #ffffff)
            ------------------------------------------------------------------- */}
         <aside
-          className={`flex flex-col min-h-0 bg-white overflow-y-auto ${
+          className={`flex flex-col min-h-0 bg-[#edf2f7] overflow-y-auto ${
             mobileTab === 'scope' || mobileTab === 'params' || mobileTab === 'terminal'
               ? 'hidden lg:flex'
               : 'flex'
           }`}
         >
-          {/* 1. 顶部模式二选一切换器 */}
-          <div className="border-b border-sky-100 bg-gradient-to-b from-sky-50/60 to-white p-3.5">
-            <div className="mb-2 flex items-center justify-between text-[11px] font-bold text-slate-500">
+          {/* 1. 顶部模式二选一切换器 (色阶 #e2e9f1) */}
+          <div className="border-b border-slate-300 bg-[#e2e9f1] p-3.5">
+            <div className="mb-2 flex items-center justify-between text-xs font-bold text-slate-600">
               <span>控制模式切换</span>
               <button
                 type="button"
                 onClick={handleQueryState}
                 disabled={!connStatus.connected}
-                className="font-mono text-sky-600 hover:underline cursor-pointer disabled:opacity-40"
+                className="font-mono text-sky-700 hover:underline cursor-pointer disabled:opacity-40"
               >
                 ↻ GetState (0x13)
               </button>
             </div>
-            <div className="grid grid-cols-2 gap-1.5 rounded-xl border border-sky-200/80 bg-sky-50/70 p-1">
+            <div className="grid grid-cols-2 gap-1.5 rounded-xl border border-slate-300 bg-[#d5e0ec] p-1">
               <button
                 type="button"
                 onClick={() => setActiveMode('voltage')}
-                className={`flex items-center justify-center gap-1.5 rounded-lg py-2.5 text-xs font-black tracking-wide transition-all cursor-pointer ${
+                className={`flex items-center justify-center gap-1.5 rounded-lg py-2.5 text-[13px] font-black tracking-wide transition-all cursor-pointer ${
                   activeMode === 'voltage'
                     ? 'bg-sky-600 text-white shadow-sm'
-                    : 'text-slate-600 hover:text-sky-700 hover:bg-white/60'
+                    : 'text-slate-700 hover:text-sky-700 hover:bg-white/70'
                 }`}
               >
-                <Zap className="h-3.5 w-3.5" />
+                <Zap className="h-4 w-4" />
                 ⚡ 手动电压模式
               </button>
               <button
                 type="button"
                 onClick={() => setActiveMode('torque')}
-                className={`flex items-center justify-center gap-1.5 rounded-lg py-2.5 text-xs font-black tracking-wide transition-all cursor-pointer ${
+                className={`flex items-center justify-center gap-1.5 rounded-lg py-2.5 text-[13px] font-black tracking-wide transition-all cursor-pointer ${
                   activeMode === 'torque'
                     ? 'bg-amber-500 text-white shadow-sm'
-                    : 'text-slate-600 hover:text-amber-700 hover:bg-white/60'
+                    : 'text-slate-700 hover:text-amber-700 hover:bg-white/70'
                 }`}
               >
-                <Target className="h-3.5 w-3.5" />
+                <Target className="h-4 w-4" />
                 🎯 扭矩闭环模式
               </button>
             </div>
@@ -1418,23 +1418,23 @@ export function App() {
           {activeMode === 'voltage' ? (
             <div className="flex-1 flex flex-col justify-between p-4 space-y-4">
               <div className="space-y-3.5">
-                {/* 设定值 vs 下位机已生效对比窗 */}
-                <div className="rounded-xl border border-sky-200 bg-gradient-to-br from-sky-50 via-white to-sky-100/50 p-3.5 shadow-2xs">
-                  <div className="flex items-center justify-between text-[11px] font-bold text-sky-800">
+                {/* 设定值 vs 下位机已生效对比窗 (独立白卡片) */}
+                <div className="rounded-xl border border-slate-300 bg-white p-4 shadow-xs">
+                  <div className="flex items-center justify-between text-xs font-bold text-sky-800">
                     <span>电压开环控制 (V_target)</span>
                     <span
-                      className={`rounded-md px-2 py-0.5 text-[10px] font-bold ${
+                      className={`rounded-md px-2 py-0.5 text-xs font-bold ${
                         isVoltageSynced
-                          ? 'bg-emerald-100 text-emerald-700 border border-emerald-200'
-                          : 'bg-amber-100 text-amber-800 border border-amber-200'
+                          ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
+                          : 'bg-amber-100 text-amber-800 border border-amber-300'
                       }`}
                     >
                       {isVoltageSynced ? '● 已同步' : '◐ 待下发'}
                     </span>
                   </div>
-                  <div className="mt-2 flex items-baseline justify-between font-mono tnum">
+                  <div className="mt-2.5 flex items-baseline justify-between font-mono tnum">
                     <div>
-                      <div className="text-[10px] font-semibold text-slate-500">
+                      <div className="text-xs font-semibold text-slate-500">
                         设定电压 (SET)
                       </div>
                       <div className="text-3xl font-black text-sky-600">
@@ -1442,10 +1442,10 @@ export function App() {
                       </div>
                     </div>
                     <div className="text-right">
-                      <div className="text-[10px] font-semibold text-slate-500">
+                      <div className="text-xs font-semibold text-slate-500">
                         已生效 (MCU)
                       </div>
-                      <div className="text-xl font-extrabold text-slate-800">
+                      <div className="text-2xl font-extrabold text-slate-800">
                         {appliedVoltage.toFixed(2)} <span className="text-xs text-slate-500">V</span>
                       </div>
                     </div>
@@ -1454,21 +1454,21 @@ export function App() {
 
                 {/* 闭环互锁警告横幅 */}
                 {torqueEnabled && (
-                  <div className="rounded-xl border-2 border-amber-300 bg-amber-50 p-3">
-                    <div className="flex items-center gap-2 text-xs font-black text-amber-800">
+                  <div className="rounded-xl border-2 border-amber-400 bg-amber-50 p-3.5 shadow-xs">
+                    <div className="flex items-center gap-2 text-xs font-black text-amber-900">
                       <Lock className="h-4 w-4 text-amber-600" />
                       扭矩闭环运行中 (ModeConflict 互锁)
                     </div>
-                    <p className="mt-1 text-[11px] text-amber-700 leading-relaxed">
+                    <p className="mt-1 text-xs text-amber-800 leading-relaxed">
                       闭环开启时禁止发送非零手动电压。请先关闭闭环或点击 0V 停机。
                     </p>
                   </div>
                 )}
 
-                {/* 控制参数 1：目标输出电压推子与预设矩阵 */}
-                <div className="rounded-xl border border-sky-100 bg-sky-50/40 p-3.5">
-                  <div className="mb-2 flex items-center justify-between text-xs font-bold">
-                    <span className="text-slate-700">
+                {/* 控制参数 1：目标输出电压推子与预设矩阵 (独立白卡片) */}
+                <div className="rounded-xl border border-slate-300 bg-white p-4 shadow-xs">
+                  <div className="mb-2 flex items-center justify-between text-[13px] font-bold">
+                    <span className="text-slate-800">
                       目标电压设定
                     </span>
                     <span className="font-mono text-sky-600">0.0 ~ 18.0 V</span>
@@ -1485,7 +1485,7 @@ export function App() {
                       className="studio-fader-blue w-full"
                     />
                   </div>
-                  <div className="mt-2.5 grid grid-cols-4 gap-1.5">
+                  <div className="mt-2.5 grid grid-cols-4 gap-2">
                     {VOLTAGE_PRESETS.map((v) => {
                       const active = Math.abs(draftVoltage - v) < 0.05;
                       return (
@@ -1494,10 +1494,10 @@ export function App() {
                           type="button"
                           disabled={torqueEnabled}
                           onClick={() => updateVoltageDraft(v, autoSyncVoltage)}
-                          className={`rounded-lg border py-2 font-mono text-xs font-bold tnum transition-all cursor-pointer disabled:opacity-40 disabled:pointer-events-none ${
+                          className={`rounded-lg border py-2 font-mono text-[13px] font-bold tnum transition-all cursor-pointer disabled:opacity-40 disabled:pointer-events-none ${
                             active
                               ? 'border-sky-600 bg-sky-600 text-white shadow-xs'
-                              : 'border-sky-200/80 bg-white text-slate-700 hover:border-sky-400 hover:bg-sky-50'
+                              : 'border-slate-300 bg-[#f8fafc] text-slate-700 hover:border-sky-500 hover:bg-sky-50'
                           }`}
                         >
                           {v.toFixed(1)}V
@@ -1507,20 +1507,20 @@ export function App() {
                   </div>
                 </div>
 
-                {/* 控制参数 2：步进微调增量 */}
-                <div className="rounded-xl border border-sky-100 bg-sky-50/40 p-3.5">
-                  <div className="mb-2 flex items-center justify-between text-xs font-bold">
-                    <span className="text-slate-700">
+                {/* 控制参数 2：步进微调增量 (独立白卡片) */}
+                <div className="rounded-xl border border-slate-300 bg-white p-4 shadow-xs">
+                  <div className="mb-2 flex items-center justify-between text-[13px] font-bold">
+                    <span className="text-slate-800">
                       步进微调 (Step)
                     </span>
-                    <span className="font-mono text-[11px] text-slate-400">±0.2V / ±0.5V / ±1.0V</span>
+                    <span className="font-mono text-xs text-slate-500">±0.2V / ±0.5V / ±1.0V</span>
                   </div>
-                  <div className="flex items-center gap-1.5">
+                  <div className="flex items-center gap-2">
                     <button
                       type="button"
                       disabled={torqueEnabled}
                       onClick={() => updateVoltageDraft(draftVoltage - 0.2, autoSyncVoltage)}
-                      className="h-10 w-16 rounded-lg border border-sky-200 bg-white font-mono text-xs font-black text-slate-700 hover:border-sky-500 hover:text-sky-600 cursor-pointer disabled:opacity-40"
+                      className="h-10 w-16 rounded-lg border border-slate-300 bg-[#f8fafc] font-mono text-[13px] font-black text-slate-700 hover:border-sky-500 hover:text-sky-600 cursor-pointer disabled:opacity-40"
                     >
                       -0.2V
                     </button>
@@ -1535,18 +1535,18 @@ export function App() {
                       onKeyDown={(e) => {
                         if (e.key === 'Enter') sendTargetVoltage(draftVoltage);
                       }}
-                      className="h-10 flex-1 rounded-lg border border-sky-200 bg-white text-center font-mono text-base font-black tnum text-slate-900 outline-none focus:border-sky-500 disabled:opacity-50"
+                      className="h-10 flex-1 rounded-lg border border-slate-300 bg-[#f8fafc] text-center font-mono text-base font-black tnum text-slate-900 outline-none focus:border-sky-500 focus:bg-white disabled:opacity-50"
                     />
                     <button
                       type="button"
                       disabled={torqueEnabled}
                       onClick={() => updateVoltageDraft(draftVoltage + 0.2, autoSyncVoltage)}
-                      className="h-10 w-16 rounded-lg border border-sky-200 bg-white font-mono text-xs font-black text-slate-700 hover:border-sky-500 hover:text-sky-600 cursor-pointer disabled:opacity-40"
+                      className="h-10 w-16 rounded-lg border border-slate-300 bg-[#f8fafc] font-mono text-[13px] font-black text-slate-700 hover:border-sky-500 hover:text-sky-600 cursor-pointer disabled:opacity-40"
                     >
                       +0.2V
                     </button>
                   </div>
-                  <div className="mt-2 grid grid-cols-4 gap-1.5">
+                  <div className="mt-2 grid grid-cols-4 gap-2">
                     {[-1.0, -0.5, 0.5, 1.0].map((delta) => (
                       <button
                         key={delta}
@@ -1555,7 +1555,7 @@ export function App() {
                         onClick={() =>
                           updateVoltageDraft(draftVoltage + delta, autoSyncVoltage)
                         }
-                        className="rounded-md border border-sky-200/70 bg-white py-1.5 font-mono text-[11px] font-bold text-slate-600 hover:border-sky-400 hover:text-sky-600 cursor-pointer disabled:opacity-40"
+                        className="rounded-lg border border-slate-300 bg-[#f8fafc] py-1.5 font-mono text-xs font-bold text-slate-700 hover:border-sky-500 hover:text-sky-600 cursor-pointer disabled:opacity-40"
                       >
                         {delta > 0 ? `+${delta.toFixed(1)}V` : `${delta.toFixed(1)}V`}
                       </button>
@@ -1564,7 +1564,7 @@ export function App() {
                 </div>
 
                 {/* 实时自动下发开关 */}
-                <label className="flex items-center justify-between rounded-lg border border-sky-100 bg-sky-50/50 px-3 py-2 text-xs font-medium text-slate-600 cursor-pointer">
+                <label className="flex items-center justify-between rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-xs font-semibold text-slate-700 shadow-2xs cursor-pointer">
                   <span>拖动滑块或步进时自动下发 (20Hz)</span>
                   <input
                     type="checkbox"
@@ -1581,7 +1581,7 @@ export function App() {
                   type="button"
                   disabled={torqueEnabled}
                   onClick={() => sendTargetVoltage(draftVoltage)}
-                  className="flex h-11 items-center justify-center gap-2 rounded-xl bg-gradient-to-b from-sky-500 to-sky-600 text-xs font-black text-white shadow-sm hover:from-sky-600 hover:to-sky-700 cursor-pointer disabled:opacity-45 disabled:pointer-events-none"
+                  className="flex h-11 items-center justify-center gap-2 rounded-xl bg-gradient-to-b from-sky-500 to-sky-600 text-[13px] font-black text-white shadow-sm hover:from-sky-600 hover:to-sky-700 cursor-pointer disabled:opacity-45 disabled:pointer-events-none"
                 >
                   {torqueEnabled ? (
                     <>
@@ -1601,7 +1601,7 @@ export function App() {
                     updateVoltageDraft(0.0, true);
                     appendLog('warn', '【软件停机】发送 0.00V 停止输出');
                   }}
-                  className="flex h-11 items-center justify-center gap-2 rounded-xl bg-gradient-to-b from-red-500 to-red-600 text-xs font-black text-white shadow-sm hover:from-red-600 hover:to-red-700 cursor-pointer"
+                  className="flex h-11 items-center justify-center gap-2 rounded-xl bg-gradient-to-b from-red-500 to-red-600 text-[13px] font-black text-white shadow-sm hover:from-red-600 hover:to-red-700 cursor-pointer"
                 >
                   <OctagonAlert className="h-4 w-4" />
                   软件停机 (0V)
@@ -1612,23 +1612,23 @@ export function App() {
             /* ================= 扭矩闭环控制面板 ================= */
             <div className="flex-1 flex flex-col justify-between p-4 space-y-3.5">
               <div className="space-y-3.5">
-                {/* 设定扭矩 vs 下位机已接受对比窗 */}
-                <div className="rounded-xl border border-amber-200 bg-gradient-to-br from-amber-50 via-white to-orange-50/60 p-3.5 shadow-2xs">
-                  <div className="flex items-center justify-between text-[11px] font-bold text-amber-900">
+                {/* 设定扭矩 vs 下位机已接受对比窗 (独立白卡片) */}
+                <div className="rounded-xl border border-slate-300 bg-white p-4 shadow-xs">
+                  <div className="flex items-center justify-between text-xs font-bold text-amber-900">
                     <span className="flex items-center gap-1.5">
                       {torqueEnabled ? (
-                        <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />
+                        <CheckCircle2 className="h-4 w-4 text-emerald-600" />
                       ) : (
-                        <ShieldAlert className="h-3.5 w-3.5 text-amber-600" />
+                        <ShieldAlert className="h-4 w-4 text-amber-600" />
                       )}
                       {torqueEnabled ? '闭环运行中 (TIM3 100Hz)' : '扭矩闭环待机'}
                     </span>
                     <span
-                      className={`rounded-md px-2 py-0.5 text-[10px] font-bold ${
+                      className={`rounded-md px-2 py-0.5 text-xs font-bold ${
                         commTimeoutWarning
-                          ? 'bg-red-100 text-red-700 border border-red-200'
+                          ? 'bg-red-100 text-red-700 border border-red-300'
                           : isTorqueSynced
-                            ? 'bg-emerald-100 text-emerald-700 border border-emerald-200'
+                            ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
                             : 'bg-amber-100 text-amber-800 border border-amber-300'
                       }`}
                     >
@@ -1639,9 +1639,9 @@ export function App() {
                           : '◐ 待下发'}
                     </span>
                   </div>
-                  <div className="mt-2 flex items-baseline justify-between font-mono tnum">
+                  <div className="mt-2.5 flex items-baseline justify-between font-mono tnum">
                     <div>
-                      <div className="text-[10px] font-semibold text-slate-500">
+                      <div className="text-xs font-semibold text-slate-500">
                         设定扭矩 (SET)
                       </div>
                       <div className="text-3xl font-black text-amber-600">
@@ -1649,10 +1649,10 @@ export function App() {
                       </div>
                     </div>
                     <div className="text-right">
-                      <div className="text-[10px] font-semibold text-slate-500">
+                      <div className="text-xs font-semibold text-slate-500">
                         已接受 (MCU)
                       </div>
-                      <div className="text-xl font-extrabold text-slate-800">
+                      <div className="text-2xl font-extrabold text-slate-800">
                         {appliedTorque.toFixed(3)} <span className="text-xs text-slate-500">N·m</span>
                       </div>
                     </div>
@@ -1660,18 +1660,18 @@ export function App() {
                 </div>
 
                 {/* 双段式前馈与动态电压上限指示器 (Vff + 0.5V) */}
-                <div className="rounded-xl border border-sky-200 bg-sky-50/75 p-3">
-                  <div className="flex items-center justify-between text-[11px] font-bold">
-                    <span className="text-sky-900">
+                <div className="rounded-xl border border-slate-300 bg-white p-3.5 shadow-xs">
+                  <div className="flex items-center justify-between text-xs font-bold">
+                    <span className="text-slate-800">
                       前馈与动态电压上限 (Vmax = Vff + 0.5V)
                     </span>
-                    <span className="rounded bg-white border border-sky-200 px-1.5 py-0.5 font-mono text-[10px] text-sky-700">
+                    <span className="rounded bg-sky-100 border border-sky-200 px-2 py-0.5 font-mono text-xs text-sky-800">
                       1V ⇋ 0.5 N·m
                     </span>
                   </div>
 
                   {/* 双色分段进度条 */}
-                  <div className="my-2 h-2.5 w-full overflow-hidden rounded-full bg-white border border-sky-200 flex">
+                  <div className="my-2.5 h-3 w-full overflow-hidden rounded-full bg-slate-200 border border-slate-300 flex">
                     <div
                       className="h-full bg-sky-500 transition-all duration-150"
                       style={{ width: `${(acceptedVff / MAX_VOLTAGE) * 100}%` }}
@@ -1686,36 +1686,36 @@ export function App() {
                     />
                   </div>
 
-                  <div className="grid grid-cols-2 gap-2 font-mono tnum">
-                    <div className="rounded-lg border border-sky-200/80 bg-white px-2.5 py-1.5">
-                      <span className="block text-[10px] text-slate-500">
+                  <div className="grid grid-cols-2 gap-2.5 font-mono tnum">
+                    <div className="rounded-lg border border-slate-200 bg-[#f8fafc] px-3 py-2">
+                      <span className="block text-xs font-semibold text-slate-500">
                         前馈电压 Vff
                       </span>
-                      <span className="text-sm font-black text-sky-700">
+                      <span className="text-base font-black text-sky-700">
                         {acceptedVff.toFixed(2)} V
                       </span>
                     </div>
-                    <div className="rounded-lg border border-amber-200/90 bg-white px-2.5 py-1.5">
-                      <span className="block text-[10px] text-slate-500">
+                    <div className="rounded-lg border border-slate-200 bg-[#f8fafc] px-3 py-2">
+                      <span className="block text-xs font-semibold text-slate-500">
                         动态上限 Vmax
                       </span>
-                      <span className="text-sm font-black text-amber-600">
+                      <span className="text-base font-black text-amber-600">
                         {acceptedVmax.toFixed(2)} V
                       </span>
                     </div>
                   </div>
 
                   {!isTorqueSynced && (
-                    <div className="mt-2 rounded-md border border-amber-300 bg-amber-50 px-2 py-1 font-mono text-[10px] font-bold text-amber-900 tnum">
+                    <div className="mt-2 rounded-md border border-amber-300 bg-amber-50 px-2.5 py-1.5 font-mono text-xs font-bold text-amber-900 tnum">
                       ▸ 待下发预览 ({draftTorque.toFixed(2)} N·m): Vff={draftVff.toFixed(2)}V, Vmax={draftVmax.toFixed(2)}V
                     </div>
                   )}
                 </div>
 
-                {/* 控制参数 1：目标扭矩幅值推子与档位 */}
-                <div className="rounded-xl border border-amber-200/70 bg-amber-50/35 p-3">
-                  <div className="mb-1.5 flex items-center justify-between text-xs font-bold">
-                    <span className="text-slate-700">
+                {/* 控制参数 1：目标扭矩幅值推子与档位 (独立白卡片) */}
+                <div className="rounded-xl border border-slate-300 bg-white p-3.5 shadow-xs">
+                  <div className="mb-1.5 flex items-center justify-between text-[13px] font-bold">
+                    <span className="text-slate-800">
                       目标扭矩设定 (T_target)
                     </span>
                     <span className="font-mono text-amber-600">0.0 ~ {torqueLimit.toFixed(1)} N·m</span>
@@ -1731,11 +1731,11 @@ export function App() {
                       className="studio-fader-orange w-full"
                     />
                   </div>
-                  <div className="mt-1.5 flex items-center gap-1.5">
+                  <div className="mt-1.5 flex items-center gap-2">
                     <button
                       type="button"
                       onClick={() => updateTorqueDraft(draftTorque - 0.1, false)}
-                      className="h-9 w-14 rounded-lg border border-amber-200 bg-white font-mono text-xs font-black text-slate-700 hover:border-amber-500 cursor-pointer"
+                      className="h-9 w-14 rounded-lg border border-slate-300 bg-[#f8fafc] font-mono text-xs font-black text-slate-700 hover:border-amber-500 cursor-pointer"
                     >
                       -0.1
                     </button>
@@ -1749,17 +1749,17 @@ export function App() {
                       onKeyDown={(e) => {
                         if (e.key === 'Enter') sendTargetTorque(draftTorque);
                       }}
-                      className="h-9 flex-1 rounded-lg border border-amber-200 bg-white text-center font-mono text-sm font-black tnum text-slate-900 outline-none focus:border-amber-500"
+                      className="h-9 flex-1 rounded-lg border border-slate-300 bg-[#f8fafc] text-center font-mono text-sm font-black tnum text-slate-900 outline-none focus:border-amber-500 focus:bg-white"
                     />
                     <button
                       type="button"
                       onClick={() => updateTorqueDraft(draftTorque + 0.1, false)}
-                      className="h-9 w-14 rounded-lg border border-amber-200 bg-white font-mono text-xs font-black text-slate-700 hover:border-amber-500 cursor-pointer"
+                      className="h-9 w-14 rounded-lg border border-slate-300 bg-[#f8fafc] font-mono text-xs font-black text-slate-700 hover:border-amber-500 cursor-pointer"
                     >
                       +0.1
                     </button>
                   </div>
-                  <div className="mt-2 grid grid-cols-4 gap-1.5">
+                  <div className="mt-2 grid grid-cols-4 gap-2">
                     {TORQUE_PRESETS.map((t) => {
                       const active = Math.abs(draftTorque - t) < 0.05;
                       return (
@@ -1767,10 +1767,10 @@ export function App() {
                           key={t}
                           type="button"
                           onClick={() => updateTorqueDraft(t, false)}
-                          className={`rounded-md border py-1.5 font-mono text-xs font-bold tnum cursor-pointer ${
+                          className={`rounded-lg border py-1.5 font-mono text-[13px] font-bold tnum cursor-pointer ${
                             active
                               ? 'border-amber-500 bg-amber-500 text-white shadow-2xs'
-                              : 'border-amber-200/80 bg-white text-slate-700 hover:border-amber-400 hover:bg-amber-50'
+                              : 'border-slate-300 bg-[#f8fafc] text-slate-700 hover:border-amber-400 hover:bg-amber-50'
                           }`}
                         >
                           {t.toFixed(1)}
@@ -1781,20 +1781,20 @@ export function App() {
                 </div>
 
                 {/* 控制参数 2：扭矩安全上限 (TorqueLimit ID 6) */}
-                <div className="rounded-xl border border-amber-200/70 bg-amber-50/35 p-3">
-                  <div className="mb-1.5 flex items-center justify-between text-xs font-bold">
-                    <span className="text-slate-700">
+                <div className="rounded-xl border border-slate-300 bg-white p-3.5 shadow-xs">
+                  <div className="mb-1.5 flex items-center justify-between text-[13px] font-bold">
+                    <span className="text-slate-800">
                       扭矩上限 (TorqueLimit)
                     </span>
-                    <span className="font-mono text-[11px] text-slate-400">ID 6</span>
+                    <span className="font-mono text-xs text-slate-500">ID 6</span>
                   </div>
-                  <div className="flex items-center gap-1.5">
+                  <div className="flex items-center gap-2">
                     <button
                       type="button"
                       onClick={() =>
                         handleUpdateTorqueLimit(Math.max(0.1, torqueLimit - 0.5))
                       }
-                      className="h-9 w-12 rounded-lg border border-amber-200 bg-white font-mono text-xs font-black text-slate-700 hover:border-amber-500 cursor-pointer"
+                      className="h-9 w-12 rounded-lg border border-slate-300 bg-[#f8fafc] font-mono text-xs font-black text-slate-700 hover:border-amber-500 cursor-pointer"
                     >
                       -0.5
                     </button>
@@ -1807,14 +1807,14 @@ export function App() {
                       onChange={(e) =>
                         setDraftParams((prev) => ({ ...prev, 6: e.target.value }))
                       }
-                      className="h-9 flex-1 rounded-lg border border-amber-200 bg-white text-center font-mono text-sm font-black tnum text-slate-900 outline-none focus:border-amber-500"
+                      className="h-9 flex-1 rounded-lg border border-slate-300 bg-[#f8fafc] text-center font-mono text-sm font-black tnum text-slate-900 outline-none focus:border-amber-500 focus:bg-white"
                     />
                     <button
                       type="button"
                       onClick={() =>
                         handleUpdateTorqueLimit(Math.min(10.0, torqueLimit + 0.5))
                       }
-                      className="h-9 w-12 rounded-lg border border-amber-200 bg-white font-mono text-xs font-black text-slate-700 hover:border-amber-500 cursor-pointer"
+                      className="h-9 w-12 rounded-lg border border-slate-300 bg-[#f8fafc] font-mono text-xs font-black text-slate-700 hover:border-amber-500 cursor-pointer"
                     >
                       +0.5
                     </button>
@@ -1825,7 +1825,7 @@ export function App() {
                           parseFloat(draftParams[6] ?? String(torqueLimit))
                         )
                       }
-                      className="h-9 rounded-lg border border-amber-500 bg-amber-500 px-3 text-xs font-bold text-white hover:bg-amber-600 cursor-pointer shadow-2xs"
+                      className="h-9 rounded-lg border border-amber-500 bg-amber-500 px-3.5 text-xs font-bold text-white hover:bg-amber-600 cursor-pointer shadow-2xs"
                     >
                       更新上限
                     </button>
@@ -1835,28 +1835,28 @@ export function App() {
 
               {/* 扭矩闭环操作按钮组 */}
               <div className="space-y-2 pt-1">
-                <div className="grid grid-cols-3 gap-1.5">
+                <div className="grid grid-cols-3 gap-2">
                   <button
                     type="button"
                     onClick={() => sendTargetTorque(draftTorque)}
-                    className="h-10 rounded-xl border border-amber-400 bg-amber-50 text-xs font-black text-amber-800 hover:bg-amber-100 cursor-pointer"
+                    className="h-10 rounded-xl border border-amber-400 bg-amber-50 text-[13px] font-black text-amber-800 hover:bg-amber-100 cursor-pointer"
                   >
                     下发扭矩
                   </button>
                   <button
                     type="button"
                     onClick={() => handleSetTorqueLoopEnabled(true)}
-                    className="flex h-10 items-center justify-center gap-1 rounded-xl bg-gradient-to-b from-emerald-500 to-emerald-600 text-xs font-black text-white shadow-xs hover:from-emerald-600 hover:to-emerald-700 cursor-pointer"
+                    className="flex h-10 items-center justify-center gap-1 rounded-xl bg-gradient-to-b from-emerald-500 to-emerald-600 text-[13px] font-black text-white shadow-xs hover:from-emerald-600 hover:to-emerald-700 cursor-pointer"
                   >
-                    <Play className="h-3.5 w-3.5" />
+                    <Play className="h-4 w-4" />
                     {torqueEnabled ? '闭环运行中' : '开启闭环'}
                   </button>
                   <button
                     type="button"
                     onClick={() => handleSetTorqueLoopEnabled(false)}
-                    className="flex h-10 items-center justify-center gap-1 rounded-xl border border-slate-200 bg-slate-100 text-xs font-black text-slate-700 hover:bg-slate-200 cursor-pointer"
+                    className="flex h-10 items-center justify-center gap-1 rounded-xl border border-slate-300 bg-white text-[13px] font-black text-slate-700 hover:bg-slate-100 cursor-pointer"
                   >
-                    <Square className="h-3.5 w-3.5" />
+                    <Square className="h-4 w-4" />
                     关闭闭环
                   </button>
                 </div>
@@ -1866,7 +1866,7 @@ export function App() {
                     sendTargetVoltage(0.0);
                     appendLog('warn', '【紧急停机】发送 0.00V 关闭闭环并停止 PWM');
                   }}
-                  className="flex h-10 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-b from-red-500 to-red-600 text-xs font-black text-white shadow-xs hover:from-red-600 hover:to-red-700 cursor-pointer"
+                  className="flex h-10 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-b from-red-500 to-red-600 text-[13px] font-black text-white shadow-xs hover:from-red-600 hover:to-red-700 cursor-pointer"
                 >
                   <OctagonAlert className="h-4 w-4" />
                   紧急停机 (0V)
@@ -1880,12 +1880,12 @@ export function App() {
       {/* =====================================================================
           窄窗 / 移动端底部四栏导航条 (< 1024px)
          ===================================================================== */}
-      <nav className="fixed bottom-0 left-0 right-0 z-50 flex items-center justify-around border-t border-sky-200 bg-white/95 px-2 py-1.5 backdrop-blur-md lg:hidden">
+      <nav className="fixed bottom-0 left-0 right-0 z-50 flex items-center justify-around border-t border-slate-300 bg-[#e8eef5] px-2 py-1.5 lg:hidden">
         <button
           type="button"
           onClick={() => setMobileTab('control')}
-          className={`flex flex-1 flex-col items-center gap-0.5 py-1 text-[11px] font-bold cursor-pointer ${
-            mobileTab === 'control' ? 'text-sky-600' : 'text-slate-500'
+          className={`flex flex-1 flex-col items-center gap-0.5 py-1 text-xs font-bold cursor-pointer ${
+            mobileTab === 'control' ? 'text-sky-600' : 'text-slate-600'
           }`}
         >
           <Sliders className="h-4 w-4" />
@@ -1894,8 +1894,8 @@ export function App() {
         <button
           type="button"
           onClick={() => setMobileTab('scope')}
-          className={`flex flex-1 flex-col items-center gap-0.5 py-1 text-[11px] font-bold cursor-pointer ${
-            mobileTab === 'scope' ? 'text-sky-600' : 'text-slate-500'
+          className={`flex flex-1 flex-col items-center gap-0.5 py-1 text-xs font-bold cursor-pointer ${
+            mobileTab === 'scope' ? 'text-sky-600' : 'text-slate-600'
           }`}
         >
           <Monitor className="h-4 w-4" />
@@ -1907,8 +1907,8 @@ export function App() {
             setMobileTab('params');
             setBottomDock('params');
           }}
-          className={`flex flex-1 flex-col items-center gap-0.5 py-1 text-[11px] font-bold cursor-pointer ${
-            mobileTab === 'params' ? 'text-sky-600' : 'text-slate-500'
+          className={`flex flex-1 flex-col items-center gap-0.5 py-1 text-xs font-bold cursor-pointer ${
+            mobileTab === 'params' ? 'text-sky-600' : 'text-slate-600'
           }`}
         >
           <Settings2 className="h-4 w-4" />
@@ -1920,8 +1920,8 @@ export function App() {
             setMobileTab('terminal');
             setBottomDock('bus');
           }}
-          className={`flex flex-1 flex-col items-center gap-0.5 py-1 text-[11px] font-bold cursor-pointer ${
-            mobileTab === 'terminal' ? 'text-sky-600' : 'text-slate-500'
+          className={`flex flex-1 flex-col items-center gap-0.5 py-1 text-xs font-bold cursor-pointer ${
+            mobileTab === 'terminal' ? 'text-sky-600' : 'text-slate-600'
           }`}
         >
           <Terminal className="h-4 w-4" />

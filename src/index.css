@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-/* Disable OS prefers-color-scheme: dark automatic override so the UI stays 100% bright */
+/* Disable OS prefers-color-scheme: dark automatic override */
 @custom-variant dark (&:where(.theme-dark-disabled, .theme-dark-disabled *));
 
 @layer base {
@@ -12,7 +12,7 @@
 
   body {
     font-family: var(--font-sans);
-    background-color: #f4f8fc;
+    background-color: #e2e8f0;
     color: #0f172a;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -25,23 +25,21 @@
   font-feature-settings: "tnum", "zero";
 }
 
-/* Luminous Daylight Studio Surface */
-.studio-surface-bright {
-  background-color: #f4f8fc;
-  background-image:
-    radial-gradient(rgba(2, 132, 199, 0.09) 1px, transparent 1px),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.7) 0%, rgba(240, 247, 255, 0.5) 100%);
-  background-size: 18px 18px, 100% 100%;
+/* Soft Matte Studio Base (Non-glaring cool slate-gray aluminum) */
+.studio-surface-matte {
+  background-color: #e6ecf2;
+  background-image: radial-gradient(rgba(15, 23, 42, 0.06) 1px, transparent 1px);
+  background-size: 18px 18px;
 }
 
-/* Tactile Bright Fader / Slider Track */
+/* Tactile Fader / Slider Track */
 input[type="range"].studio-fader-blue {
   -webkit-appearance: none;
   appearance: none;
   height: 8px;
   border-radius: 999px;
-  background: linear-gradient(90deg, #e0f2fe 0%, #bae6fd 100%);
-  border: 1px solid #7dd3fc;
+  background: linear-gradient(90deg, #dbeafe 0%, #bae6fd 100%);
+  border: 1px solid #93c5fd;
   outline: none;
 }
 
@@ -91,21 +89,21 @@ input[type="range"].studio-fader-orange::-webkit-slider-thumb:hover {
   box-shadow: 0 3px 10px rgba(217, 119, 6, 0.5);
 }
 
-/* Custom Slim Bright Scrollbar */
+/* Custom Slim Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f5f9;
+  background: #e2e8f0;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: #94a3b8;
   border-radius: 999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: #64748b;
 }
