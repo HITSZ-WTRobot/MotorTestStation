@@ -3,38 +3,77 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>电机测控与调试上位机 | Motor Test Station</title>
+    <title>电机测控与调试上位机 | Motor Test Station (Cleanroom Pro v2.4)</title>
     <style>
 /**
  * @file style.css
- * @brief 工业级暗色主题 UI 样式系统 (Cyber-Industrial Instrumentation Theme)
+ * @brief 电机测控与调试上位机 UI 样式系统 (Cleanroom White + Ice Blue 纯白与淡蓝实验室工程风)
+ * @architecture 现代高精度实验室仪器美学 · 单栏位电压/扭矩模式切换 (460px Sidebar)
+ * @version 2.3 (模式二选一切换栏位 + 下位机参数持久化组)
  */
 
 :root {
-    --bg-dark: #070a12;
-    --bg-panel: #0d1322;
-    --bg-panel-hover: #131c31;
-    --bg-card: #111827;
-    --border-subtle: #1e293b;
-    --border-bright: #334155;
-    
-    --accent-cyan: #38bdf8;
-    --accent-cyan-glow: rgba(56, 189, 248, 0.25);
-    --accent-amber: #f59e0b;
-    --accent-amber-glow: rgba(245, 158, 11, 0.25);
-    
-    --color-success: #10b981;
-    --color-success-glow: rgba(16, 185, 129, 0.3);
-    --color-error: #ef4444;
-    --color-error-glow: rgba(239, 68, 68, 0.3);
-    --color-warning: #fbbf24;
-    
-    --text-main: #f1f5f9;
-    --text-muted: #94a3b8;
-    --text-dim: #64748b;
-    
-    --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    --font-mono: "JetBrains Mono", "Fira Code", Consolas, Monaco, monospace;
+    /* 核心白与浅蓝表面阶梯 (Surfaces Hierarchy) */
+    --surface-canvas: #f1f6fb;
+    --surface-nav: #ffffff;
+    --surface-panel: #ffffff;
+    --surface-card: #f8fafc;
+    --surface-card-hover: #f0f7ff;
+    --surface-sunken: #edf2f7;
+    --surface-glass: rgba(255, 255, 255, 0.94);
+    --surface-accent-soft: #e0f2fe;
+
+    /* 精密发丝线系统 (Precision Hairlines) */
+    --hairline-subtle: #f1f5f9;
+    --hairline: #e2e8f0;
+    --hairline-bright: #cbd5e1;
+    --hairline-cyan: #7dd3fc;
+    --hairline-amber: #fde68a;
+    --hairline-danger: #fca5a5;
+
+    /* 物理倒角微高光与细腻柔和阴影 (Hardware Bevel & Soft Shadows) */
+    --bevel-top: inset 0 1px 0 #ffffff;
+    --bevel-sunken: inset 0 1px 3px rgba(15, 23, 42, 0.06);
+    --shadow-card: 0 1px 3px rgba(15, 23, 42, 0.04), 0 6px 20px -2px rgba(15, 23, 42, 0.05);
+    --shadow-dropdown: 0 4px 20px rgba(15, 23, 42, 0.12);
+    --shadow-glow-cyan: 0 0 16px rgba(2, 132, 199, 0.2);
+
+    /* 遥测通道专有色系统 (Telemetry Channels & Semantics) */
+    --accent-cyan: #0284c7;          /* 主色：电离湛蓝 (Sky 600) */
+    --accent-cyan-light: #38bdf8;    /* 亮天蓝 */
+    --accent-cyan-dark: #0369a1;
+    --accent-cyan-glow: rgba(2, 132, 199, 0.16);
+    --accent-cyan-subtle: #e0f2fe;   /* 淡蓝底色 (Sky 100) */
+    --accent-cyan-border: #bae6fd;
+
+    --accent-amber: #d97706;         /* 通道 B：机械琥珀金 (Amber 600) */
+    --accent-amber-light: #f59e0b;
+    --accent-amber-dark: #b45309;
+    --accent-amber-glow: rgba(217, 119, 6, 0.16);
+    --accent-amber-subtle: #fef3c7;
+    --accent-amber-border: #fde68a;
+
+    /* 状态与警示色 */
+    --color-success: #16a34a;        /* 翡翠绿 */
+    --color-success-subtle: #dcfce7;
+    --color-success-glow: rgba(22, 163, 74, 0.2);
+    --color-error: #dc2626;          /* 安全红 */
+    --color-error-subtle: #fee2e2;
+    --color-error-glow: rgba(220, 38, 38, 0.25);
+    --color-warning: #d97706;
+
+    /* 文字与排版阶梯 (Typography & Inks - 保证白底高对比度) */
+    --text-bright: #0f172a;          /* 最深黑蓝，清晰易读 */
+    --text-main: #1e293b;            /* 正文文字 */
+    --text-muted: #475569;           /* 次要说明 */
+    --text-dim: #64748b;             /* 标签与单位 */
+    --text-faint: #94a3b8;           /* 弱化占位 */
+
+    --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", "Helvetica Neue", Arial, sans-serif;
+    --font-mono: "JetBrains Mono", "SF Mono", "Fira Code", Menlo, Consolas, monospace;
+
+    /* 关键防抖特性：所有遥测数据强制开启等宽数字，消除 60Hz 采样下的水平文字微抖动 */
+    --tnum: tabular-nums;
 }
 
 * {
@@ -44,29 +83,41 @@
 }
 
 body {
-    background-color: var(--bg-dark);
+    background-color: var(--surface-canvas);
     color: var(--text-main);
     font-family: var(--font-sans);
     line-height: 1.5;
     min-height: 100vh;
     overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+
+    /* 现代实验室淡蓝微格蓝图背景 (Cleanroom Light Blue Blueprint) */
     background-image: 
-        radial-gradient(circle at 15% 15%, rgba(56, 189, 248, 0.05) 0%, transparent 40%),
-        radial-gradient(circle at 85% 85%, rgba(245, 158, 11, 0.04) 0%, transparent 45%);
+        linear-gradient(rgba(2, 132, 199, 0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(2, 132, 199, 0.04) 1px, transparent 1px),
+        radial-gradient(circle at 10% 5%, rgba(56, 189, 248, 0.12) 0%, transparent 45%),
+        radial-gradient(circle at 90% 95%, rgba(2, 132, 199, 0.08) 0%, transparent 45%);
+    background-size: 24px 24px, 24px 24px, 100% 100%, 100% 100%;
 }
 
-/* 顶部状态栏 */
+/* ==========================================================================
+   1. 顶部控制台中控栏 (Top Cockpit Command Bar)
+   ========================================================================== */
+
 .top-header {
-    background: linear-gradient(180deg, #0f172a 0%, #0d1322 100%);
-    border-bottom: 1px solid var(--border-subtle);
-    padding: 12px 24px;
+    background: var(--surface-nav);
+    border-bottom: 1px solid var(--hairline);
+    padding: 10px 24px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 1px 4px rgba(15, 23, 42, 0.04), 0 4px 16px rgba(15, 23, 42, 0.03);
     position: sticky;
     top: 0;
     z-index: 100;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
 }
 
 .brand-section {
@@ -76,82 +127,106 @@ body {
 }
 
 .brand-icon {
-    width: 32px;
-    height: 32px;
-    background: linear-gradient(135deg, var(--accent-cyan), var(--accent-amber));
+    width: 36px;
+    height: 36px;
+    background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
     border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
+    box-shadow: 0 2px 8px rgba(2, 132, 199, 0.25);
+    border: 1px solid rgba(2, 132, 199, 0.3);
 }
 
 .brand-icon svg {
-    width: 18px;
-    height: 18px;
-    fill: #000;
+    width: 20px;
+    height: 20px;
+    fill: #ffffff;
 }
 
 .brand-title {
-    font-size: 18px;
+    font-size: 15px;
     font-weight: 700;
-    letter-spacing: 0.5px;
-    color: #fff;
+    letter-spacing: -0.01em;
+    color: var(--text-bright);
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
 }
 
 .brand-badge {
-    font-size: 11px;
-    font-weight: 600;
-    padding: 2px 8px;
-    border-radius: 9999px;
-    background: rgba(56, 189, 248, 0.15);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    padding: 3px 8px;
+    border-radius: 4px;
+    background: var(--accent-cyan-subtle);
     color: var(--accent-cyan);
-    border: 1px solid rgba(56, 189, 248, 0.3);
+    border: 1px solid var(--hairline-cyan);
     font-family: var(--font-mono);
+    text-transform: uppercase;
+}
+
+.brand-sub {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-dim);
+    font-family: var(--font-mono);
+    letter-spacing: 0.02em;
+    margin-top: 2px;
 }
 
 .connection-toolbar {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
 }
 
 .conn-status-indicator {
     display: flex;
     align-items: center;
     gap: 8px;
-    font-size: 13px;
+    font-size: 12px;
     font-family: var(--font-mono);
     color: var(--text-muted);
-    background: rgba(15, 23, 42, 0.6);
+    background: var(--surface-sunken);
     padding: 6px 14px;
-    border-radius: 8px;
-    border: 1px solid var(--border-subtle);
+    border-radius: 6px;
+    border: 1px solid var(--hairline);
+    letter-spacing: 0.02em;
+    box-shadow: var(--bevel-sunken);
 }
 
 .status-dot {
-    width: 9px;
-    height: 9px;
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
     background: var(--color-error);
-    box-shadow: 0 0 8px var(--color-error-glow);
+    box-shadow: 0 0 6px var(--color-error-glow);
     transition: all 0.3s ease;
 }
 
 .status-dot.connected {
     background: var(--color-success);
-    box-shadow: 0 0 10px var(--color-success-glow);
+    box-shadow: 0 0 8px var(--color-success-glow);
+    animation: status-pulse 2s infinite ease-in-out;
 }
 
 .status-dot.mocking {
     background: var(--color-warning);
-    box-shadow: 0 0 10px rgba(251, 191, 36, 0.4);
+    box-shadow: 0 0 8px rgba(217, 119, 6, 0.35);
+    animation: status-pulse 1.5s infinite ease-in-out;
 }
 
-/* 按钮通用 */
+@keyframes status-pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.2); opacity: 0.85; }
+}
+
+/* ==========================================================================
+   2. 交互按钮系统 (Clean & Tactile Buttons)
+   ========================================================================== */
+
 .btn {
     display: inline-flex;
     align-items: center;
@@ -160,178 +235,318 @@ body {
     font-family: var(--font-sans);
     font-size: 13px;
     font-weight: 600;
-    padding: 8px 16px;
-    border-radius: 8px;
+    letter-spacing: -0.01em;
+    padding: 8px 14px;
+    border-radius: 6px;
     border: 1px solid transparent;
     cursor: pointer;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
     user-select: none;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
 }
 
 .btn:active {
-    transform: scale(0.97);
+    transform: translateY(1px) scale(0.985);
+}
+.btn:disabled, .btn.disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    pointer-events: none;
+    box-shadow: none !important;
+    transform: none !important;
 }
 
+input:disabled, .slider-custom:disabled, select:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    background-color: #f1f5f9;
+}
+.preset-chip:disabled, .quick-step-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+    box-shadow: none !important;
+}
+
+
 .btn-primary {
-    background: linear-gradient(180deg, #0284c7 0%, #0369a1 100%);
-    color: #fff;
-    border-color: #38bdf8;
-    box-shadow: 0 0 15px rgba(56, 189, 248, 0.3);
+    background: linear-gradient(180deg, #0ea5e9 0%, #0284c7 100%);
+    color: #ffffff;
+    border-color: #0284c7;
+    box-shadow: 0 1px 3px rgba(2, 132, 199, 0.25), 0 2px 8px rgba(2, 132, 199, 0.2);
 }
 
 .btn-primary:hover {
-    background: linear-gradient(180deg, #0369a1 0%, #075985 100%);
-    box-shadow: 0 0 20px rgba(56, 189, 248, 0.5);
+    background: linear-gradient(180deg, #0284c7 0%, #0369a1 100%);
+    box-shadow: 0 2px 10px rgba(2, 132, 199, 0.35);
+}
+
+.btn-success {
+    background: linear-gradient(180deg, #10b981 0%, #059669 100%);
+    color: #ffffff;
+    border-color: #059669;
+    box-shadow: 0 1px 3px rgba(16, 185, 129, 0.25);
+}
+
+.btn-success:hover {
+    background: linear-gradient(180deg, #059669 0%, #047857 100%);
+    box-shadow: 0 2px 10px rgba(16, 185, 129, 0.35);
 }
 
 .btn-disconnect {
-    background: rgba(239, 68, 68, 0.15);
-    color: #f87171;
-    border-color: rgba(239, 68, 68, 0.4);
+    background: var(--color-error-subtle);
+    color: #b91c1c;
+    border-color: var(--hairline-danger);
 }
 
 .btn-disconnect:hover {
-    background: rgba(239, 68, 68, 0.25);
-    color: #fff;
-    box-shadow: 0 0 15px var(--color-error-glow);
+    background: #fecaca;
+    color: #991b1b;
 }
 
 .btn-outline {
-    background: transparent;
-    border-color: var(--border-bright);
+    background: #ffffff;
+    border-color: var(--hairline);
     color: var(--text-muted);
 }
 
 .btn-outline:hover {
-    background: rgba(255, 255, 255, 0.05);
-    color: #fff;
-    border-color: var(--accent-cyan);
+    background: var(--surface-card-hover);
+    color: var(--accent-cyan);
+    border-color: var(--hairline-cyan);
 }
 
 .btn-danger {
-    background: linear-gradient(180deg, #dc2626 0%, #b91c1c 100%);
-    color: #fff;
-    border-color: #ef4444;
-    font-size: 14px;
+    background: linear-gradient(180deg, #ef4444 0%, #dc2626 100%);
+    color: #ffffff;
+    border: 1px solid #b91c1c;
+    font-size: 13px;
     font-weight: 700;
-    letter-spacing: 0.5px;
-    box-shadow: 0 0 20px rgba(239, 68, 68, 0.4);
+    letter-spacing: 0.04em;
+    box-shadow: 0 1px 3px rgba(220, 38, 38, 0.25), 0 2px 10px rgba(220, 38, 38, 0.2);
 }
 
 .btn-danger:hover {
-    background: linear-gradient(180deg, #b91c1c 0%, #991b1b 100%);
-    box-shadow: 0 0 25px rgba(239, 68, 68, 0.6);
+    background: linear-gradient(180deg, #dc2626 0%, #b91c1c 100%);
+    box-shadow: 0 3px 14px rgba(220, 38, 38, 0.4);
 }
 
-/* 下拉框与输入框 */
-select, input[type="number"], input[type="text"] {
-    background: #090e1a;
-    border: 1px solid var(--border-subtle);
-    color: var(--text-main);
-    padding: 7px 12px;
-    border-radius: 6px;
-    font-family: var(--font-mono);
-    font-size: 13px;
-    outline: none;
-    transition: border-color 0.2s, box-shadow 0.2s;
-}
+/* ==========================================================================
+   3. 主布局与宽幅控制栏 (Main Layout & 460px Sidebar)
+   ========================================================================== */
 
-select:focus, input:focus {
-    border-color: var(--accent-cyan);
-    box-shadow: 0 0 8px var(--accent-cyan-glow);
-}
-
-/* 主容器布局 */
 .main-layout {
     display: grid;
-    grid-template-columns: 360px 1fr;
+    grid-template-columns: 460px 1fr;
     gap: 20px;
     padding: 20px 24px;
-    max-width: 1720px;
+    max-width: 1780px;
     margin: 0 auto;
 }
 
-@media (max-width: 1200px) {
+@media (max-width: 1280px) {
     .main-layout {
         grid-template-columns: 1fr;
     }
 }
 
-/* 卡片容器 */
-.card-panel {
-    background: var(--bg-panel);
-    border: 1px solid var(--border-subtle);
+/* 控制卡片通则 */
+.control-group-card {
+    background: var(--surface-panel);
+    border: 1px solid var(--hairline);
     border-radius: 12px;
-    padding: 18px;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+    padding: 18px 20px;
+    box-shadow: var(--shadow-card);
     margin-bottom: 20px;
     position: relative;
     overflow: hidden;
 }
 
-.card-panel::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+/* 顶部模式切换分段开关 (Mode Toggle Strip: 电压 vs 扭矩) */
+.mode-toggle-strip {
+    display: flex;
+    background: var(--surface-sunken);
+    border: 1px solid var(--hairline);
+    border-radius: 8px;
+    padding: 4px;
+    margin-bottom: 16px;
+    gap: 4px;
+    box-shadow: var(--bevel-sunken);
 }
 
-.card-header {
+.mode-toggle-btn {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 9px 12px;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    font-family: var(--font-sans);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    user-select: none;
+}
+
+.mode-toggle-btn:hover {
+    color: var(--text-bright);
+    background: rgba(255, 255, 255, 0.6);
+}
+
+.mode-toggle-btn.active.btn-mode-voltage {
+    background: #ffffff;
+    color: var(--accent-cyan);
+    border-color: var(--hairline);
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+}
+
+.mode-toggle-btn.active.btn-mode-torque {
+    background: #ffffff;
+    color: var(--accent-amber);
+    border-color: var(--hairline);
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+}
+
+.mode-pane {
+    display: none;
+}
+
+.mode-pane.active {
+    display: block;
+}
+
+.group-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 16px;
+    margin-bottom: 14px;
     padding-bottom: 10px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid var(--hairline-subtle);
 }
 
-.card-title {
+.group-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.group-badge {
+    font-size: 10px;
+    font-weight: 800;
+    padding: 3px 8px;
+    border-radius: 4px;
+    letter-spacing: 0.08em;
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+}
+
+.group-badge.badge-v {
+    background: var(--accent-cyan-subtle);
+    color: var(--accent-cyan);
+    border: 1px solid var(--accent-cyan-border);
+}
+
+.group-badge.badge-t {
+    background: var(--accent-amber-subtle);
+    color: var(--accent-amber);
+    border: 1px solid var(--accent-amber-border);
+}
+
+.group-title {
     font-size: 14px;
     font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    color: var(--text-muted);
-    display: flex;
-    align-items: center;
-    gap: 8px;
+    color: var(--text-bright);
+    letter-spacing: -0.01em;
 }
 
-.card-title span.tag {
-    font-size: 10px;
-    padding: 2px 6px;
-    border-radius: 4px;
-    background: rgba(255, 255, 255, 0.06);
-    color: var(--text-dim);
+/* 参数块分割 */
+.param-section-box {
+    background: var(--surface-card);
+    border: 1px solid var(--hairline);
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin-bottom: 14px;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
 }
 
-/* 控制面板组件 */
-.control-row {
-    margin-bottom: 16px;
-}
-
-.control-label {
+.param-section-box .box-label {
     display: flex;
     justify-content: space-between;
+    align-items: baseline;
     font-size: 12px;
     font-weight: 600;
     color: var(--text-muted);
     margin-bottom: 8px;
 }
 
-.control-label .val-disp {
-    color: var(--accent-cyan);
-    font-family: var(--font-mono);
-    font-size: 14px;
+.param-tag {
+    font-size: 9px;
     font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 3px;
+    background: #ffffff;
+    border: 1px solid var(--hairline);
+    color: var(--text-dim);
+    font-family: var(--font-mono);
+    letter-spacing: 0.05em;
 }
 
-/* 大号滑块 */
+/* ==========================================================================
+   4. 表单、滑轨与步进微调器
+   ========================================================================== */
+
+select, input[type="number"], input[type="text"] {
+    background: #ffffff;
+    border: 1px solid var(--hairline);
+    color: var(--text-bright);
+    padding: 7px 12px;
+    border-radius: 6px;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    font-variant-numeric: var(--tnum);
+}
+
+select {
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    padding-right: 28px;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+select:focus, input:focus {
+    border-color: var(--accent-cyan);
+    box-shadow: 0 0 0 2px var(--accent-cyan-subtle);
+}
+
+.val-disp {
+    font-family: var(--font-mono);
+    font-size: 18px;
+    font-weight: 800;
+    font-variant-numeric: var(--tnum);
+    letter-spacing: -0.02em;
+}
+
+.val-disp.val-v {
+    color: var(--accent-cyan);
+}
+
+.val-disp.val-t {
+    color: var(--accent-amber);
+}
+
 .slider-container {
     position: relative;
-    padding: 4px 0;
+    padding: 10px 0;
 }
 
 .slider-custom {
@@ -340,209 +555,413 @@ select:focus, input:focus {
     width: 100%;
     height: 8px;
     border-radius: 4px;
-    background: #172338;
+    background: var(--surface-sunken);
+    border: 1px solid var(--hairline);
     outline: none;
     cursor: pointer;
-    transition: background 0.2s;
 }
 
 .slider-custom::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
-    width: 22px;
-    height: 22px;
+    width: 20px;
+    height: 20px;
     border-radius: 50%;
     background: var(--accent-cyan);
     cursor: pointer;
-    box-shadow: 0 0 14px var(--accent-cyan-glow);
-    border: 2px solid #fff;
-    transition: transform 0.1s, box-shadow 0.2s;
+    box-shadow: 0 2px 6px rgba(2, 132, 199, 0.4);
+    border: 2px solid #ffffff;
+    transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.15s;
+}
+
+.slider-custom.slider-amber::-webkit-slider-thumb {
+    background: var(--accent-amber);
+    box-shadow: 0 2px 6px rgba(217, 119, 6, 0.4);
 }
 
 .slider-custom::-webkit-slider-thumb:hover {
-    transform: scale(1.15);
-    box-shadow: 0 0 20px rgba(56, 189, 248, 0.7);
+    transform: scale(1.2);
 }
 
-/* 步进微调输入与按钮组 */
 .stepper-group {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
 }
 
 .stepper-btn {
-    width: 36px;
-    height: 36px;
-    background: #172238;
-    border: 1px solid var(--border-subtle);
-    color: #fff;
+    width: 38px;
+    height: 38px;
+    background: #ffffff;
+    border: 1px solid var(--hairline);
+    color: var(--text-bright);
     border-radius: 6px;
     font-size: 16px;
-    font-weight: bold;
+    font-weight: 700;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: background 0.2s, border-color 0.2s;
+    transition: all 0.15s;
+    user-select: none;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
 }
 
 .stepper-btn:hover {
-    background: #1e2e4a;
-    border-color: var(--accent-cyan);
+    background: var(--surface-card-hover);
+    border-color: var(--hairline-cyan);
+    color: var(--accent-cyan);
+}
+
+.stepper-btn:active {
+    transform: translateY(1px);
 }
 
 .stepper-input {
     flex: 1;
-    height: 36px;
+    height: 38px;
     text-align: center;
     font-size: 15px;
     font-weight: 700;
 }
 
-/* 预设档位胶囊按钮网格 */
 .preset-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 8px;
-    margin-top: 10px;
+    gap: 6px;
+    margin-top: 8px;
 }
 
 .preset-chip {
-    padding: 7px 4px;
-    background: #121929;
-    border: 1px solid var(--border-subtle);
+    padding: 8px 2px;
+    background: #ffffff;
+    border: 1px solid var(--hairline);
     border-radius: 6px;
     color: var(--text-muted);
     font-family: var(--font-mono);
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 600;
     cursor: pointer;
     text-align: center;
-    transition: all 0.2s;
+    transition: all 0.15s ease;
+    user-select: none;
+    font-variant-numeric: var(--tnum);
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
 }
 
 .preset-chip:hover {
-    background: #1a243a;
-    border-color: var(--accent-cyan);
-    color: #fff;
-    box-shadow: 0 0 10px rgba(56, 189, 248, 0.2);
+    background: var(--surface-card-hover);
+    border-color: var(--hairline-cyan);
+    color: var(--accent-cyan);
 }
 
 .preset-chip.active {
-    background: rgba(56, 189, 248, 0.15);
+    background: var(--accent-cyan-subtle);
     border-color: var(--accent-cyan);
     color: var(--accent-cyan);
     font-weight: 700;
+    box-shadow: 0 1px 3px rgba(2, 132, 199, 0.2);
 }
 
-/* 急停与发送操作区 */
-.action-row {
+.preset-chip.torque-chip.active {
+    background: var(--accent-amber-subtle);
+    border-color: var(--accent-amber);
+    color: var(--accent-amber);
+}
+
+.quick-step-row {
     display: flex;
+    gap: 6px;
+    margin-top: 8px;
+}
+
+.quick-step-btn {
+    flex: 1;
+    padding: 6px 0;
+    background: #ffffff;
+    border: 1px solid var(--hairline);
+    border-radius: 4px;
+    color: var(--text-dim);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: center;
+}
+
+.quick-step-btn:hover {
+    background: var(--surface-card-hover);
+    color: var(--accent-cyan);
+    border-color: var(--hairline-cyan);
+}
+
+.status-pill-strip {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.status-pill {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    background: var(--surface-sunken);
+    border: 1px solid var(--hairline);
+    border-radius: 6px;
+    padding: 6px 8px;
+    font-size: 11px;
+    font-family: var(--font-mono);
+    color: var(--text-muted);
+}
+
+.status-pill.active {
+    color: #15803d;
+    border-color: #86efac;
+    background: var(--color-success-subtle);
+    font-weight: 700;
+}
+
+.status-pill.warning {
+    color: #b45309;
+    border-color: #fde68a;
+    background: #fef3c7;
+}
+
+.status-pill.disabled {
+    color: var(--text-dim);
+}
+
+/* ==========================================================================
+   5. 下位机参数持久化卡片 (Group 02: Parameters & Flash Storage)
+   ========================================================================== */
+
+.param-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     gap: 10px;
-    margin-top: 20px;
+    margin-bottom: 14px;
 }
 
-.action-row .btn-send {
+.param-card {
+    background: var(--surface-card);
+    border: 1px solid var(--hairline);
+    border-radius: 8px;
+    padding: 10px 12px;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
+    transition: border-color 0.15s, background-color 0.15s;
+}
+
+.param-card.dirty {
+    border-color: var(--accent-cyan);
+    background: #f0f9ff;
+}
+
+.param-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+}
+
+.param-name {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-bright);
+    font-family: var(--font-mono);
+}
+
+.param-badge-ram {
+    font-size: 10px;
+    color: var(--accent-cyan);
+    background: var(--accent-cyan-subtle);
+    border: 1px solid var(--accent-cyan-border);
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-family: var(--font-mono);
+    font-variant-numeric: var(--tnum);
+    font-weight: 600;
+}
+
+.param-input-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.param-input {
     flex: 1;
-    height: 44px;
-    font-size: 14px;
+    height: 32px;
+    text-align: right;
+    font-size: 13px;
+    font-weight: 700;
+    background: #ffffff;
+    border: 1px solid var(--hairline);
+    color: var(--text-bright);
+    border-radius: 6px;
+    padding: 0 8px;
+    outline: none;
+    font-family: var(--font-mono);
+    font-variant-numeric: var(--tnum);
 }
 
-.action-row .btn-estop {
-    flex: 1;
-    height: 44px;
+.param-input:focus {
+    border-color: var(--accent-cyan);
+    box-shadow: 0 0 0 2px var(--accent-cyan-subtle);
 }
 
-/* 实时数字仪表盘网格 */
+.param-desc {
+    font-size: 10px;
+    color: var(--text-dim);
+    margin-top: 4px;
+    line-height: 1.3;
+}
+
+.btn-save-flash {
+    background: linear-gradient(180deg, #f0f9ff 0%, #e0f2fe 100%);
+    border: 1px solid var(--accent-cyan);
+    color: var(--accent-cyan);
+    width: 100%;
+    height: 42px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    box-shadow: 0 1px 3px rgba(2, 132, 199, 0.15);
+}
+
+.btn-save-flash:hover {
+    background: linear-gradient(180deg, #0ea5e9 0%, #0284c7 100%);
+    color: #ffffff;
+    box-shadow: 0 3px 12px rgba(2, 132, 199, 0.3);
+}
+
+/* ==========================================================================
+   6. 遥测大屏仪表盘 (Telemetry Gauges)
+   ========================================================================== */
+
 .gauges-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 14px;
-    margin-bottom: 20px;
+    margin-bottom: 18px;
 }
 
 .metric-gauge-card {
-    background: linear-gradient(135deg, rgba(17, 24, 39, 0.8) 0%, rgba(13, 19, 34, 0.9) 100%);
-    border: 1px solid var(--border-subtle);
-    border-radius: 10px;
-    padding: 16px;
+    background: #ffffff;
+    border: 1px solid var(--hairline);
+    border-radius: 12px;
+    padding: 16px 20px;
     position: relative;
     overflow: hidden;
+    box-shadow: var(--shadow-card);
 }
 
 .metric-gauge-card.voltage-card {
-    border-left: 4px solid var(--accent-cyan);
+    border-top: 3px solid var(--accent-cyan);
 }
 
 .metric-gauge-card.torque-card {
-    border-left: 4px solid var(--accent-amber);
+    border-top: 3px solid var(--accent-amber);
 }
 
 .metric-title {
     font-size: 11px;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.8px;
-    color: var(--text-muted);
+    letter-spacing: 0.08em;
+    color: var(--text-dim);
     display: flex;
     justify-content: space-between;
+    align-items: center;
 }
 
 .metric-value-wrap {
     margin: 8px 0;
     display: flex;
     align-items: baseline;
-    gap: 6px;
+    gap: 8px;
 }
 
 .metric-huge-val {
-    font-size: 36px;
+    font-size: 42px;
     font-weight: 800;
     font-family: var(--font-mono);
-    letter-spacing: -0.5px;
+    letter-spacing: -0.04em;
     line-height: 1;
+    font-variant-numeric: var(--tnum);
 }
 
 .voltage-card .metric-huge-val {
     color: var(--accent-cyan);
-    text-shadow: 0 0 20px var(--accent-cyan-glow);
 }
 
 .torque-card .metric-huge-val {
     color: var(--accent-amber);
-    text-shadow: 0 0 20px var(--accent-amber-glow);
 }
 
 .metric-unit {
     font-size: 14px;
-    font-weight: 600;
+    font-weight: 700;
     color: var(--text-dim);
+    font-family: var(--font-mono);
 }
 
 .metric-sub-stats {
     display: flex;
-    gap: 14px;
+    gap: 16px;
     font-size: 11px;
     font-family: var(--font-mono);
     color: var(--text-dim);
-    border-top: 1px dashed rgba(255, 255, 255, 0.06);
-    padding-top: 8px;
+    border-top: 1px solid var(--hairline-subtle);
+    padding-top: 10px;
+    font-variant-numeric: var(--tnum);
 }
 
 .metric-sub-stats span {
-    color: var(--text-muted);
+    color: var(--text-bright);
+    font-weight: 600;
 }
 
-/* 示波器区域 */
+.meter-track {
+    width: 100%;
+    height: 5px;
+    background: var(--surface-sunken);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-top: 6px;
+    border: 1px solid var(--hairline-subtle);
+}
+
+.meter-fill-v {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #38bdf8, #0284c7);
+    border-radius: 2px;
+    transition: width 0.1s ease-out;
+}
+
+.meter-fill-t {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #fbbf24, #d97706);
+    border-radius: 2px;
+    transition: width 0.1s ease-out;
+}
+
+/* ==========================================================================
+   7. 实时示波器区域 (Oscilloscope Viewport)
+   ========================================================================== */
+
 .scope-wrapper {
     position: relative;
     width: 100%;
     height: 480px;
-    background: #080c14;
-    border-radius: 8px;
-    border: 1px solid var(--border-subtle);
+    background: #f8fafc;
+    border-radius: 10px;
+    border: 1px solid var(--hairline);
     overflow: hidden;
+    box-shadow: inset 0 1px 3px rgba(15, 23, 42, 0.05);
 }
 
 .scope-canvas {
@@ -556,72 +975,242 @@ select:focus, input:focus {
     gap: 8px;
 }
 
-/* 通信统计指标小面板 */
+/* ==========================================================================
+   8. 链路指标与通信终端 (Link Status & Raw Frame Terminal)
+   ========================================================================== */
+
 .stats-strip {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 10px;
-    margin-top: 14px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    margin-top: 0;
 }
 
 .stat-item {
-    background: #090e1a;
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    background: var(--surface-sunken);
+    border: 1px solid var(--hairline);
     border-radius: 6px;
     padding: 8px 12px;
+    box-shadow: var(--bevel-sunken);
 }
 
 .stat-item .stat-lbl {
     font-size: 10px;
     color: var(--text-dim);
     text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 2px;
 }
 
 .stat-item .stat-num {
     font-size: 16px;
     font-weight: 700;
     font-family: var(--font-mono);
-    color: var(--text-main);
+    color: var(--text-bright);
+    font-variant-numeric: var(--tnum);
 }
 
-/* 报文日志区 */
 .log-terminal {
-    background: #060911;
-    border: 1px solid var(--border-subtle);
-    border-radius: 6px;
+    background: #f8fafc;
+    border: 1px solid var(--hairline);
+    border-radius: 8px;
     height: 180px;
     overflow-y: auto;
-    padding: 10px;
+    padding: 10px 14px;
     font-family: var(--font-mono);
     font-size: 11px;
     line-height: 1.6;
+    box-shadow: inset 0 1px 3px rgba(15, 23, 42, 0.05);
+}
+
+.log-terminal::-webkit-scrollbar {
+    width: 6px;
+}
+
+.log-terminal::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.log-terminal::-webkit-scrollbar-thumb {
+    background: var(--hairline-bright);
+    border-radius: 3px;
+}
+
+.log-terminal::-webkit-scrollbar-thumb:hover {
+    background: var(--text-dim);
 }
 
 .log-entry {
-    margin-bottom: 2px;
+    margin-bottom: 3px;
     display: flex;
     gap: 8px;
+    font-variant-numeric: var(--tnum);
 }
 
 .log-entry .time {
-    color: var(--text-dim);
+    color: var(--text-faint);
     user-select: none;
 }
 
-.log-entry.tx .dir { color: var(--accent-cyan); font-weight: bold; }
-.log-entry.rx .dir { color: var(--color-success); font-weight: bold; }
-.log-entry.info .dir { color: #60a5fa; }
-.log-entry.error .dir { color: var(--color-error); font-weight: bold; }
+.log-entry.tx .dir { color: var(--accent-cyan); font-weight: 700; }
+.log-entry.rx .dir { color: var(--color-success); font-weight: 700; }
+.log-entry.info .dir { color: #0284c7; }
+.log-entry.warn .dir { color: var(--color-warning); font-weight: 700; }
+.log-entry.error .dir { color: var(--color-error); font-weight: 700; }
 
 .log-entry .content {
-    color: var(--text-muted);
+    color: var(--text-main);
     word-break: break-all;
 }
+
+/* ==========================================================================
+   9. 扭矩前馈与动态电压上限提示盒 (Torque Feedforward & Dynamic Ceiling Box)
+   ========================================================================== */
+
+.dynamic-ceiling-box {
+    background: #f0f7ff;
+    border: 1px solid #bae6fd;
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin-bottom: 14px;
+}
+
+.ceiling-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.ceiling-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: #0369a1;
+}
+
+.ceiling-badge {
+    font-size: 10px;
+    font-weight: 700;
+    background: #e0f2fe;
+    color: #0284c7;
+    border: 1px solid #7dd3fc;
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-family: var(--font-mono);
+}
+
+.ceiling-val-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+.ceiling-item {
+    flex: 1;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 6px 10px;
+}
+
+.ceiling-lbl {
+    font-size: 10px;
+    color: var(--text-dim);
+    display: block;
+    margin-bottom: 2px;
+}
+
+.ceiling-num {
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--accent-cyan);
+    font-family: var(--font-mono);
+    font-variant-numeric: var(--tnum);
+}
+
+.ceiling-note {
+    font-size: 10px;
+    color: #64748b;
+    line-height: 1.4;
+    border-top: 1px dashed #cbd5e1;
+    padding-top: 6px;
+}
+
+/* ==========================================================================
+   10. 设定值 vs 下位机已生效目标对比条 (Draft vs Applied Target Strip)
+   ========================================================================== */
+
+.target-compare-strip {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--surface-sunken);
+    border: 1px solid var(--hairline);
+    border-radius: 6px;
+    padding: 6px 12px;
+    margin-bottom: 12px;
+    font-size: 11px;
+    font-family: var(--font-mono);
+    font-variant-numeric: var(--tnum);
+}
+
+.target-compare-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--text-muted);
+}
+
+.target-compare-item strong {
+    font-size: 13px;
+    color: var(--text-bright);
+}
+
+.pending-badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 4px;
+    background: #fef3c7;
+    color: #b45309;
+    border: 1px solid #fde68a;
+}
+
+.synced-badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 4px;
+    background: #dcfce7;
+    color: #15803d;
+    border: 1px solid #86efac;
+}
+
+.auto-sync-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--text-dim);
+    margin: 8px 0 12px 0;
+    padding: 4px 2px;
+}
+
+.auto-sync-row label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    user-select: none;
+}
+
     </style>
 </head>
 <body>
 
-    <!-- 顶部状态导航栏 -->
+    <!-- 顶部状态导航栏 (Top Cockpit Header) -->
     <header class="top-header">
         <div class="brand-section">
             <div class="brand-icon">
@@ -629,9 +1218,12 @@ select:focus, input:focus {
                     <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
                 </svg>
             </div>
-            <div class="brand-title">
-                MOTOR TEST STATION
-                <span class="brand-badge">DMA + CRC16</span>
+            <div>
+                <div class="brand-title">
+                    MOTOR TEST STATION
+                    <span class="brand-badge">v2.4 · CLEANROOM AZURE</span>
+                </div>
+                <div class="brand-sub">STM32 实验室电机测控工作台 · 双向 14B · 模式二选一 · 前馈与动态限幅 (+0.5V)</div>
             </div>
         </div>
 
@@ -648,6 +1240,10 @@ select:focus, input:focus {
                 <option value="230400">230400 bps</option>
                 <option value="57600">57600 bps</option>
             </select>
+
+            <button id="btnQueryState" class="btn btn-outline" title="发送 GetState (0x13) 查询下位机最新选定目标与闭环状态">
+                🔄 刷新状态
+            </button>
 
             <button id="btnConnect" class="btn btn-primary">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
@@ -672,109 +1268,357 @@ select:focus, input:focus {
         </div>
     </header>
 
-    <!-- 主工作区 -->
+    <!-- 主工作区 (460px 宽幅控制台 + 右侧遥测示波器大区) -->
     <main class="main-layout">
 
-        <!-- 左侧控制与参数栏 -->
+        <!-- 左侧控制栏 -->
         <aside class="sidebar-col">
 
-            <!-- 目标输出电压设定卡片 -->
-            <section class="card-panel">
-                <div class="card-header">
-                    <div class="card-title">
-                        <span>输出电压控制</span>
-                        <span class="tag">V_TARGET</span>
-                    </div>
-                    <span class="val-disp" id="displayTargetVal">0.00 V</span>
-                </div>
-
-                <div class="control-row">
-                    <div class="control-label">
-                        <span>目标电压设定 (0.0 ~ 18.0 V)</span>
-                    </div>
-                    <div class="slider-container">
-                        <input type="range" id="sliderVoltage" class="slider-custom" min="0" max="18" step="0.05" value="0">
-                    </div>
-                </div>
-
-                <div class="control-row">
-                    <div class="stepper-group">
-                        <button type="button" id="btnStepDec" class="stepper-btn" title="减小 0.2V">-</button>
-                        <input type="number" id="inputVoltage" class="stepper-input" min="0" max="18" step="0.1" value="0.00">
-                        <button type="button" id="btnStepInc" class="stepper-btn" title="增加 0.2V">+</button>
-                    </div>
-                </div>
-
-                <!-- 快捷档位预设 -->
-                <div class="control-row">
-                    <div class="control-label">
-                        <span>常用档位快捷设定</span>
-                    </div>
-                    <div class="preset-grid">
-                        <button type="button" class="preset-chip active" data-val="0">0.0 V</button>
-                        <button type="button" class="preset-chip" data-val="3.3">3.3 V</button>
-                        <button type="button" class="preset-chip" data-val="5.0">5.0 V</button>
-                        <button type="button" class="preset-chip" data-val="8.0">8.0 V</button>
-                        <button type="button" class="preset-chip" data-val="10.0">10.0 V</button>
-                        <button type="button" class="preset-chip" data-val="12.0">12.0 V</button>
-                        <button type="button" class="preset-chip" data-val="15.0">15.0 V</button>
-                        <button type="button" class="preset-chip" data-val="18.0">18.0 V</button>
-                    </div>
-                </div>
-
-                <div style="margin-top: 14px; font-size: 12px; color: var(--text-dim); display: flex; align-items: center; gap: 6px;">
-                    <input type="checkbox" id="chkAutoSync" checked style="accent-color: var(--accent-cyan); cursor: pointer;">
-                    <label for="chkAutoSync" style="cursor: pointer; user-select: none;">拖动滑块或点击档位时实时下发 (20Hz 节流)</label>
-                </div>
-
-                <div class="action-row">
-                    <button type="button" id="btnSend" class="btn btn-primary btn-send">
+            <!-- ==========================================
+                 栏位 1: 主运行控制单元 (通过按钮切换 电压 vs 扭矩)
+                 ========================================== -->
+            <section id="primaryControlCard" class="control-group-card group-voltage">
+                
+                <!-- 模式二选一分段切换条 -->
+                <div class="mode-toggle-strip">
+                    <button type="button" class="mode-toggle-btn active btn-mode-voltage" data-mode="voltage">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                            <path d="M7 2v11h3v9l7-12h-4l4-8z"/>
                         </svg>
-                        立即下发目标
+                        ⚡ 手动电压模式
                     </button>
-                    <button type="button" id="btnEstop" class="btn btn-danger btn-estop">
+                    <button type="button" class="mode-toggle-btn btn-mode-torque" data-mode="torque">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14h2v2h-2v-2zm0-10h2v8h-2V6z"/>
                         </svg>
-                        一键急停 (0V)
+                        🎯 扭矩闭环模式
                     </button>
+                </div>
+
+                <!-- 模式 A: 手动电压模式面板 (包含控制参数 1 与 参数 2) -->
+                <div id="mode-pane-voltage" class="mode-pane active">
+                    <div class="group-header">
+                        <div class="group-title-wrap">
+                            <span class="group-badge badge-v">MODE · VOLTAGE</span>
+                            <span class="group-title">驱动输出控制单元</span>
+                        </div>
+                        <span class="val-disp val-v" id="displayTargetVal">0.00 V</span>
+                    </div>
+
+                    <!-- 设定值 vs 下位机已生效目标对比条 -->
+                    <div class="target-compare-strip">
+                        <div class="target-compare-item">
+                            <span>下位机已生效:</span>
+                            <strong id="appliedVoltageVal">0.00 V</strong>
+                        </div>
+                        <span id="voltageSyncTag" class="synced-badge">✓ 已下发同步</span>
+                    </div>
+
+                    <div id="voltageConflictNotice" class="conflict-notice" style="display: none; font-size: 11px; margin-bottom: 12px; background: #fffbeb; border: 1px solid #fde68a; border-radius: 6px; padding: 6px 10px; color: #92400e;">
+                        <span>⚠️ 扭矩闭环已开启，发送非零手动电压会被下位机拒绝 (ModeConflict)；请先关闭闭环或下发0V。</span>
+                    </div>
+
+                    <!-- 控制参数 1: 目标输出电压 -->
+                    <div class="param-section-box">
+                        <div class="box-label">
+                            <span>控制参数 1 · 目标输出电压 (0.0 ~ 18.0 V)</span>
+                            <span class="param-tag">V_TARGET</span>
+                        </div>
+                        <div class="slider-container">
+                            <input type="range" id="sliderVoltage" class="slider-custom" min="0" max="18" step="0.05" value="0">
+                        </div>
+                        <div class="preset-grid">
+                            <button type="button" class="preset-chip active" data-val="0">0.0 V</button>
+                            <button type="button" class="preset-chip" data-val="3.3">3.3 V</button>
+                            <button type="button" class="preset-chip" data-val="5.0">5.0 V</button>
+                            <button type="button" class="preset-chip" data-val="8.0">8.0 V</button>
+                            <button type="button" class="preset-chip" data-val="10.0">10.0 V</button>
+                            <button type="button" class="preset-chip" data-val="12.0">12.0 V</button>
+                            <button type="button" class="preset-chip" data-val="15.0">15.0 V</button>
+                            <button type="button" class="preset-chip" data-val="18.0">18.0 V</button>
+                        </div>
+                    </div>
+
+                    <!-- 控制参数 2: 步进微调增量 -->
+                    <div class="param-section-box">
+                        <div class="box-label">
+                            <span>控制参数 2 · 步进微调量 (CNC 增量调节)</span>
+                            <span class="param-tag">STEP DELTA</span>
+                        </div>
+                        <div class="stepper-group">
+                            <button type="button" id="btnStepDec" class="stepper-btn" title="减小 0.2V">-0.2V</button>
+                            <input type="number" id="inputVoltage" class="stepper-input" min="0" max="18" step="0.1" value="0.00">
+                            <button type="button" id="btnStepInc" class="stepper-btn" title="增加 0.2V">+0.2V</button>
+                        </div>
+                        <div class="quick-step-row">
+                            <button type="button" class="quick-step-btn" onclick="document.getElementById('inputVoltage').value = Math.max(0, parseFloat(document.getElementById('inputVoltage').value || 0) - 1.0).toFixed(2); document.getElementById('inputVoltage').dispatchEvent(new Event('change'));">-1.0V</button>
+                            <button type="button" class="quick-step-btn" onclick="document.getElementById('inputVoltage').value = Math.max(0, parseFloat(document.getElementById('inputVoltage').value || 0) - 0.5).toFixed(2); document.getElementById('inputVoltage').dispatchEvent(new Event('change'));">-0.5V</button>
+                            <button type="button" class="quick-step-btn" onclick="document.getElementById('inputVoltage').value = Math.min(18, parseFloat(document.getElementById('inputVoltage').value || 0) + 0.5).toFixed(2); document.getElementById('inputVoltage').dispatchEvent(new Event('change'));">+0.5V</button>
+                            <button type="button" class="quick-step-btn" onclick="document.getElementById('inputVoltage').value = Math.min(18, parseFloat(document.getElementById('inputVoltage').value || 0) + 1.0).toFixed(2); document.getElementById('inputVoltage').dispatchEvent(new Event('change'));">+1.0V</button>
+                        </div>
+                    </div>
+
+                    <!-- 自动下发开关 -->
+                    <div class="auto-sync-row">
+                        <label for="chkAutoSync">
+                            <input type="checkbox" id="chkAutoSync" style="accent-color: var(--accent-cyan); cursor: pointer;">
+                            <span>拖动滑块或点击预设/步进时自动下发 (20Hz 节流)</span>
+                        </label>
+                    </div>
+
+                    <div style="display: flex; gap: 10px; margin-top: 8px;">
+                        <button type="button" id="btnSend" class="btn btn-primary" style="flex: 1.2;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                            </svg>
+                            下发电压目标
+                        </button>
+                        <button type="button" id="btnEstop" class="btn btn-danger" style="flex: 1;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+                            </svg>
+                            软件停机 (0V)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 模式 B: 扭矩闭环模式面板 (包含控制参数 1 与 参数 2，及前馈动态限幅提示) -->
+                <div id="mode-pane-torque" class="mode-pane">
+                    <div class="group-header">
+                        <div class="group-title-wrap">
+                            <span class="group-badge badge-t">MODE · TORQUE</span>
+                            <span class="group-title">扭矩闭环控制单元</span>
+                        </div>
+                        <span class="val-disp val-t" id="displayTargetTorque">0.000 N·m</span>
+                    </div>
+
+                    <!-- 闭环与反馈状态指示条 -->
+                    <div class="status-pill-strip">
+                        <div id="pillTorqueLoop" class="status-pill disabled">○ 扭矩闭环: <strong>已关闭</strong></div>
+                        <div id="pillFeedbackValid" class="status-pill disabled">○ 反馈就绪: <strong>未就绪</strong></div>
+                        <div id="pillTorqueLimit" class="status-pill">上限: 3.00 N·m</div>
+                    </div>
+
+                    <!-- 设定值 vs 下位机已接受扭矩目标对比条 -->
+                    <div class="target-compare-strip">
+                        <div class="target-compare-item">
+                            <span>设备已接受目标:</span>
+                            <strong id="appliedTorqueVal">0.000 N·m</strong>
+                        </div>
+                        <span id="torqueSyncTag" class="synced-badge">✓ 已下发同步</span>
+                    </div>
+
+                    <!-- 控制参数 1: 目标扭矩幅值 -->
+                    <div class="param-section-box">
+                        <div class="box-label">
+                            <span>控制参数 1 · 目标扭矩幅值 (0.0 ~ Limit)</span>
+                            <span class="param-tag">TORQUE_TARGET</span>
+                        </div>
+                        <div class="slider-container">
+                            <input type="range" id="sliderTorque" class="slider-custom slider-amber" min="0" max="3" step="0.05" value="0">
+                        </div>
+                        <div class="stepper-group" style="margin-bottom: 8px;">
+                            <button type="button" id="btnStepTorqueDec" class="stepper-btn" title="减小 0.1 N·m">-0.1</button>
+                            <input type="number" id="inputTorque" class="stepper-input" min="0" max="3" step="0.05" value="0.000">
+                            <button type="button" id="btnStepTorqueInc" class="stepper-btn" title="增加 0.1 N·m">+0.1</button>
+                        </div>
+                        <div class="preset-grid">
+                            <button type="button" class="preset-chip torque-chip active" data-val="0">0.0</button>
+                            <button type="button" class="preset-chip torque-chip" data-val="0.5">0.5</button>
+                            <button type="button" class="preset-chip torque-chip" data-val="1.0">1.0</button>
+                            <button type="button" class="preset-chip torque-chip" data-val="1.5">1.5</button>
+                            <button type="button" class="preset-chip torque-chip" data-val="2.0">2.0</button>
+                            <button type="button" class="preset-chip torque-chip" data-val="2.5">2.5</button>
+                            <button type="button" class="preset-chip torque-chip" data-val="3.0">3.0</button>
+                        </div>
+                    </div>
+
+                    <!-- 扭矩前馈与动态电压上限提示盒 (按下位机已接受目标计算) -->
+                    <div class="dynamic-ceiling-box">
+                        <div class="ceiling-header">
+                            <span class="ceiling-title">⚡ 扭矩前馈与动态电压上限 (基于已接受目标)</span>
+                            <span class="ceiling-badge">1 V ⇋ 0.5 N·m (+0.5V 裕量)</span>
+                        </div>
+                        <div class="ceiling-val-row">
+                            <div class="ceiling-item">
+                                <span class="ceiling-lbl">动态输出电压上限 Vmax</span>
+                                <span class="ceiling-num" id="dispTorqueVmax">0.00 V</span>
+                            </div>
+                            <div class="ceiling-item">
+                                <span class="ceiling-lbl">固件前馈计算基准 Vff</span>
+                                <span class="ceiling-num" id="dispTorqueVff">0.00 V</span>
+                            </div>
+                        </div>
+                        <div id="dispDraftCeilingHint" style="display: none; font-size: 11px; color: #b45309; background: #fef3c7; border: 1px solid #fde68a; border-radius: 4px; padding: 4px 8px; margin-bottom: 6px; font-family: var(--font-mono);"></div>
+                        <div class="ceiling-note">
+                            * 依据交接文档规范：按设备已接受目标计算前馈 Vff = min(T/0.5, 18V)，非零目标叠加 +0.5V 裕量作为动态限幅 Vmax = min(Vff + 0.5, 18V)；此为理论限幅提示，非实测电压。
+                        </div>
+                    </div>
+
+                    <!-- 控制参数 2: 扭矩安全上限幅值 -->
+                    <div class="param-section-box">
+                        <div class="box-label">
+                            <span>控制参数 2 · 扭矩保护上限 (在线调整下位机 ID 6)</span>
+                            <span class="param-tag">TORQUE_LIMIT</span>
+                        </div>
+                        <div style="display: flex; gap: 8px; align-items: center;">
+                            <div class="stepper-group" style="flex: 1;">
+                                <button type="button" id="btnStepLimitDec" class="stepper-btn" title="减小 0.5">-0.5</button>
+                                <input type="number" id="inputTorqueLimit" class="stepper-input" min="0.1" max="10" step="0.5" value="3.00">
+                                <button type="button" id="btnStepLimitInc" class="stepper-btn" title="增加 0.5">+0.5</button>
+                            </div>
+                            <button type="button" id="btnSetTorqueLimit" class="btn btn-outline" style="font-size: 12px; height: 38px; border-color: var(--accent-amber); color: var(--accent-amber);">
+                                更新上限
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 扭矩模式操作按钮 -->
+                    <div style="display: flex; gap: 8px; margin-bottom: 8px;">
+                        <button type="button" id="btnSetTorque" class="btn btn-outline" style="flex: 1; border-color: var(--accent-amber); color: var(--accent-amber);">
+                            下发扭矩目标
+                        </button>
+                        <button type="button" id="btnEnableTorque" class="btn btn-success" style="flex: 1;" title="自动先下发当前设定目标，再开启扭矩闭环">
+                            ▶ 开启闭环
+                        </button>
+                        <button type="button" id="btnDisableTorque" class="btn btn-outline" style="flex: 1;">
+                            ⏹ 关闭闭环
+                        </button>
+                    </div>
+                    <div>
+                        <button type="button" id="btnStopTorque" class="btn btn-danger" style="width: 100%;">
+                            ⛔ 紧急停机 (关闭闭环并归零)
+                        </button>
+                    </div>
+                </div>
+
+            </section>
+
+            <!-- ==========================================
+                 栏位 2: 下位机 6 参数调优与 Flash 安全持久化组 (GROUP 02)
+                 ========================================== -->
+            <section class="control-group-card">
+                <div class="group-header">
+                    <div class="group-title-wrap">
+                        <span class="group-badge" style="background: var(--surface-sunken); color: var(--text-dim); border: 1px solid var(--hairline);">GROUP 02</span>
+                        <span class="group-title">下位机 6 参数调优与 Flash 保存</span>
+                    </div>
+                    <span id="flashSaveBadge" style="font-size: 11px; font-family: var(--font-mono); color: var(--text-dim);">未保存改动</span>
+                </div>
+
+                <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+                    <button type="button" id="btnReadParams" class="btn btn-outline" style="flex: 1; font-size: 12px; padding: 6px 8px;">
+                        📥 从设备读取 (RAM)
+                    </button>
+                    <button type="button" id="btnApplyParams" class="btn btn-primary" style="flex: 1; font-size: 12px; padding: 6px 8px;">
+                        📤 应用改动到 RAM
+                    </button>
+                </div>
+
+                <!-- 完整 6 项参数对称网格 (2列 x 3行: Kp, Ki, Kd, Q, R, TorqueLimit) -->
+                <div class="param-grid">
+                    <div class="param-card">
+                        <div class="param-header">
+                            <span class="param-name">1. Kp</span>
+                            <span class="param-badge-ram" id="ramKp">1.00</span>
+                        </div>
+                        <div class="param-input-wrap">
+                            <input type="number" id="paramKp" class="param-input" step="0.1" min="0" value="1.00">
+                        </div>
+                        <div class="param-desc">扭矩 PID 比例增益 (100Hz)</div>
+                    </div>
+
+                    <div class="param-card">
+                        <div class="param-header">
+                            <span class="param-name">2. Ki</span>
+                            <span class="param-badge-ram" id="ramKi">0.05</span>
+                        </div>
+                        <div class="param-input-wrap">
+                            <input type="number" id="paramKi" class="param-input" step="0.01" min="0" value="0.05">
+                        </div>
+                        <div class="param-desc">扭矩 PID 离散积分增益</div>
+                    </div>
+
+                    <div class="param-card">
+                        <div class="param-header">
+                            <span class="param-name">3. Kd</span>
+                            <span class="param-badge-ram" id="ramKd">0.01</span>
+                        </div>
+                        <div class="param-input-wrap">
+                            <input type="number" id="paramKd" class="param-input" step="0.01" min="0" value="0.01">
+                        </div>
+                        <div class="param-desc">扭矩 PID 离散微分增益</div>
+                    </div>
+
+                    <div class="param-card">
+                        <div class="param-header">
+                            <span class="param-name">4. Q (Process)</span>
+                            <span class="param-badge-ram" id="ramQ">0.0100</span>
+                        </div>
+                        <div class="param-input-wrap">
+                            <input type="number" id="paramQ" class="param-input" step="0.001" min="0" value="0.0100">
+                        </div>
+                        <div class="param-desc">卡尔曼过程噪声方差</div>
+                    </div>
+
+                    <div class="param-card">
+                        <div class="param-header">
+                            <span class="param-name">5. R (Measure)</span>
+                            <span class="param-badge-ram" id="ramR">0.0100</span>
+                        </div>
+                        <div class="param-input-wrap">
+                            <input type="number" id="paramR" class="param-input" step="0.001" min="0.0001" value="0.0100">
+                        </div>
+                        <div class="param-desc">卡尔曼测量噪声方差 (&gt;0)</div>
+                    </div>
+
+                    <div class="param-card">
+                        <div class="param-header">
+                            <span class="param-name">6. TorqueLimit</span>
+                            <span class="param-badge-ram" id="ramLimit">3.00</span>
+                        </div>
+                        <div class="param-input-wrap">
+                            <input type="number" id="paramLimit" class="param-input" step="0.5" min="0.1" value="3.00">
+                        </div>
+                        <div class="param-desc">目标扭矩幅值上限 (N·m)</div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 10px;">
+                    <button type="button" id="btnSaveFlash" class="btn btn-save-flash">
+                        💾 停机安全保存到 Flash
+                    </button>
+                    <div style="font-size: 11px; color: var(--text-dim); margin-top: 6px; line-height: 1.4;">
+                        * 严格遵循 HANDOFF.md 停机保存规范：先发送 0V 停止输出，逐项写入 6 项 RAM 参数，再擦写持久化到板载 Flash。
+                    </div>
                 </div>
             </section>
 
-            <!-- 通信指标统计与协议卡片 -->
-            <section class="card-panel">
-                <div class="card-header">
-                    <div class="card-title">
-                        <span>链路状态与通信质量</span>
+            <!-- 通信链路状态卡片 -->
+            <section class="card-panel" style="padding: 14px 18px; margin-bottom: 0;">
+                <div class="card-header" style="margin-bottom: 10px; padding-bottom: 6px;">
+                    <div class="card-title" style="font-size: 12px;">
+                        <span>通信链路质量与指标</span>
+                        <span class="tag" style="font-size: 9px; padding: 1px 5px;">USART3 115200</span>
                     </div>
-                    <span style="font-size: 11px; color: var(--text-dim); font-family: var(--font-mono);">USART3 115200</span>
                 </div>
-
                 <div class="stats-strip" style="grid-template-columns: 1fr 1fr; margin-top: 0;">
-                    <div class="stat-item">
-                        <div class="stat-lbl">接收有效帧 (RX)</div>
-                        <div class="stat-num" id="statRxFrames" style="color: var(--color-success);">0</div>
+                    <div class="stat-item" style="padding: 6px 10px;">
+                        <div class="stat-lbl" style="font-size: 9px;">RX 有效帧</div>
+                        <div class="stat-num" id="statRxFrames" style="font-size: 14px; color: var(--color-success);">0</div>
                     </div>
-                    <div class="stat-item">
-                        <div class="stat-lbl">发送命令数 (TX)</div>
-                        <div class="stat-num" id="statTxFrames" style="color: var(--accent-cyan);">0</div>
+                    <div class="stat-item" style="padding: 6px 10px;">
+                        <div class="stat-lbl" style="font-size: 9px;">TX 命令数</div>
+                        <div class="stat-num" id="statTxFrames" style="font-size: 14px; color: var(--accent-cyan);">0</div>
                     </div>
-                    <div class="stat-item">
-                        <div class="stat-lbl">通信帧率 (FPS)</div>
-                        <div class="stat-num" id="statFps" style="color: #60a5fa;">-- Hz</div>
+                    <div class="stat-item" style="padding: 6px 10px;">
+                        <div class="stat-lbl" style="font-size: 9px;">遥测帧率</div>
+                        <div class="stat-num" id="statFps" style="font-size: 14px; color: #0284c7;">-- Hz</div>
                     </div>
-                    <div class="stat-item">
-                        <div class="stat-lbl">CRC 校验错误</div>
-                        <div class="stat-num" id="statCrcErrors" style="color: var(--text-dim);">0</div>
+                    <div class="stat-item" style="padding: 6px 10px;">
+                        <div class="stat-lbl" style="font-size: 9px;">CRC 校验错</div>
+                        <div class="stat-num" id="statCrcErrors" style="font-size: 14px; color: var(--text-dim);">0</div>
                     </div>
-                </div>
-
-                <div style="margin-top: 14px; font-size: 11px; color: var(--text-dim); line-height: 1.6; border-top: 1px dashed rgba(255,255,255,0.06); padding-top: 10px;">
-                    <div>• 帧格式：14 字节小端对齐，帧头 <code>0xA5</code>，版本 <code>0x01</code></div>
-                    <div>• 校验算法：CRC-16/CCITT-FALSE (初值 0xFFFF)</div>
-                    <div>• 反馈数据：実测输出电压 <code>V_feedback</code> + 实测扭矩 <code>Torque</code></div>
                 </div>
             </section>
 
@@ -789,43 +1633,60 @@ select:focus, input:focus {
                 <div class="metric-gauge-card voltage-card">
                     <div class="metric-title">
                         <span>实测输出电压 (V_FEEDBACK)</span>
-                        <span style="color: var(--accent-cyan); font-family: var(--font-mono);">CHANNEL A</span>
+                        <span style="color: var(--accent-cyan); font-family: var(--font-mono); font-weight: 700;">● CHANNEL A</span>
                     </div>
                     <div class="metric-value-wrap">
                         <span class="metric-huge-val" id="dispVoltage">0.000</span>
                         <span class="metric-unit">V</span>
                     </div>
+                    <div class="meter-track">
+                        <div id="meterBarV" class="meter-fill-v"></div>
+                    </div>
                     <div class="metric-sub-stats">
                         <div>谷值 Min: <span id="dispVoltageMin">--</span> V</div>
                         <div>峰值 Max: <span id="dispVoltageMax">--</span> V</div>
+                        <div>全局量程: <span>18.00</span> V</div>
                     </div>
                 </div>
 
                 <!-- 实测扭矩卡片 -->
                 <div class="metric-gauge-card torque-card">
                     <div class="metric-title">
-                        <span>实测扭矩反馈 (TORQUE_FEEDBACK)</span>
-                        <span style="color: var(--accent-amber); font-family: var(--font-mono);">CHANNEL B</span>
+                        <span>实测机械扭矩 (TORQUE_FEEDBACK)</span>
+                        <span style="color: var(--accent-amber); font-family: var(--font-mono); font-weight: 700;">● CHANNEL B</span>
                     </div>
                     <div class="metric-value-wrap">
                         <span class="metric-huge-val" id="dispTorque">0.000</span>
-                        <span class="metric-unit">Nm</span>
+                        <span class="metric-unit">N·m</span>
+                    </div>
+                    <div class="meter-track">
+                        <div id="meterBarT" class="meter-fill-t"></div>
                     </div>
                     <div class="metric-sub-stats">
-                        <div>峰值 |Max|: <span id="dispTorqueMax">--</span> Nm</div>
-                        <div>标定满量程: <span>20.0</span> Nm</div>
+                        <div>峰值 |Max|: <span id="dispTorqueMax">--</span> N·m</div>
+                        <div>安全上限: <span id="dispTorqueLimit">3.00 N·m</span></div>
                     </div>
                 </div>
             </div>
 
             <!-- 双通道 Canvas 示波器卡片 -->
-            <section class="card-panel" style="margin-bottom: 20px;">
+            <section class="card-panel" style="margin-bottom: 18px;">
                 <div class="card-header">
                     <div class="card-title">
                         <span>双通道实时动态示波器</span>
-                        <span class="tag">60 FPS 硬件加速</span>
+                        <span class="tag" style="background: var(--accent-cyan-subtle); color: var(--accent-cyan); border: 1px solid var(--accent-cyan-border); font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: 700;">60 FPS 硬件加速</span>
                     </div>
-                    <div class="scope-actions">
+                    <div class="scope-actions" style="align-items: center;">
+                        <label style="font-size: 12px; color: var(--text-muted); display: inline-flex; align-items: center; gap: 5px; cursor: pointer; user-select: none; margin-right: 4px;">
+                            <input type="checkbox" id="chkShowTargetRef" checked style="accent-color: var(--accent-cyan); cursor: pointer;">
+                            目标/限幅参考线
+                        </label>
+                        <select id="selectScopePoints" title="历史时间窗口点数" style="padding: 4px 24px 4px 8px; font-size: 12px;">
+                            <option value="250">窗口: 250 点</option>
+                            <option value="500" selected>窗口: 500 点</option>
+                            <option value="1000">窗口: 1000 点</option>
+                            <option value="2000">窗口: 2000 点</option>
+                        </select>
                         <button type="button" id="btnPauseChart" class="btn btn-outline" style="padding: 5px 12px; font-size: 12px;">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
                                 <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
@@ -857,12 +1718,16 @@ select:focus, input:focus {
                 <div class="card-header">
                     <div class="card-title">
                         <span>通信报文监视器</span>
-                        <span class="tag">RAW FRAMES</span>
+                        <span class="tag" style="background: var(--surface-sunken); color: var(--text-dim); border: 1px solid var(--hairline); font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: 700;">TX / 0x82 应答常显</span>
                     </div>
                     <div style="display: flex; align-items: center; gap: 14px;">
-                        <label style="font-size: 12px; color: var(--text-dim); display: flex; align-items: center; gap: 6px; cursor: pointer; user-select: none;">
+                        <label style="font-size: 12px; color: var(--text-dim); display: flex; align-items: center; gap: 5px; cursor: pointer; user-select: none;" title="开启后打印每 10ms 一次的 0x81 周期测量反馈帧">
                             <input type="checkbox" id="chkShowHex" style="accent-color: var(--accent-cyan); cursor: pointer;">
-                            详细打印十六进制数据
+                            打印高频测量帧 (0x81)
+                        </label>
+                        <label style="font-size: 12px; color: var(--text-dim); display: flex; align-items: center; gap: 5px; cursor: pointer; user-select: none;">
+                            <input type="checkbox" id="chkPauseLog" style="accent-color: var(--accent-cyan); cursor: pointer;">
+                            暂停滚动
                         </label>
                         <button type="button" id="btnClearLog" class="btn btn-outline" style="padding: 4px 10px; font-size: 11px;">
                             清空日志
@@ -882,10 +1747,17 @@ select:focus, input:focus {
 // Embedded: protocol.js
 /**
  * @file protocol.js
- * @brief 电机上位机通信协议编解码器与帧流解包器
+ * @brief STM32 电机测控与闭环调试通信协议编解码器与流式解包器
+ * @version 0x01 (匹配 Motor_test 最新下位机协议与 HANDOFF.md 规范)
  *
- * 协议规范（双向均为固定 14 字节小端对齐）：
- * 帧头(0xA5) + 版本(0x01) + 类型(0x01/0x81) + 序号(uint8) + Float32(4B) + Float32/保留(4B) + CRC16(2B)
+ * 协议规范（双向固定 14 字节小端对齐，CRC-16/CCITT-FALSE）：
+ * [0] 帧头 0xA5
+ * [1] 版本 0x01
+ * [2] 操作码 / 消息类型 (下行 0x01~0x13，上行 0x81/0x82)
+ * [3] 序列号 (0~255)
+ * [4~7] word0 (小端 uint32 / float32)
+ * [8~11] word1 (小端 uint32 / float32)
+ * [12~13] CRC16 (低字节在前，小端)
  */
 
 (function (global) {
@@ -893,12 +1765,89 @@ select:focus, input:focus {
 
     const HEADER = 0xA5;
     const VERSION = 0x01;
-    const TYPE_SET_VOLTAGE = 0x01;
-    const TYPE_FEEDBACK = 0x81;
     const FRAME_SIZE = 14;
     const MAX_VOLTAGE = 18.0;
 
-    // CRC-16/CCITT-FALSE 预计算 256 项查找表
+    // 上行类型
+    const TYPE_FEEDBACK = 0x81;
+    const TYPE_COMMAND_RESPONSE = 0x82;
+
+    // 下行命令类型
+    const CommandType = Object.freeze({
+        SetVoltage: 0x01,
+        SetTorque: 0x02,
+        SetTorqueEnabled: 0x03,
+        SetParameter: 0x10,
+        GetParameter: 0x11,
+        SaveParameters: 0x12,
+        GetState: 0x13
+    });
+
+    const CommandNames = Object.freeze({
+        0x01: 'SetVoltage',
+        0x02: 'SetTorque',
+        0x03: 'SetTorqueEnabled',
+        0x10: 'SetParameter',
+        0x11: 'GetParameter',
+        0x12: 'SaveParameters',
+        0x13: 'GetState'
+    });
+
+    // 参数 ID
+    const ParameterId = Object.freeze({
+        Kp: 1,
+        Ki: 2,
+        Kd: 3,
+        ProcessNoise: 4,      // Q
+        MeasurementNoise: 5,  // R
+        TorqueLimit: 6
+    });
+
+    const ParameterNames = Object.freeze({
+        1: { name: 'Kp', label: '比例增益 Kp', default: 1.0, min: 0.0, step: 0.1 },
+        2: { name: 'Ki', label: '积分增益 Ki (100Hz)', default: 0.0, min: 0.0, step: 0.01 },
+        3: { name: 'Kd', label: '微分增益 Kd', default: 0.0, min: 0.0, step: 0.01 },
+        4: { name: 'ProcessNoise', label: '过程噪声 Q', default: 0.01, min: 0.0, step: 0.001 },
+        5: { name: 'MeasurementNoise', label: '测量噪声 R', default: 0.01, min: 0.0001, step: 0.001 },
+        6: { name: 'TorqueLimit', label: '扭矩上限幅值', default: 3.0, min: 0.1, step: 0.5 }
+    });
+
+    // 应答状态码
+    const Result = Object.freeze({
+        Ok: 0,
+        InvalidValue: 1,
+        NotReady: 2,
+        ModeConflict: 3,
+        OutputActive: 4,
+        StorageError: 5,
+        HardwareError: 6
+    });
+
+    const ResultNames = Object.freeze({
+        0: 'Ok (成功)',
+        1: 'InvalidValue (数值非法/越界)',
+        2: 'NotReady (未就绪/无有效扭矩反馈)',
+        3: 'ModeConflict (模式冲突/闭环中禁止手动电压)',
+        4: 'OutputActive (输出未停止/拒绝保存)',
+        5: 'StorageError (Flash 存储错误)',
+        6: 'HardwareError (硬件错误/启停失败)'
+    });
+
+    // 存储错误码
+    const StorageCodeNames = Object.freeze({
+        0: 'Ok (写入成功)',
+        1: 'NotFound (未找到有效记录)',
+        2: 'InvalidLayout (存储布局错误)',
+        3: 'InvalidParameters (参数校验未通过)',
+        4: 'OutputActive (输出处于运行状态)',
+        5: 'UnlockFailed (Flash解锁失败)',
+        6: 'EraseFailed (扇区擦除失败)',
+        7: 'ProgramFailed (编程写入失败)',
+        8: 'VerifyFailed (回读校验不匹配)',
+        9: 'LockFailed (Flash上锁失败)'
+    });
+
+    // CRC-16/CCITT-FALSE 预计算查找表
     // Poly: 0x1021, Init: 0xFFFF, RefIn: false, RefOut: false, XorOut: 0x0000
     const CRC_TABLE = new Uint16Array(256);
     for (let i = 0; i < 256; i++) {
@@ -913,12 +1862,6 @@ select:focus, input:focus {
         CRC_TABLE[i] = curr;
     }
 
-    /**
-     * 计算数据的 CRC16/CCITT-FALSE
-     * @param {Uint8Array} buffer 
-     * @param {number} length 
-     * @returns {number} 16位无符号整数
-     */
     function calcCrc16(buffer, length = buffer.length) {
         let crc = 0xFFFF;
         for (let i = 0; i < length; i++) {
@@ -927,212 +1870,346 @@ select:focus, input:focus {
         return crc & 0xFFFF;
     }
 
-    /**
-     * 将字节数组格式化为大写十六进制字符串（如 "A5 01 01 00 ..."）
-     * @param {Uint8Array} arr 
-     * @returns {string}
-     */
     function bytesToHex(arr) {
         return Array.from(arr).map(b => b.toString(16).padStart(2, '0').toUpperCase()).join(' ');
     }
 
     /**
-     * 打包下行指令：设置目标输出电压
-     * @param {number} targetVoltage 目标电压 (V, 范围 0.0 ~ 18.0)
-     * @param {number} sequence 帧序号 (0 ~ 255)
-     * @returns {Uint8Array} 14 字节的完整二进制帧
+     * 辅助完成帧打包 (前12字节计算CRC并置入12~13)
      */
-    function encodeSetVoltage(targetVoltage, sequence = 0) {
-        let v = Number(targetVoltage);
-        if (!Number.isFinite(v)) v = 0.0;
-        if (v < 0.0) v = 0.0;
-        if (v > MAX_VOLTAGE) v = MAX_VOLTAGE;
-
-        const frame = new Uint8Array(FRAME_SIZE);
-        frame[0] = HEADER;
-        frame[1] = VERSION;
-        frame[2] = TYPE_SET_VOLTAGE;
-        frame[3] = (sequence & 0xFF);
-
-        const view = new DataView(frame.buffer);
-        // 小端 Float32
-        view.setFloat32(4, v, true);
-        // 保留 4 字节为 0.0
-        view.setFloat32(8, 0.0, true);
-
-        // CRC 校验前 12 字节
+    function finishFrame(frame) {
         const crc = calcCrc16(frame, 12);
         frame[12] = crc & 0xFF;        // 低字节在前
         frame[13] = (crc >>> 8) & 0xFF; // 高字节在后
-
         return frame;
     }
 
+    // --- 下行命令打包函数 ---
+
     /**
-     * 解码上行反馈帧（14 字节）
+     * 0x01 SetVoltage: 设置手动输出目标电压 (0.0 ~ 18.0 V)
+     */
+    function encodeSetVoltage(voltage, sequence = 0) {
+        const v = Math.max(0.0, Math.min(MAX_VOLTAGE, Number(voltage) || 0.0));
+        const frame = new Uint8Array(FRAME_SIZE);
+        frame[0] = HEADER;
+        frame[1] = VERSION;
+        frame[2] = CommandType.SetVoltage;
+        frame[3] = (sequence & 0xFF);
+        const view = new DataView(frame.buffer);
+        view.setFloat32(4, v, true);
+        view.setUint32(8, 0, true);
+        return finishFrame(frame);
+    }
+
+    /**
+     * 0x02 SetTorque: 设置扭矩目标幅值 (0.0 ~ TorqueLimit)
+     */
+    function encodeSetTorque(torque, sequence = 0) {
+        const t = Math.max(0.0, Number(torque) || 0.0);
+        const frame = new Uint8Array(FRAME_SIZE);
+        frame[0] = HEADER;
+        frame[1] = VERSION;
+        frame[2] = CommandType.SetTorque;
+        frame[3] = (sequence & 0xFF);
+        const view = new DataView(frame.buffer);
+        view.setFloat32(4, t, true);
+        view.setUint32(8, 0, true);
+        return finishFrame(frame);
+    }
+
+    /**
+     * 0x03 SetTorqueEnabled: 开启 (1) / 关闭 (0) 扭矩闭环
+     */
+    function encodeSetTorqueEnabled(enabled, sequence = 0) {
+        const frame = new Uint8Array(FRAME_SIZE);
+        frame[0] = HEADER;
+        frame[1] = VERSION;
+        frame[2] = CommandType.SetTorqueEnabled;
+        frame[3] = (sequence & 0xFF);
+        const view = new DataView(frame.buffer);
+        view.setUint32(4, enabled ? 1 : 0, true);
+        view.setUint32(8, 0, true);
+        return finishFrame(frame);
+    }
+
+    /**
+     * 0x10 SetParameter: 写入下位机 RAM 参数
+     */
+    function encodeSetParameter(parameterId, value, sequence = 0) {
+        const frame = new Uint8Array(FRAME_SIZE);
+        frame[0] = HEADER;
+        frame[1] = VERSION;
+        frame[2] = CommandType.SetParameter;
+        frame[3] = (sequence & 0xFF);
+        const view = new DataView(frame.buffer);
+        view.setUint32(4, parameterId, true);
+        view.setFloat32(8, Number(value) || 0.0, true);
+        return finishFrame(frame);
+    }
+
+    /**
+     * 0x11 GetParameter: 读取下位机当前 RAM 参数
+     */
+    function encodeGetParameter(parameterId, sequence = 0) {
+        const frame = new Uint8Array(FRAME_SIZE);
+        frame[0] = HEADER;
+        frame[1] = VERSION;
+        frame[2] = CommandType.GetParameter;
+        frame[3] = (sequence & 0xFF);
+        const view = new DataView(frame.buffer);
+        view.setUint32(4, parameterId, true);
+        view.setUint32(8, 0, true);
+        return finishFrame(frame);
+    }
+
+    /**
+     * 0x12 SaveParameters: 将当前 RAM 参数持久化到下位机 Flash
+     */
+    function encodeSaveParameters(sequence = 0) {
+        const frame = new Uint8Array(FRAME_SIZE);
+        frame[0] = HEADER;
+        frame[1] = VERSION;
+        frame[2] = CommandType.SaveParameters;
+        frame[3] = (sequence & 0xFF);
+        const view = new DataView(frame.buffer);
+        view.setUint32(4, 0, true);
+        view.setUint32(8, 0, true);
+        return finishFrame(frame);
+    }
+
+    /**
+     * 0x13 GetState: 查询当前选定扭矩目标与状态
+     */
+    function encodeGetState(sequence = 0) {
+        const frame = new Uint8Array(FRAME_SIZE);
+        frame[0] = HEADER;
+        frame[1] = VERSION;
+        frame[2] = CommandType.GetState;
+        frame[3] = (sequence & 0xFF);
+        const view = new DataView(frame.buffer);
+        view.setUint32(4, 0, true);
+        view.setUint32(8, 0, true);
+        return finishFrame(frame);
+    }
+
+    // --- 上行帧解码函数 ---
+
+    /**
+     * 通用上行帧解码器 (支持 0x81 测量反馈与 0x82 命令应答)
      * @param {Uint8Array} frame 
      * @returns {object|null}
      */
-    function decodeFeedback(frame) {
+    function decodeFrame(frame) {
         if (!frame || frame.length !== FRAME_SIZE) return null;
-        if (frame[0] !== HEADER || frame[1] !== VERSION || frame[2] !== TYPE_FEEDBACK) {
-            return null;
-        }
+        if (frame[0] !== HEADER || frame[1] !== VERSION) return null;
 
         const view = new DataView(frame.buffer, frame.byteOffset, frame.byteLength);
         const expectedCrc = calcCrc16(frame, 12);
-        const actualCrc = view.getUint16(12, true); // 小端读取
+        const actualCrc = view.getUint16(12, true);
 
         if (expectedCrc !== actualCrc) {
             return {
                 valid: false,
-                error: `CRC mismatch (expected 0x${expectedCrc.toString(16).padStart(4, '0')}, got 0x${actualCrc.toString(16).padStart(4, '0')})`,
+                error: `CRC校验不匹配 (期望 0x${expectedCrc.toString(16).padStart(4, '0').toUpperCase()}, 实际 0x${actualCrc.toString(16).padStart(4, '0').toUpperCase()})`,
                 rawBytes: new Uint8Array(frame)
             };
         }
 
+        const type = frame[2];
         const seq = frame[3];
-        const voltage = view.getFloat32(4, true);
-        const torque = view.getFloat32(8, true);
 
-        return {
-            valid: true,
-            seq: seq,
-            voltage: Number.isFinite(voltage) ? voltage : 0.0,
-            torque: Number.isFinite(torque) ? torque : 0.0,
-            rawBytes: new Uint8Array(frame),
-            timestamp: performance.now()
-        };
-    }
+        if (type === TYPE_FEEDBACK) {
+            // 0x81 测量反馈帧
+            const voltage = view.getFloat32(4, true);
+            const torque = view.getFloat32(8, true);
+            return {
+                valid: true,
+                type: 'feedback',
+                seq: seq,
+                voltage: Number.isFinite(voltage) ? voltage : 0.0,
+                torque: Number.isFinite(torque) ? torque : 0.0,
+                rawBytes: new Uint8Array(frame),
+                timestamp: performance.now()
+            };
+        } else if (type === TYPE_COMMAND_RESPONSE) {
+            // 0x82 命令应答帧
+            const statusWord = view.getUint32(4, true);
+            const result = statusWord & 0xFF;
+            const torqueEnabled = Boolean(statusWord & (1 << 8));
+            const feedbackValid = Boolean(statusWord & (1 << 9));
+            const originalCmdType = (statusWord >> 16) & 0xFF;
+            const value = view.getFloat32(8, true);
 
-    /**
-     * 流式帧解包器，可应对串口数据分片、粘包和前置噪声
-     */
-    class StreamUnpacker {
-        constructor(onFrameCallback, onErrorCallback) {
-            this.buffer = new Uint8Array(1024);
-            this.bufferLen = 0;
-            this.onFrame = onFrameCallback || (() => {});
-            this.onError = onErrorCallback || (() => {});
-            this.stats = {
-                bytesReceived: 0,
-                validFrames: 0,
-                crcErrors: 0,
-                discardedBytes: 0
+            return {
+                valid: true,
+                type: 'response',
+                seq: seq,
+                result: result,
+                resultName: ResultNames[result] || `Unknown (${result})`,
+                torqueEnabled: torqueEnabled,
+                feedbackValid: feedbackValid,
+                originalCmdType: originalCmdType,
+                originalCmdName: CommandNames[originalCmdType] || `0x${originalCmdType.toString(16).padStart(2, '0')}`,
+                value: Number.isFinite(value) ? value : 0.0,
+                rawBytes: new Uint8Array(frame),
+                timestamp: performance.now()
             };
         }
 
-        reset() {
-            this.bufferLen = 0;
+        return null;
+    }
+
+    /**
+     * @class StreamUnpacker
+     * @brief 流式串口分片解包器（具备自动重同步与双向帧路由）
+     */
+    class StreamUnpacker {
+        constructor(handlers = {}) {
+            this.onFeedback = handlers.onFeedback || handlers; // 兼容旧版单一回调
+            this.onResponse = handlers.onResponse || null;
+            this.onError = handlers.onError || null;
+
+            this.buffer = new Uint8Array(2048);
+            this.length = 0;
+
+            this.stats = {
+                validFrames: 0,
+                feedbackFrames: 0,
+                responseFrames: 0,
+                crcErrors: 0,
+                syncDrops: 0
+            };
         }
 
-        /**
-         * 接收新流入的数据块
-         * @param {Uint8Array} chunk 
-         */
         feed(chunk) {
             if (!chunk || chunk.length === 0) return;
-            this.stats.bytesReceived += chunk.length;
 
-            // 扩展缓冲区容量如果需要
-            if (this.bufferLen + chunk.length > this.buffer.length) {
-                const newCap = Math.max(this.buffer.length * 2, this.bufferLen + chunk.length + 256);
-                const nextBuf = new Uint8Array(newCap);
-                nextBuf.set(this.buffer.subarray(0, this.bufferLen), 0);
-                this.buffer = nextBuf;
+            // 扩容保护
+            if (this.length + chunk.length > this.buffer.length) {
+                const newCap = Math.max(this.buffer.length * 2, this.length + chunk.length + 512);
+                const newBuf = new Uint8Array(newCap);
+                newBuf.set(this.buffer.subarray(0, this.length), 0);
+                this.buffer = newBuf;
             }
 
-            this.buffer.set(chunk, this.bufferLen);
-            this.bufferLen += chunk.length;
+            this.buffer.set(chunk, this.length);
+            this.length += chunk.length;
 
-            // 循环寻找完整有效帧
-            while (this.bufferLen >= FRAME_SIZE) {
-                // 查找帧头 0xA5
-                let headerIdx = -1;
-                for (let i = 0; i < this.bufferLen; i++) {
-                    if (this.buffer[i] === HEADER) {
-                        headerIdx = i;
-                        break;
-                    }
-                }
-
-                if (headerIdx === -1) {
-                    // 整个缓冲区中没有帧头，全为垃圾数据
-                    this.stats.discardedBytes += this.bufferLen;
-                    this.bufferLen = 0;
-                    break;
-                }
-
-                if (headerIdx > 0) {
-                    // 抛弃帧头前面的噪点字节
-                    this.stats.discardedBytes += headerIdx;
-                    this.buffer.copyWithin(0, headerIdx, this.bufferLen);
-                    this.bufferLen -= headerIdx;
-                }
-
-                // 现在 buffer[0] 一定是 0xA5
-                if (this.bufferLen < FRAME_SIZE) {
-                    // 虽有帧头，但不足 14 字节，等待下次流数据拼接
-                    break;
-                }
-
-                // 检查版本与消息类型初步过滤
-                const ver = this.buffer[1];
-                const type = this.buffer[2];
-
-                if (ver !== VERSION || (type !== TYPE_FEEDBACK && type !== TYPE_SET_VOLTAGE)) {
-                    // 不是合法协议帧，滑过该假帧头字节
-                    this.stats.discardedBytes += 1;
-                    this.buffer.copyWithin(0, 1, this.bufferLen);
-                    this.bufferLen -= 1;
+            let searchIdx = 0;
+            while (searchIdx <= this.length - FRAME_SIZE) {
+                // 搜索帧头 0xA5
+                if (this.buffer[searchIdx] !== HEADER) {
+                    searchIdx++;
+                    this.stats.syncDrops++;
                     continue;
                 }
 
-                // 提取 14 字节候选帧进行校验
-                const candidate = this.buffer.subarray(0, FRAME_SIZE);
-                const decoded = decodeFeedback(candidate);
-
-                if (decoded && decoded.valid) {
-                    this.stats.validFrames++;
-                    this.onFrame(decoded);
-                    // 消耗这 14 字节
-                    this.buffer.copyWithin(0, FRAME_SIZE, this.bufferLen);
-                    this.bufferLen -= FRAME_SIZE;
-                } else {
-                    // CRC 校验错误
-                    this.stats.crcErrors++;
-                    this.onError(decoded || { error: 'Unknown frame error' });
-                    // 滑过这 1 字节继续找下一个可能的帧头
-                    this.stats.discardedBytes += 1;
-                    this.buffer.copyWithin(0, 1, this.bufferLen);
-                    this.bufferLen -= 1;
+                // 检查版本号
+                if (this.buffer[searchIdx + 1] !== VERSION) {
+                    searchIdx++;
+                    this.stats.syncDrops++;
+                    continue;
                 }
+
+                // 检查是否为有效上行消息类型 (0x81 或 0x82)
+                const msgType = this.buffer[searchIdx + 2];
+                if (msgType !== TYPE_FEEDBACK && msgType !== TYPE_COMMAND_RESPONSE) {
+                    searchIdx++;
+                    this.stats.syncDrops++;
+                    continue;
+                }
+
+                // 提取候选 14 字节
+                const candidate = this.buffer.subarray(searchIdx, searchIdx + FRAME_SIZE);
+                const decoded = decodeFrame(candidate);
+
+                if (!decoded) {
+                    searchIdx++;
+                    continue;
+                }
+
+                if (!decoded.valid) {
+                    this.stats.crcErrors++;
+                    if (this.onError) this.onError(decoded);
+                    searchIdx++; // CRC 错误向后滑动重新搜索
+                    continue;
+                }
+
+                // 合法帧路由
+                this.stats.validFrames++;
+                if (decoded.type === 'feedback') {
+                    this.stats.feedbackFrames++;
+                    if (typeof this.onFeedback === 'function') {
+                        this.onFeedback(decoded);
+                    }
+                } else if (decoded.type === 'response') {
+                    this.stats.responseFrames++;
+                    if (typeof this.onResponse === 'function') {
+                        this.onResponse(decoded);
+                    }
+                }
+
+                searchIdx += FRAME_SIZE;
             }
+
+            // 整理剩余半帧数据
+            if (searchIdx > 0) {
+                const remain = this.length - searchIdx;
+                if (remain > 0) {
+                    this.buffer.copyWithin(0, searchIdx, this.length);
+                }
+                this.length = remain;
+            }
+        }
+
+        reset() {
+            this.length = 0;
+            this.stats.validFrames = 0;
+            this.stats.feedbackFrames = 0;
+            this.stats.responseFrames = 0;
+            this.stats.crcErrors = 0;
+            this.stats.syncDrops = 0;
         }
     }
 
-    // 导出到全局命名空间
-    global.MotorProtocol = {
+    const MotorProtocol = {
         HEADER,
         VERSION,
-        TYPE_SET_VOLTAGE,
-        TYPE_FEEDBACK,
         FRAME_SIZE,
         MAX_VOLTAGE,
+        TYPE_FEEDBACK,
+        TYPE_COMMAND_RESPONSE,
+        CommandType,
+        CommandNames,
+        ParameterId,
+        ParameterNames,
+        Result,
+        ResultNames,
+        StorageCodeNames,
         calcCrc16,
         bytesToHex,
         encodeSetVoltage,
-        decodeFeedback,
+        encodeSetTorque,
+        encodeSetTorqueEnabled,
+        encodeSetParameter,
+        encodeGetParameter,
+        encodeSaveParameters,
+        encodeGetState,
+        decodeFrame,
         StreamUnpacker
     };
 
+    global.MotorProtocol = MotorProtocol;
+
 })(typeof window !== 'undefined' ? window : (typeof globalThis !== 'undefined' ? globalThis : (typeof global !== 'undefined' ? global : this)));
-    </script>
-    <script>
+
+
 // Embedded: serial.js
 /**
  * @file serial.js
- * @brief 串口硬件适配器 (Web Serial API) 与 虚拟单片机仿真器 (Mock Motor)
+ * @brief 现代 Web Serial 硬件串口驱动与高保真虚拟电机下位机仿真器
+ * @version 0x01 (支持 0x81/0x82 协议与扭矩闭环状态机)
  */
 
 (function (global) {
@@ -1140,94 +2217,114 @@ select:focus, input:focus {
 
     class SerialManager {
         constructor(options = {}) {
+            this.baudRate = options.baudRate || 115200;
+            this.onData = options.onData || (() => {});
+            this.onStatusChange = options.onStatusChange || (() => {});
+            this.onLog = options.onLog || (() => {});
+
             this.port = null;
             this.reader = null;
             this.writer = null;
             this.keepReading = false;
             this.isConnected = false;
+
+            // 虚拟硬件仿真器状态机
             this.isMocking = false;
-
-            this.onData = options.onData || (() => {});
-            this.onLog = options.onLog || (() => {});
-            this.onStatusChange = options.onStatusChange || (() => {});
-
-            this.baudRate = options.baudRate || 115200;
             this.mockTimer = null;
-            this.mockTargetV = 0.0;
-            this.mockCurrentV = 0.0;
-            this.mockTorque = 0.0;
             this.mockSeq = 0;
+
+            // 仿真参数与控制量
+            this.mockState = {
+                vTarget: 0.0,
+                vCurrent: 0.0,
+                torqueTarget: 0.0,
+                torqueCurrent: 0.0,
+                torqueEnabled: false,
+                feedbackValid: true,
+                pidIntegral: 0.0,
+                pidPrevError: 0.0,
+                ramParams: {
+                    1: 1.0,    // Kp
+                    2: 0.05,   // Ki
+                    3: 0.01,   // Kd
+                    4: 0.01,   // Q
+                    5: 0.01,   // R
+                    6: 3.0     // TorqueLimit
+                },
+                flashParams: {
+                    1: 1.0,
+                    2: 0.05,
+                    3: 0.01,
+                    4: 0.01,
+                    5: 0.01,
+                    6: 3.0
+                }
+            };
         }
 
-        /**
-         * 检测当前浏览器是否支持 Web Serial API
-         */
         static isSupported() {
-            return typeof navigator !== 'undefined' && 'serial' in navigator;
+            return 'serial' in navigator;
         }
 
-        /**
-         * 请求用户授权并连接物理串口
-         * @param {number} baudRate 波特率 (默认 115200)
-         */
-        async connect(baudRate = 115200) {
+        async connect(baudRate = this.baudRate) {
+            if (!SerialManager.isSupported()) {
+                throw new Error('当前浏览器不支持 Web Serial API，请使用 Google Chrome 或 Edge 89+');
+            }
+
             if (this.isMocking) {
                 this.stopMock();
             }
 
-            if (!SerialManager.isSupported()) {
-                throw new Error('当前浏览器不支持 Web Serial API。请使用最新版 Google Chrome、Microsoft Edge 或 Opera 浏览器。');
-            }
-
-            this.baudRate = baudRate;
             try {
                 this.port = await navigator.serial.requestPort();
                 await this.port.open({
-                    baudRate: this.baudRate,
+                    baudRate: baudRate,
                     dataBits: 8,
                     stopBits: 1,
                     parity: 'none',
                     flowControl: 'none',
                     bufferSize: 4096
                 });
+                try {
+                    if (this.port.setSignals) {
+                        await this.port.setSignals({ dataTerminalReady: true, requestToSend: true });
+                    }
+                } catch (_) {}
 
                 this.isConnected = true;
                 this.keepReading = true;
-                this.onStatusChange({ connected: true, type: 'hardware', port: this.port, baudRate: this.baudRate });
-                this.onLog('success', `串口已成功开启 (波特率: ${this.baudRate} 8N1)`);
+                this.baudRate = baudRate;
+
+                this.onStatusChange({ connected: true, baudRate: this.baudRate, type: 'hardware' });
+                this.onLog('info', `已成功连接串口 (波特率: ${this.baudRate} 8N1)`);
 
                 this._readLoop();
                 return true;
             } catch (err) {
                 this.isConnected = false;
                 this.onStatusChange({ connected: false });
-                if (err.name === 'NotFoundError') {
-                    this.onLog('info', '用户取消了串口选择');
-                } else {
+                if (err.name !== 'NotFoundError') {
                     this.onLog('error', `串口连接失败: ${err.message}`);
-                    throw err;
                 }
-                return false;
+                throw err;
             }
         }
 
-        /**
-         * 关闭串口连接
-         */
         async disconnect() {
+            this.keepReading = false;
+
             if (this.isMocking) {
                 this.stopMock();
                 return;
             }
 
-            this.keepReading = false;
             try {
                 if (this.reader) {
                     await this.reader.cancel();
                     this.reader = null;
                 }
                 if (this.writer) {
-                    await this.writer.close();
+                    this.writer.releaseLock();
                     this.writer = null;
                 }
                 if (this.port) {
@@ -1244,7 +2341,7 @@ select:focus, input:focus {
         }
 
         /**
-         * 发送二进制数据
+         * 发送二进制帧数据
          * @param {Uint8Array} data 
          */
         async send(data) {
@@ -1268,9 +2365,6 @@ select:focus, input:focus {
             }
         }
 
-        /**
-         * 读取循环
-         */
         async _readLoop() {
             while (this.port && this.port.readable && this.keepReading) {
                 try {
@@ -1304,38 +2398,65 @@ select:focus, input:focus {
         }
 
         /**
-         * 启动虚拟硬件模拟器模式（便于脱机调试）
+         * 启动虚拟硬件仿真器
          */
         startMock() {
             if (this.isConnected) {
                 this.disconnect();
             }
             this.isMocking = true;
-            this.mockTargetV = 0.0;
-            this.mockCurrentV = 0.0;
-            this.mockTorque = 0.0;
+
+            // 复位仿真运行态
+            this.mockState.vTarget = 0.0;
+            this.mockState.vCurrent = 0.0;
+            this.mockState.torqueTarget = 0.0;
+            this.mockState.torqueCurrent = 0.0;
+            this.mockState.torqueEnabled = false;
+            this.mockState.feedbackValid = true;
+            this.mockState.pidIntegral = 0.0;
+            this.mockState.pidPrevError = 0.0;
             this.mockSeq = 0;
 
             this.onStatusChange({ connected: true, type: 'mock' });
-            this.onLog('info', '已启动【虚拟电机模拟器】模式 (仿真 20Hz 连续反馈)');
+            this.onLog('info', '已启动【虚拟电机与下位机仿真器】(支持 0x81 测量与 0x82 闭环应答)');
 
-            // 50ms 一帧 (20Hz)
+            // 50ms 一帧 (20Hz 遥测反馈)
             this.mockTimer = setInterval(() => {
-                // 一阶惯性电压过渡仿真: V_feedback 动态逼近 target
-                const alpha = 0.12;
-                this.mockCurrentV += (this.mockTargetV - this.mockCurrentV) * alpha;
+                const ms = this.mockState;
 
-                // 叠加微量传感器热噪声
-                const vNoise = (Math.random() - 0.5) * 0.008;
-                const finalV = Math.max(0, this.mockCurrentV + vNoise);
+                // 若扭矩闭环开启，执行外环扭矩前馈 + PID 计算 (最新下位机固件架构)
+                if (ms.torqueEnabled && ms.feedbackValid) {
+                    const kp = ms.ramParams[1] || 1.0;
+                    const ki = ms.ramParams[2] || 0.05;
+                    const kd = ms.ramParams[3] || 0.01;
 
-                // 扭矩物理仿真模型：阻尼扭矩 + 与电压相关的电磁扭矩 + 微量扰动
-                const targetTorque = finalV > 0.1 ? (finalV * 0.45 + Math.sin(Date.now() / 400) * 0.3) : 0.0;
-                this.mockTorque += (targetTorque - this.mockTorque) * 0.15;
-                const tNoise = (Math.random() - 0.5) * 0.03;
-                const finalT = this.mockTorque + tNoise;
+                    // 最新规范：前馈 Vff = min(T / 0.5, 18V)，动态电压上限增加 +0.5V 裕量避免电压不足
+                    const torquePerVolt = 0.5;
+                    const vff = ms.torqueTarget > 0 ? Math.min(ms.torqueTarget / torquePerVolt, MotorProtocol.MAX_VOLTAGE) : 0.0;
+                    const voltageLimit = ms.torqueTarget > 0 ? Math.min(vff + 0.5, MotorProtocol.MAX_VOLTAGE) : 0.0;
 
-                // 打包上行反馈帧
+                    const err = ms.torqueTarget - ms.torqueCurrent;
+                    ms.pidIntegral = Math.max(-voltageLimit, Math.min(voltageLimit, ms.pidIntegral + ki * err));
+                    const dErr = err - ms.pidPrevError;
+                    ms.pidPrevError = err;
+
+                    const pidOut = kp * err + ms.pidIntegral + kd * dErr + vff;
+                    ms.vTarget = Math.max(0.0, Math.min(voltageLimit, pidOut));
+                }
+
+                // 一阶惯性电压过渡仿真
+                const vAlpha = 0.15;
+                ms.vCurrent += (ms.vTarget - ms.vCurrent) * vAlpha;
+                const vNoise = (Math.random() - 0.5) * 0.006;
+                const finalV = Math.max(0.0, ms.vCurrent + vNoise);
+
+                // 扭矩物理仿真模型 (电磁扭矩 + 惯性阻尼 + ADS1220 热噪声)
+                const targetTorque = finalV > 0.05 ? (finalV * 0.42 + Math.sin(Date.now() / 500) * 0.12) : 0.0;
+                ms.torqueCurrent += (targetTorque - ms.torqueCurrent) * 0.18;
+                const tNoise = (Math.random() - 0.5) * 0.015;
+                const finalT = Math.max(0.0, ms.torqueCurrent + tNoise);
+
+                // 打包并下发 0x81 测量反馈帧
                 const frame = new Uint8Array(MotorProtocol.FRAME_SIZE);
                 frame[0] = MotorProtocol.HEADER;
                 frame[1] = MotorProtocol.VERSION;
@@ -1350,53 +2471,213 @@ select:focus, input:focus {
                 frame[12] = crc & 0xFF;
                 frame[13] = (crc >>> 8) & 0xFF;
 
-                // 模拟串口流入
                 this.onData(frame);
             }, 50);
         }
 
-        /**
-         * 停止虚拟硬件模拟器
-         */
         stopMock() {
             if (!this.isMocking) return;
             if (this.mockTimer) {
                 clearInterval(this.mockTimer);
                 this.mockTimer = null;
             }
+            this.isMocking = false;
             this.onStatusChange({ connected: false });
             this.onLog('info', '已关闭虚拟模拟器');
         }
 
         /**
-         * 虚拟硬件处理上位机发送的下行控制帧
+         * 虚拟硬件处理上位机发送的下行控制帧并生成 0x82 应答
          */
         _handleMockReceive(data) {
             if (!data || data.length !== MotorProtocol.FRAME_SIZE) return;
-            if (data[0] !== MotorProtocol.HEADER || data[1] !== MotorProtocol.VERSION || data[2] !== MotorProtocol.TYPE_SET_VOLTAGE) {
-                return;
-            }
-            const expectedCrc = MotorProtocol.calcCrc16(data, 12);
-            const dv = new DataView(data.buffer, data.byteOffset, data.byteLength);
-            const actualCrc = dv.getUint16(12, true);
-            if (expectedCrc === actualCrc) {
-                const target = dv.getFloat32(4, true);
-                if (Number.isFinite(target) && target >= 0 && target <= MotorProtocol.MAX_VOLTAGE) {
-                    this.mockTargetV = target;
+            if (data[0] !== MotorProtocol.HEADER || data[1] !== MotorProtocol.VERSION) return;
+
+            // 校验 CRC
+            const crcExp = MotorProtocol.calcCrc16(data, 12);
+            const dvIn = new DataView(data.buffer, data.byteOffset, data.byteLength);
+            const crcAct = dvIn.getUint16(12, true);
+            if (crcExp !== crcAct) return;
+
+            const cmdType = data[2];
+            const seq = data[3];
+            const ms = this.mockState;
+
+            let result = MotorProtocol.Result.Ok;
+            let respVal = 0.0;
+
+            const mp = MotorProtocol;
+
+            switch (cmdType) {
+                case mp.CommandType.SetVoltage: {
+                    const reqV = dvIn.getFloat32(4, true);
+                    const reserved = dvIn.getUint32(8, true);
+                    if (reserved !== 0 || !Number.isFinite(reqV) || reqV < 0.0 || reqV > 18.0) {
+                        result = mp.Result.InvalidValue;
+                    } else if (reqV === 0.0) {
+                        // 软件停止
+                        ms.torqueEnabled = false;
+                        ms.vTarget = 0.0;
+                        ms.pidIntegral = 0.0;
+                        result = mp.Result.Ok;
+                        respVal = 0.0;
+                    } else if (ms.torqueEnabled) {
+                        // 扭矩闭环运行中，禁止非零手动电压
+                        result = mp.Result.ModeConflict;
+                        respVal = 0.0;
+                    } else {
+                        ms.vTarget = reqV;
+                        result = mp.Result.Ok;
+                        respVal = reqV;
+                    }
+                    break;
                 }
+
+                case mp.CommandType.SetTorque: {
+                    const reqT = dvIn.getFloat32(4, true);
+                    const reserved = dvIn.getUint32(8, true);
+                    const limit = ms.ramParams[6] || 3.0;
+                    if (reserved !== 0 || !Number.isFinite(reqT) || reqT < 0.0 || reqT > limit) {
+                        result = mp.Result.InvalidValue;
+                    } else {
+                        ms.torqueTarget = reqT;
+                        result = mp.Result.Ok;
+                        respVal = reqT;
+                    }
+                    break;
+                }
+
+                case mp.CommandType.SetTorqueEnabled: {
+                    const enableArg = dvIn.getUint32(4, true);
+                    const reserved = dvIn.getUint32(8, true);
+                    if (reserved !== 0 || (enableArg !== 0 && enableArg !== 1)) {
+                        result = mp.Result.InvalidValue;
+                    } else if (enableArg === 1) {
+                        if (!ms.feedbackValid) {
+                            result = mp.Result.NotReady;
+                        } else {
+                            ms.torqueEnabled = true;
+                            ms.pidIntegral = 0.0;
+                            ms.pidPrevError = 0.0;
+                            result = mp.Result.Ok;
+                            respVal = 1.0;
+                        }
+                    } else {
+                        ms.torqueEnabled = false;
+                        ms.vTarget = 0.0;
+                        ms.pidIntegral = 0.0;
+                        result = mp.Result.Ok;
+                        respVal = 0.0;
+                    }
+                    break;
+                }
+
+                case mp.CommandType.SetParameter: {
+                    const paramId = dvIn.getUint32(4, true);
+                    const val = dvIn.getFloat32(8, true);
+                    if (paramId < 1 || paramId > 6 || !Number.isFinite(val)) {
+                        result = mp.Result.InvalidValue;
+                    } else if (paramId === 5 && val <= 0) { // R > 0
+                        result = mp.Result.InvalidValue;
+                    } else if (paramId === 6 && val <= 0) { // Limit > 0
+                        result = mp.Result.InvalidValue;
+                    } else if (val < 0) {
+                        result = mp.Result.InvalidValue;
+                    } else {
+                        ms.ramParams[paramId] = val;
+                        if (paramId === 6) {
+                            ms.torqueTarget = Math.min(ms.torqueTarget, val);
+                        }
+                        // 复位 PID
+                        ms.pidIntegral = 0.0;
+                        ms.pidPrevError = 0.0;
+                        result = mp.Result.Ok;
+                        respVal = val;
+                    }
+                    break;
+                }
+
+                case mp.CommandType.GetParameter: {
+                    const paramId = dvIn.getUint32(4, true);
+                    const reserved = dvIn.getUint32(8, true);
+                    if (reserved !== 0 || paramId < 1 || paramId > 6) {
+                        result = mp.Result.InvalidValue;
+                    } else {
+                        result = mp.Result.Ok;
+                        respVal = ms.ramParams[paramId] !== undefined ? ms.ramParams[paramId] : 0.0;
+                    }
+                    break;
+                }
+
+                case mp.CommandType.SaveParameters: {
+                    const first = dvIn.getUint32(4, true);
+                    const second = dvIn.getUint32(8, true);
+                    if (first !== 0 || second !== 0) {
+                        result = mp.Result.InvalidValue;
+                    } else if (ms.torqueEnabled || ms.vTarget > 0.05) {
+                        result = mp.Result.OutputActive;
+                        respVal = 0.0;
+                    } else {
+                        // 模拟持久化到 Flash
+                        ms.flashParams = Object.assign({}, ms.ramParams);
+                        result = mp.Result.Ok;
+                        respVal = 0.0; // StorageCode.Ok = 0
+                    }
+                    break;
+                }
+
+                case mp.CommandType.GetState: {
+                    const first = dvIn.getUint32(4, true);
+                    const second = dvIn.getUint32(8, true);
+                    if (first !== 0 || second !== 0) {
+                        result = mp.Result.InvalidValue;
+                    } else {
+                        result = mp.Result.Ok;
+                        respVal = ms.torqueTarget;
+                    }
+                    break;
+                }
+
+                default:
+                    return; // 未知命令丢弃
             }
+
+            // 打包 0x82 命令应答帧
+            const respFrame = new Uint8Array(mp.FRAME_SIZE);
+            respFrame[0] = mp.HEADER;
+            respFrame[1] = mp.VERSION;
+            respFrame[2] = mp.TYPE_COMMAND_RESPONSE;
+            respFrame[3] = seq;
+
+            const dvOut = new DataView(respFrame.buffer);
+            const statusWord = (result & 0xFF) |
+                               ((ms.torqueEnabled ? 1 : 0) << 8) |
+                               ((ms.feedbackValid ? 1 : 0) << 9) |
+                               ((cmdType & 0xFF) << 16);
+            dvOut.setUint32(4, statusWord, true);
+            dvOut.setFloat32(8, respVal, true);
+
+            const crc = mp.calcCrc16(respFrame, 12);
+            respFrame[12] = crc & 0xFF;
+            respFrame[13] = (crc >>> 8) & 0xFF;
+
+            // 异步延迟 2ms 回传（模拟真实下位机应答时延）
+            setTimeout(() => {
+                this.onData(respFrame);
+            }, 2);
         }
     }
 
     global.SerialManager = SerialManager;
 
 })(typeof window !== 'undefined' ? window : (typeof globalThis !== 'undefined' ? globalThis : (typeof global !== 'undefined' ? global : this)));
-    </script>
-    <script>
+
+
 // Embedded: chart.js
 /**
  * @file chart.js
- * @brief 高性能工业级双通道实时 Canvas 示波器 (电压通道 & 扭矩通道)
+ * @brief 高性能工业/实验室级双通道实时 Canvas 示波器 (电压通道 & 扭矩通道 & 目标参考轨迹)
+ * @architecture Cleanroom White + Ice Blue 极客纯白与浅蓝仪器视觉规范
  */
 
 (function (global) {
@@ -1409,15 +2690,25 @@ select:focus, input:focus {
             this.ctx = this.canvas.getContext('2d');
 
             // 配置参数
-            this.maxPoints = options.maxPoints || 500; // 屏幕显示的历史点数 (约 25 秒)
+            this.maxPoints = options.maxPoints || 500; // 屏幕显示的历史点数
             this.vMin = 0.0;
             this.vMax = 20.0; // 电压轴量程 0 ~ 20V
-            this.tMin = -5.0;
-            this.tMax = 25.0; // 扭矩轴量程 -5 ~ 25 Nm (支持自适应或固定)
+            this.tMin = -0.5;
+            this.tMax = 5.0;  // 扭矩轴初始量程 (支持自适应扩展)
             this.autoScaleTorque = true;
+            this.showTargetRef = true;
 
-            // 数据缓存队列
-            this.data = []; // { time, voltage, torque }
+            // 当前控制参考值 (用于绘制目标/限幅参考线)
+            this.refState = {
+                mode: 'voltage',    // 'voltage' | 'torque'
+                vTarget: 0.0,       // 手动电压目标 (V)
+                tTarget: 0.0,       // 闭环扭矩目标 (N·m)
+                vCeiling: 0.0,      // 闭环动态电压上限 Vmax (V)
+                torqueEnabled: false
+            };
+
+            // 数据缓存队列: { time, voltage, torque, vRef, tRef }
+            this.data = [];
             this.isPaused = false;
 
             // 交互光标
@@ -1425,19 +2716,25 @@ select:focus, input:focus {
             this.mouseY = null;
             this.isHovering = false;
 
-            // 调色盘规范（与工业深暗风格契合）
+            // 调色盘规范：纯白 + 冰蓝 Cleanroom 实验室仪表调色体系
             this.theme = {
-                bg: '#080c14',
-                gridMajor: '#17223b',
-                gridMinor: '#0f172a',
-                text: '#64748b',
-                accentLine: '#1e293b',
-                voltageLine: '#38bdf8',     // Sky Blue
-                voltageFill: 'rgba(56, 189, 248, 0.08)',
-                torqueLine: '#f59e0b',      // Amber Gold
-                torqueFill: 'rgba(245, 158, 11, 0.08)',
-                crosshair: 'rgba(148, 163, 184, 0.5)',
-                tooltipBg: 'rgba(15, 23, 42, 0.92)'
+                bg: '#f8fafc',                              // 浅亮仪器背景
+                gridMajor: 'rgba(15, 23, 42, 0.08)',         // 主分度线
+                gridMinor: 'rgba(15, 23, 42, 0.03)',         // 副分度线
+                text: '#64748b',                            // 轴标签文字
+                textBright: '#334155',                      // 标头文字
+                accentLine: 'rgba(15, 23, 42, 0.16)',       // 外框线
+                voltageLine: '#0284c7',                     // 通道 A: 湛蓝 (Electric Sky Blue)
+                voltageRefLine: 'rgba(2, 132, 199, 0.55)',  // 电压目标/上限参考虚线
+                voltageFillTop: 'rgba(2, 132, 199, 0.16)',
+                voltageFillBottom: 'rgba(2, 132, 199, 0.01)',
+                torqueLine: '#d97706',                      // 通道 B: 机械金 (Machine Amber)
+                torqueRefLine: 'rgba(217, 119, 6, 0.65)',   // 扭矩目标参考虚线
+                torqueFillTop: 'rgba(217, 119, 6, 0.16)',
+                torqueFillBottom: 'rgba(217, 119, 6, 0.01)',
+                crosshair: 'rgba(15, 23, 42, 0.45)',        // 准星虚线
+                tooltipBg: 'rgba(255, 255, 255, 0.96)',      // 悬浮提示框背景
+                tooltipBorder: 'rgba(2, 132, 199, 0.35)'     // 悬浮提示框边框
             };
 
             this._setupEvents();
@@ -1474,18 +2771,47 @@ select:focus, input:focus {
         }
 
         /**
+         * 更新当前目标参考线状态
+         */
+        setTargets(state = {}) {
+            Object.assign(this.refState, state);
+        }
+
+        /**
+         * 设置历史采样窗口点数 (时基缩放)
+         */
+        setMaxPoints(maxPoints) {
+            const n = parseInt(maxPoints, 10);
+            if (Number.isFinite(n) && n >= 50 && n <= 5000) {
+                this.maxPoints = n;
+                while (this.data.length > this.maxPoints) {
+                    this.data.shift();
+                }
+            }
+        }
+
+        setShowTargetRef(show) {
+            this.showTargetRef = Boolean(show);
+        }
+
+        /**
          * 推送一帧新数据点
          * @param {number} voltage 电压值 (V)
-         * @param {number} torque 扭矩值
+         * @param {number} torque 扭矩值 (N·m)
          * @param {number} time 时间戳 (ms)
          */
         pushData(voltage, torque, time = performance.now()) {
             if (this.isPaused) return;
 
+            const vRef = this.refState.torqueEnabled ? this.refState.vCeiling : this.refState.vTarget;
+            const tRef = this.refState.tTarget;
+
             this.data.push({
                 time: time,
                 voltage: Number(voltage) || 0.0,
-                torque: Number(torque) || 0.0
+                torque: Number(torque) || 0.0,
+                vRef: Number(vRef) || 0.0,
+                tRef: Number(tRef) || 0.0
             });
 
             if (this.data.length > this.maxPoints) {
@@ -1508,10 +2834,10 @@ select:focus, input:focus {
         exportCsv() {
             if (this.data.length === 0) return null;
             const t0 = this.data[0].time;
-            let csv = 'Index,RelTimeSec,Voltage_V,Torque_Nm\n';
+            let csv = 'Index,RelTimeSec,Voltage_V,Torque_Nm,VoltageRef_V,TorqueRef_Nm\n';
             this.data.forEach((p, idx) => {
                 const relTime = ((p.time - t0) / 1000).toFixed(4);
-                csv += `${idx},${relTime},${p.voltage.toFixed(4)},${p.torque.toFixed(4)}\n`;
+                csv += `${idx},${relTime},${p.voltage.toFixed(4)},${p.torque.toFixed(4)},${(p.vRef || 0).toFixed(4)},${(p.tRef || 0).toFixed(4)}\n`;
             });
             return csv;
         }
@@ -1532,9 +2858,9 @@ select:focus, input:focus {
             ctx.fillRect(0, 0, w, h);
 
             // 边距
-            const padLeft = 55;
-            const padRight = 55;
-            const padTop = 30;
+            const padLeft = 58;
+            const padRight = 58;
+            const padTop = 34;
             const padBottom = 32;
 
             const plotW = w - padLeft - padRight;
@@ -1542,33 +2868,35 @@ select:focus, input:focus {
 
             if (plotW <= 0 || plotH <= 0) return;
 
-            // 计算动态自适应扭矩刻度
+            // 计算动态自适应扭矩刻度 (包含目标参考线防止越界)
             let tMin = this.tMin;
             let tMax = this.tMax;
             if (this.autoScaleTorque && this.data.length > 0) {
-                let minT = Infinity;
-                let maxT = -Infinity;
+                let minT = 0.0;
+                let maxT = this.refState.tTarget > 0 ? this.refState.tTarget : 0.5;
                 for (let i = 0; i < this.data.length; i++) {
                     const t = this.data[i].torque;
+                    const tr = this.data[i].tRef || 0;
                     if (t < minT) minT = t;
                     if (t > maxT) maxT = t;
+                    if (this.showTargetRef && tr > maxT) maxT = tr;
                 }
                 if (Number.isFinite(minT) && Number.isFinite(maxT)) {
-                    const span = Math.max(2.0, maxT - minT);
-                    tMin = Math.floor(minT - span * 0.15);
-                    tMax = Math.ceil(maxT + span * 0.15);
+                    const span = Math.max(1.0, maxT - minT);
+                    tMin = Math.floor((minT - span * 0.1) * 10) / 10;
+                    tMax = Math.ceil((maxT + span * 0.18) * 10) / 10;
                 }
             }
 
-            // 2. 绘制网格与时间刻度
+            // 2. 绘制网格与时间刻度 (Tektronix Reticle 风格)
             ctx.lineWidth = 1;
             const gridRows = 6;
             const gridCols = 8;
 
             // 横向网格线 (电压与扭矩分度)
             for (let r = 0; r <= gridRows; r++) {
-                const y = padTop + (plotH / gridRows) * r;
-                ctx.strokeStyle = (r === 0 || r === gridRows) ? this.theme.accentLine : this.theme.gridMinor;
+                const y = Math.round(padTop + (plotH / gridRows) * r) + 0.5;
+                ctx.strokeStyle = (r === 0 || r === gridRows) ? this.theme.accentLine : this.theme.gridMajor;
                 ctx.beginPath();
                 ctx.moveTo(padLeft, y);
                 ctx.lineTo(w - padRight, y);
@@ -1577,12 +2905,12 @@ select:focus, input:focus {
                 // 标定左 Y 轴刻度 (电压 0 ~ 20V)
                 const vVal = this.vMax - (this.vMax - this.vMin) * (r / gridRows);
                 ctx.fillStyle = this.theme.voltageLine;
-                ctx.font = '11px Consolas, monospace';
+                ctx.font = '11px "JetBrains Mono", Consolas, monospace';
                 ctx.textAlign = 'right';
                 ctx.textBaseline = 'middle';
                 ctx.fillText(`${vVal.toFixed(1)}V`, padLeft - 8, y);
 
-                // 标定右 Y 轴刻度 (扭矩)
+                // 标定右 Y 轴刻度 (扭矩 N·m)
                 const tVal = tMax - (tMax - tMin) * (r / gridRows);
                 ctx.fillStyle = this.theme.torqueLine;
                 ctx.textAlign = 'left';
@@ -1591,19 +2919,84 @@ select:focus, input:focus {
 
             // 纵向网格线
             for (let c = 0; c <= gridCols; c++) {
-                const x = padLeft + (plotW / gridCols) * c;
-                ctx.strokeStyle = (c === 0 || c === gridCols) ? this.theme.accentLine : this.theme.gridMinor;
+                const x = Math.round(padLeft + (plotW / gridCols) * c) + 0.5;
+                ctx.strokeStyle = (c === 0 || c === gridCols) ? this.theme.accentLine : this.theme.gridMajor;
                 ctx.beginPath();
                 ctx.moveTo(x, padTop);
                 ctx.lineTo(x, h - padBottom);
                 ctx.stroke();
             }
 
-            // 绘制底边时间轴说明
+            // 计算实际时间跨度说明
+            let timeSpanText = `历史窗口容量: ${this.maxPoints} 点 (等待数据流...)`;
+            if (this.data.length > 1) {
+                const spanSec = ((this.data[this.data.length - 1].time - this.data[0].time) / 1000).toFixed(1);
+                timeSpanText = `实时时间跨度: ${spanSec} 秒 (已采样 ${this.data.length} / ${this.maxPoints} 点)`;
+            }
             ctx.fillStyle = this.theme.text;
+            ctx.font = '11px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'top';
-            ctx.fillText('历史时间窗口 (最近 ~25 秒 / 500 点)', padLeft + plotW / 2, h - padBottom + 10);
+            ctx.fillText(timeSpanText, padLeft + plotW / 2, h - padBottom + 10);
+
+            const getY_V = (v) => {
+                const ratio = (v - this.vMin) / (this.vMax - this.vMin);
+                return padTop + plotH * (1 - Math.max(0, Math.min(1, ratio)));
+            };
+
+            const getY_T = (t) => {
+                const ratio = (t - tMin) / (tMax - tMin);
+                return padTop + plotH * (1 - Math.max(0, Math.min(1, ratio)));
+            };
+
+            // 2.5 绘制目标/上限参考虚线 (Target / Ceiling Reference Lines)
+            if (this.showTargetRef) {
+                ctx.save();
+                ctx.beginPath();
+                ctx.rect(padLeft, padTop, plotW, plotH);
+                ctx.clip();
+
+                const activeVRef = this.refState.torqueEnabled ? this.refState.vCeiling : this.refState.vTarget;
+                if (activeVRef > 0.01) {
+                    const yVRef = Math.round(getY_V(activeVRef)) + 0.5;
+                    ctx.strokeStyle = this.theme.voltageRefLine;
+                    ctx.lineWidth = 1.2;
+                    ctx.setLineDash([6, 4]);
+                    ctx.beginPath();
+                    ctx.moveTo(padLeft, yVRef);
+                    ctx.lineTo(w - padRight, yVRef);
+                    ctx.stroke();
+
+                    ctx.setLineDash([]);
+                    ctx.font = '10px "JetBrains Mono", Consolas, monospace';
+                    ctx.fillStyle = this.theme.voltageLine;
+                    ctx.textAlign = 'left';
+                    ctx.textBaseline = 'bottom';
+                    const vLabel = this.refState.torqueEnabled
+                        ? `Vmax 限幅: ${activeVRef.toFixed(2)}V`
+                        : `V 目标: ${activeVRef.toFixed(2)}V`;
+                    ctx.fillText(vLabel, padLeft + 6, Math.max(padTop + 12, yVRef - 3));
+                }
+
+                if (this.refState.tTarget > 0.005) {
+                    const yTRef = Math.round(getY_T(this.refState.tTarget)) + 0.5;
+                    ctx.strokeStyle = this.theme.torqueRefLine;
+                    ctx.lineWidth = 1.2;
+                    ctx.setLineDash([6, 4]);
+                    ctx.beginPath();
+                    ctx.moveTo(padLeft, yTRef);
+                    ctx.lineTo(w - padRight, yTRef);
+                    ctx.stroke();
+
+                    ctx.setLineDash([]);
+                    ctx.font = '10px "JetBrains Mono", Consolas, monospace';
+                    ctx.fillStyle = this.theme.torqueLine;
+                    ctx.textAlign = 'right';
+                    ctx.textBaseline = 'bottom';
+                    ctx.fillText(`T 目标: ${this.refState.tTarget.toFixed(3)} N·m`, w - padRight - 6, Math.max(padTop + 12, yTRef - 3));
+                }
+                ctx.restore();
+            }
 
             // 3. 映射与绘制曲线
             if (this.data.length > 1) {
@@ -1612,23 +3005,16 @@ select:focus, input:focus {
                 // 数据靠右对齐
                 const offsetX = padLeft + (this.maxPoints - count) * stepX;
 
-                const getY_V = (v) => {
-                    const ratio = (v - this.vMin) / (this.vMax - this.vMin);
-                    return padTop + plotH * (1 - Math.max(0, Math.min(1, ratio)));
-                };
-
-                const getY_T = (t) => {
-                    const ratio = (t - tMin) / (tMax - tMin);
-                    return padTop + plotH * (1 - Math.max(0, Math.min(1, ratio)));
-                };
-
-                // (A) 绘制电压通道折线与半透明渐变
                 ctx.save();
                 ctx.beginPath();
                 ctx.rect(padLeft, padTop, plotW, plotH);
                 ctx.clip(); // 限制在示波器绘图区内
 
-                // 阴影面积
+                // (A) 绘制电压通道渐变面积
+                const gradV = ctx.createLinearGradient(0, padTop, 0, padTop + plotH);
+                gradV.addColorStop(0, this.theme.voltageFillTop);
+                gradV.addColorStop(1, this.theme.voltageFillBottom);
+
                 ctx.beginPath();
                 ctx.moveTo(offsetX, getY_V(this.data[0].voltage));
                 for (let i = 1; i < count; i++) {
@@ -1639,10 +3025,10 @@ select:focus, input:focus {
                 ctx.lineTo(offsetX + (count - 1) * stepX, padTop + plotH);
                 ctx.lineTo(offsetX, padTop + plotH);
                 ctx.closePath();
-                ctx.fillStyle = this.theme.voltageFill;
+                ctx.fillStyle = gradV;
                 ctx.fill();
 
-                // 曲线
+                // (A) 绘制电压折线
                 ctx.beginPath();
                 ctx.moveTo(offsetX, getY_V(this.data[0].voltage));
                 for (let i = 1; i < count; i++) {
@@ -1653,11 +3039,27 @@ select:focus, input:focus {
                 ctx.strokeStyle = this.theme.voltageLine;
                 ctx.lineWidth = 2.0;
                 ctx.lineJoin = 'round';
-                ctx.shadowColor = this.theme.voltageLine;
-                ctx.shadowBlur = 4;
                 ctx.stroke();
 
-                // (B) 绘制扭矩通道折线与半透明渐变
+                // (B) 绘制扭矩通道渐变面积
+                const gradT = ctx.createLinearGradient(0, padTop, 0, padTop + plotH);
+                gradT.addColorStop(0, this.theme.torqueFillTop);
+                gradT.addColorStop(1, this.theme.torqueFillBottom);
+
+                ctx.beginPath();
+                ctx.moveTo(offsetX, getY_T(this.data[0].torque));
+                for (let i = 1; i < count; i++) {
+                    const px = offsetX + i * stepX;
+                    const py = getY_T(this.data[i].torque);
+                    ctx.lineTo(px, py);
+                }
+                ctx.lineTo(offsetX + (count - 1) * stepX, padTop + plotH);
+                ctx.lineTo(offsetX, padTop + plotH);
+                ctx.closePath();
+                ctx.fillStyle = gradT;
+                ctx.fill();
+
+                // (B) 绘制扭矩折线
                 ctx.beginPath();
                 ctx.moveTo(offsetX, getY_T(this.data[0].torque));
                 for (let i = 1; i < count; i++) {
@@ -1668,8 +3070,6 @@ select:focus, input:focus {
                 ctx.strokeStyle = this.theme.torqueLine;
                 ctx.lineWidth = 2.0;
                 ctx.lineJoin = 'round';
-                ctx.shadowColor = this.theme.torqueLine;
-                ctx.shadowBlur = 4;
                 ctx.stroke();
 
                 ctx.restore();
@@ -1695,7 +3095,7 @@ select:focus, input:focus {
                         const ptVy = getY_V(pt.voltage);
                         const ptTy = getY_T(pt.torque);
 
-                        // 绘制捕获点圆环
+                        // 绘制捕获点高亮圆环
                         ctx.setLineDash([]);
                         ctx.fillStyle = this.theme.voltageLine;
                         ctx.beginPath();
@@ -1707,53 +3107,62 @@ select:focus, input:focus {
                         ctx.arc(ptX, ptTy, 4, 0, Math.PI * 2);
                         ctx.fill();
 
-                        // 悬浮 Tooltip 框
-                        const tipW = 160;
-                        const tipH = 54;
-                        let tipX = this.mouseX + 12;
-                        if (tipX + tipW > w - padRight) tipX = this.mouseX - tipW - 12;
-                        let tipY = Math.min(ptVy, ptTy) - 20;
+                        // 悬浮 Tooltip 卡片
+                        const tipW = 186;
+                        const tipH = 68;
+                        let tipX = this.mouseX + 14;
+                        if (tipX + tipW > w - padRight) tipX = this.mouseX - tipW - 14;
+                        let tipY = Math.min(ptVy, ptTy) - 24;
                         if (tipY < padTop + 5) tipY = padTop + 5;
                         if (tipY + tipH > h - padBottom) tipY = h - padBottom - tipH;
 
                         ctx.fillStyle = this.theme.tooltipBg;
-                        ctx.strokeStyle = this.theme.accentLine;
+                        ctx.strokeStyle = this.theme.tooltipBorder;
                         ctx.lineWidth = 1;
                         ctx.beginPath();
                         ctx.roundRect(tipX, tipY, tipW, tipH, 6);
                         ctx.fill();
                         ctx.stroke();
 
+                        const relSec = ((pt.time - this.data[0].time) / 1000).toFixed(2);
                         ctx.textAlign = 'left';
                         ctx.textBaseline = 'top';
-                        ctx.font = '11px Consolas, monospace';
+                        ctx.font = '10px "JetBrains Mono", Consolas, monospace';
+                        ctx.fillStyle = this.theme.text;
+                        ctx.fillText(`⏱ T+${relSec}s (#${pointIdx})`, tipX + 10, tipY + 8);
+                        ctx.font = '11px "JetBrains Mono", Consolas, monospace';
                         ctx.fillStyle = this.theme.voltageLine;
-                        ctx.fillText(`● 电压: ${pt.voltage.toFixed(4)} V`, tipX + 10, tipY + 10);
+                        ctx.fillText(`● 电压: ${pt.voltage.toFixed(3)} V`, tipX + 10, tipY + 26);
                         ctx.fillStyle = this.theme.torqueLine;
-                        ctx.fillText(`● 扭矩: ${pt.torque.toFixed(4)} Nm`, tipX + 10, tipY + 30);
+                        ctx.fillText(`● 扭矩: ${pt.torque.toFixed(3)} N·m`, tipX + 10, tipY + 45);
                     }
                     ctx.restore();
                 }
             }
 
-            // 5. 顶栏示波器状态标识
+            // 5. 顶栏示波器状态图例
             ctx.save();
-            ctx.font = '12px "SF Pro Text", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+            ctx.font = '11px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
             ctx.textAlign = 'left';
             ctx.textBaseline = 'top';
-            ctx.fillRect(padLeft, 10, 10, 10);
-            ctx.fillText('通道 A: 实测输出电压 (0~20V)', padLeft + 16, 9);
 
-            // 扭矩通道图例
+            // 通道 A 图例
+            ctx.fillStyle = this.theme.voltageLine;
+            ctx.fillRect(padLeft, 11, 8, 8);
+            ctx.fillStyle = this.theme.textBright;
+            ctx.fillText('CH A: 实测电压 (0 ~ 20V)', padLeft + 14, 10);
+
+            // 通道 B 图例
             ctx.fillStyle = this.theme.torqueLine;
-            ctx.fillRect(padLeft + 220, 10, 10, 10);
-            ctx.fillText(`通道 B: 实测扭矩 (${tMin.toFixed(1)}~${tMax.toFixed(1)}Nm)`, padLeft + 236, 9);
+            ctx.fillRect(padLeft + 185, 11, 8, 8);
+            ctx.fillStyle = this.theme.textBright;
+            ctx.fillText(`CH B: 实测扭矩 (${tMin.toFixed(1)} ~ ${tMax.toFixed(1)} N·m)`, padLeft + 199, 10);
 
             if (this.isPaused) {
-                ctx.fillStyle = '#ef4444';
-                ctx.font = 'bold 12px monospace';
+                ctx.fillStyle = '#dc2626';
+                ctx.font = 'bold 11px "JetBrains Mono", monospace';
                 ctx.textAlign = 'right';
-                ctx.fillText('[ ⏸ 示波器已暂停采集 ]', w - padRight, 9);
+                ctx.fillText('[ ⏸ 示波器已暂停采集 ]', w - padRight, 10);
             }
             ctx.restore();
         }
@@ -1762,28 +3171,181 @@ select:focus, input:focus {
     global.RealtimeScope = RealtimeScope;
 
 })(typeof window !== 'undefined' ? window : (typeof globalThis !== 'undefined' ? globalThis : (typeof global !== 'undefined' ? global : this)));
-    </script>
-    <script>
+
+
 // Embedded: app.js
 /**
  * @file app.js
  * @brief 电机上位机 UI 事件绑定、数据流交互与生命周期胶水层
+ * @version 2.4 (区分设定值与已生效目标 · 6参数完整网格 · 示波器参考线 · 迟到应答防护)
  */
 
 (function () {
     'use strict';
 
-    // 状态量
-    let currentTargetV = 0.0;
-    let sequenceCounter = 0;
+    // 状态管理：严格区分本地待下发设定值 (Draft) 与下位机已接受生效值 (Applied)
+    let draftTargetV = 0.0;
+    let appliedTargetV = 0.0;
+
+    let draftTargetTorque = 0.0;
+    let appliedTargetTorque = 0.0;
+
+    let currentTorqueLimit = 3.0;
+    let isTorqueEnabled = false;
+    let isFeedbackValid = false;
+    let activeMode = 'voltage'; // 'voltage' | 'torque'
+    let deviceSyncPending = false;
+
+    // 帧率与极值统计
     let liveFpsCounter = 0;
     let lastFpsTime = performance.now();
     let currentFps = 0;
+    let txFrameCount = 0;
 
-    // 极值统计
     let vMinObserved = Infinity;
     let vMaxObserved = -Infinity;
     let tMaxObserved = -Infinity;
+
+    // 参数 RAM 缓存 (6项下位机参数，均按 IEEE 754 float32 存储)
+    const ramParams = {
+        1: Math.fround(1.0),   // Kp
+        2: Math.fround(0.05),  // Ki
+        3: Math.fround(0.01),  // Kd
+        4: Math.fround(0.01),  // Q
+        5: Math.fround(0.01),  // R
+        6: Math.fround(3.0)    // TorqueLimit
+    };
+
+    /**
+     * @class RequestQueue
+     * @brief 串行请求队列（单请求在途，支持超时记录与迟到应答识别，防止序号复用混淆）
+     */
+    class RequestQueue {
+        constructor(sendFn, onLog, onTimeoutState) {
+            this.sendFn = sendFn;
+            this.onLog = onLog;
+            this.onTimeoutState = onTimeoutState;
+            this.queue = [];
+            this.inFlight = null;
+            this.timer = null;
+            this.seq = 0;
+            this.timedOutHistory = []; // 记录近期超时的 { seq, cmdType, time }
+        }
+
+        nextSeq() {
+            // 避免快速复用近期刚超时且可能仍在下位机 FIFO 中的序号
+            for (let attempt = 0; attempt < 256; attempt++) {
+                const candidate = this.seq;
+                this.seq = (this.seq + 1) & 0xFF;
+                const conflict = this.timedOutHistory.some(item => item.seq === candidate);
+                if (!conflict) return candidate;
+            }
+            const s = this.seq;
+            this.seq = (this.seq + 1) & 0xFF;
+            return s;
+        }
+
+        enqueue(cmdType, frameEncoder, timeoutMs = 500) {
+            return new Promise((resolve, reject) => {
+                const seq = this.nextSeq();
+                const frame = frameEncoder(seq);
+                this.queue.push({
+                    cmdType,
+                    seq,
+                    frame,
+                    timeoutMs,
+                    resolve,
+                    reject,
+                    createdAt: performance.now()
+                });
+                this.processNext();
+            });
+        }
+
+        async processNext() {
+            if (this.inFlight || this.queue.length === 0) return;
+
+            const req = this.queue.shift();
+            this.inFlight = req;
+
+            try {
+                await this.sendFn(req.frame);
+                txFrameCount++;
+                if (el.statTxFrames) el.statTxFrames.textContent = txFrameCount;
+
+                const hex = MotorProtocol.bytesToHex(req.frame);
+                this.onLog('tx', `[TX #${req.seq}] ${MotorProtocol.CommandNames[req.cmdType] || req.cmdType} | ${hex}`);
+
+                // 启动超时监控
+                this.timer = setTimeout(() => {
+                    const elapsed = Math.round(performance.now() - req.createdAt);
+                    this.timedOutHistory.push({
+                        seq: req.seq,
+                        cmdType: req.cmdType,
+                        time: performance.now()
+                    });
+                    if (this.timedOutHistory.length > 32) {
+                        this.timedOutHistory.shift();
+                    }
+
+                    this.onLog('warn', `[请求超时] 命令 ${MotorProtocol.CommandNames[req.cmdType] || req.cmdType} (seq=${req.seq}) 在 ${elapsed}ms 内未收到应答，状态保持未知`);
+                    this.inFlight = null;
+                    if (typeof this.onTimeoutState === 'function') {
+                        this.onTimeoutState(req);
+                    }
+                    req.reject(new Error(`Timeout after ${elapsed}ms`));
+                    this.processNext();
+                }, req.timeoutMs);
+            } catch (err) {
+                this.inFlight = null;
+                req.reject(err);
+                this.processNext();
+            }
+        }
+
+        handleResponse(resp) {
+            // 1. 检查是否匹配当前在途请求 (同时核对序号与原操作码)
+            if (this.inFlight) {
+                if (this.inFlight.seq === resp.seq && this.inFlight.cmdType === resp.originalCmdType) {
+                    clearTimeout(this.timer);
+                    this.timer = null;
+                    const req = this.inFlight;
+                    this.inFlight = null;
+                    req.resolve(resp);
+                    this.processNext();
+                    return 'matched';
+                }
+            }
+
+            // 2. 检查是否为之前已超时请求的迟到应答
+            const lateIdx = this.timedOutHistory.findIndex(
+                item => item.seq === resp.seq && item.cmdType === resp.originalCmdType
+            );
+            if (lateIdx !== -1) {
+                this.timedOutHistory.splice(lateIdx, 1);
+                this.onLog('warn', `[迟到应答已忽略] 收到已超时请求 #${resp.seq} (${resp.originalCmdName}) 的迟到应答，请点击“刷新状态”重新同步`);
+                return 'late';
+            }
+
+            return 'unmatched';
+        }
+
+        clear() {
+            if (this.timer) {
+                clearTimeout(this.timer);
+                this.timer = null;
+            }
+            if (this.inFlight) {
+                this.inFlight.reject(new Error('Queue cleared'));
+                this.inFlight = null;
+            }
+            while (this.queue.length > 0) {
+                const r = this.queue.shift();
+                r.reject(new Error('Queue cleared'));
+            }
+            this.timedOutHistory = [];
+        }
+    }
 
     // DOM 元素引用
     const el = {
@@ -1791,59 +3353,137 @@ select:focus, input:focus {
         btnConnect: document.getElementById('btnConnect'),
         btnDisconnect: document.getElementById('btnDisconnect'),
         btnMock: document.getElementById('btnMock'),
+        btnQueryState: document.getElementById('btnQueryState'),
         statusDot: document.getElementById('statusDot'),
         statusText: document.getElementById('statusText'),
 
+        // 控制组一：电压驱动
         sliderVoltage: document.getElementById('sliderVoltage'),
         inputVoltage: document.getElementById('inputVoltage'),
         displayTargetVal: document.getElementById('displayTargetVal'),
+        appliedVoltageVal: document.getElementById('appliedVoltageVal'),
+        voltageSyncTag: document.getElementById('voltageSyncTag'),
         btnStepDec: document.getElementById('btnStepDec'),
         btnStepInc: document.getElementById('btnStepInc'),
-        presetChips: document.querySelectorAll('.preset-chip'),
+        quickStepBtns: document.querySelectorAll('#mode-pane-voltage .quick-step-btn'),
+        presetChips: document.querySelectorAll('.preset-chip:not(.torque-chip)'),
         btnSend: document.getElementById('btnSend'),
         btnEstop: document.getElementById('btnEstop'),
         chkAutoSync: document.getElementById('chkAutoSync'),
+        voltageConflictNotice: document.getElementById('voltageConflictNotice'),
 
+        // 控制组二：扭矩闭环
+        pillTorqueLoop: document.getElementById('pillTorqueLoop'),
+        pillFeedbackValid: document.getElementById('pillFeedbackValid'),
+        pillTorqueLimit: document.getElementById('pillTorqueLimit'),
+        displayTargetTorque: document.getElementById('displayTargetTorque'),
+        appliedTorqueVal: document.getElementById('appliedTorqueVal'),
+        torqueSyncTag: document.getElementById('torqueSyncTag'),
+        sliderTorque: document.getElementById('sliderTorque'),
+        inputTorque: document.getElementById('inputTorque'),
+        btnStepTorqueDec: document.getElementById('btnStepTorqueDec'),
+        btnStepTorqueInc: document.getElementById('btnStepTorqueInc'),
+        torquePresetChips: document.querySelectorAll('.preset-chip.torque-chip'),
+        btnSetTorque: document.getElementById('btnSetTorque'),
+        btnEnableTorque: document.getElementById('btnEnableTorque'),
+        btnDisableTorque: document.getElementById('btnDisableTorque'),
+        btnStopTorque: document.getElementById('btnStopTorque'),
+
+        // 扭矩上限控制与动态电压上限显示
+        inputTorqueLimit: document.getElementById('inputTorqueLimit'),
+        btnStepLimitDec: document.getElementById('btnStepLimitDec'),
+        btnStepLimitInc: document.getElementById('btnStepLimitInc'),
+        btnSetTorqueLimit: document.getElementById('btnSetTorqueLimit'),
+        dispTorqueVmax: document.getElementById('dispTorqueVmax'),
+        dispTorqueVff: document.getElementById('dispTorqueVff'),
+        dispDraftCeilingHint: document.getElementById('dispDraftCeilingHint'),
+
+        // 下位机 6 项完整参数面板 (Kp, Ki, Kd, Q, R, TorqueLimit)
+        paramInputs: {
+            1: document.getElementById('paramKp'),
+            2: document.getElementById('paramKi'),
+            3: document.getElementById('paramKd'),
+            4: document.getElementById('paramQ'),
+            5: document.getElementById('paramR'),
+            6: document.getElementById('paramLimit')
+        },
+        paramRamBadges: {
+            1: document.getElementById('ramKp'),
+            2: document.getElementById('ramKi'),
+            3: document.getElementById('ramKd'),
+            4: document.getElementById('ramQ'),
+            5: document.getElementById('ramR'),
+            6: document.getElementById('ramLimit')
+        },
+        btnReadParams: document.getElementById('btnReadParams'),
+        btnApplyParams: document.getElementById('btnApplyParams'),
+        btnSaveFlash: document.getElementById('btnSaveFlash'),
+        flashSaveBadge: document.getElementById('flashSaveBadge'),
+
+        // 大屏数显与进度条
         dispVoltage: document.getElementById('dispVoltage'),
         dispVoltageMin: document.getElementById('dispVoltageMin'),
         dispVoltageMax: document.getElementById('dispVoltageMax'),
         dispTorque: document.getElementById('dispTorque'),
         dispTorqueMax: document.getElementById('dispTorqueMax'),
+        dispTorqueLimit: document.getElementById('dispTorqueLimit'),
+        meterBarV: document.getElementById('meterBarV'),
+        meterBarT: document.getElementById('meterBarT'),
 
+        // 链路统计
         statRxFrames: document.getElementById('statRxFrames'),
         statTxFrames: document.getElementById('statTxFrames'),
         statFps: document.getElementById('statFps'),
         statCrcErrors: document.getElementById('statCrcErrors'),
 
+        // 示波器控制
+        chkShowTargetRef: document.getElementById('chkShowTargetRef'),
+        selectScopePoints: document.getElementById('selectScopePoints'),
         btnPauseChart: document.getElementById('btnPauseChart'),
         btnClearChart: document.getElementById('btnClearChart'),
         btnExportCsv: document.getElementById('btnExportCsv'),
 
+        // 日志终端
         logTerminal: document.getElementById('logTerminal'),
         btnClearLog: document.getElementById('btnClearLog'),
-        chkShowHex: document.getElementById('chkShowHex')
+        chkShowHex: document.getElementById('chkShowHex'),
+        chkPauseLog: document.getElementById('chkPauseLog')
     };
-
-    let txFrameCount = 0;
 
     // 1. 初始化示波器
     const scope = new RealtimeScope('scopeCanvas', { maxPoints: 500 });
 
-    // 2. 初始化解包器
-    const unpacker = new MotorProtocol.StreamUnpacker(
-        // 收到合法反馈帧回调
-        (feedback) => {
-            handleFeedbackFrame(feedback);
-        },
-        // 解包 CRC 错误回调
-        (err) => {
-            log('error', `[CRC校验失败] ${err.error || '数据帧损坏'}`);
-            el.statCrcErrors.textContent = unpacker.stats.crcErrors;
-            el.statCrcErrors.style.color = '#ef4444';
+    // 2. 初始化请求队列
+    const reqQueue = new RequestQueue(
+        (frame) => serial.send(frame),
+        (level, msg) => log(level, msg),
+        () => {
+            // 请求超时后，标记状态为未知，停止自动同步，提示用户刷新状态
+            if (el.pillTorqueLoop) {
+                el.pillTorqueLoop.className = 'status-pill warning';
+                el.pillTorqueLoop.innerHTML = '▲ 闭环状态: <strong>通信超时/未知</strong>';
+            }
         }
     );
 
-    // 3. 初始化串口驱动
+    // 3. 初始化解包器 (同时接收 0x81 与 0x82)
+    const unpacker = new MotorProtocol.StreamUnpacker({
+        onFeedback: (fb) => {
+            handleFeedbackFrame(fb);
+        },
+        onResponse: (resp) => {
+            handleResponseFrame(resp);
+        },
+        onError: (err) => {
+            log('error', `[CRC校验失败] ${err.error || '数据帧损坏'}`);
+            if (el.statCrcErrors) {
+                el.statCrcErrors.textContent = unpacker.stats.crcErrors;
+                el.statCrcErrors.style.color = '#dc2626';
+            }
+        }
+    });
+
+    // 4. 初始化串口驱动
     const serial = new SerialManager({
         baudRate: 115200,
         onData: (chunk) => {
@@ -1851,21 +3491,30 @@ select:focus, input:focus {
         },
         onStatusChange: (status) => {
             updateConnectionUI(status);
+            if (status.connected) {
+                deviceSyncPending = true;
+                log('info', '已建立物理串口链路，等待收到下位机首帧有效遥测后再执行参数同步...');
+            } else {
+                deviceSyncPending = false;
+                reqQueue.clear();
+            }
         },
         onLog: (level, msg) => {
             log(level, msg);
         }
     });
 
-    /**
-     * 更新顶部连接指示器
-     */
     function updateConnectionUI(status) {
         if (!status.connected) {
             el.statusDot.className = 'status-dot';
-            el.statusText.textContent = '未连接 (串口断开)';
+            // 严格遵守 HANDOFF.md §1：断开串口不会自动停机，不能显示成“已停机”
+            const hadActiveOutput = isTorqueEnabled || appliedTargetV > 0.01;
+            el.statusText.textContent = hadActiveOutput
+                ? '串口已断开 (注意: 下位机未自动停机!)'
+                : '未连接 (串口断开)';
             el.btnConnect.style.display = 'inline-flex';
             el.btnDisconnect.style.display = 'none';
+            el.btnMock.style.display = 'inline-flex';
             el.btnMock.classList.remove('btn-danger');
             el.btnMock.classList.add('btn-outline');
             el.btnMock.innerHTML = `
@@ -1874,6 +3523,16 @@ select:focus, input:focus {
                 </svg>
                 仿真模式 (Mock)
             `;
+            if (el.pillTorqueLoop) {
+                el.pillTorqueLoop.className = 'status-pill disabled';
+                el.pillTorqueLoop.innerHTML = '○ 扭矩闭环: <strong>未连接/未知</strong>';
+            }
+            if (el.pillFeedbackValid) {
+                el.pillFeedbackValid.className = 'status-pill disabled';
+                el.pillFeedbackValid.innerHTML = '○ 传感器反馈: <strong>未连接</strong>';
+            }
+            // 恢复本地控件可操作态
+            setVoltageControlsLocked(false);
         } else if (status.type === 'mock') {
             el.statusDot.className = 'status-dot mocking';
             el.statusText.textContent = '虚拟仿真运行中 (20Hz)';
@@ -1891,9 +3550,90 @@ select:focus, input:focus {
         }
     }
 
-    /**
-     * 处理合法上行反馈帧
-     */
+    function setVoltageControlsLocked(locked) {
+        if (el.voltageConflictNotice) {
+            el.voltageConflictNotice.style.display = locked ? 'flex' : 'none';
+        }
+        if (el.btnSend) {
+            el.btnSend.disabled = locked;
+            if (locked) {
+                el.btnSend.classList.add('disabled');
+                el.btnSend.innerHTML = `
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
+                    </svg>
+                    闭环中已锁定 (禁止非零电压)
+                `;
+            } else {
+                el.btnSend.classList.remove('disabled');
+                el.btnSend.innerHTML = `
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                    </svg>
+                    下发电压目标
+                `;
+            }
+        }
+        if (el.sliderVoltage) el.sliderVoltage.disabled = locked;
+        if (el.inputVoltage) el.inputVoltage.disabled = locked;
+        if (el.btnStepDec) el.btnStepDec.disabled = locked;
+        if (el.btnStepInc) el.btnStepInc.disabled = locked;
+        if (el.quickStepBtns) {
+            el.quickStepBtns.forEach(b => { b.disabled = locked; });
+        }
+        if (el.presetChips) {
+            el.presetChips.forEach(chip => { chip.disabled = locked; });
+        }
+    }
+
+    function updateLoopStatusUI(torqueEnabled, feedbackValid) {
+        isTorqueEnabled = torqueEnabled;
+        isFeedbackValid = feedbackValid;
+
+        if (el.pillTorqueLoop) {
+            if (torqueEnabled) {
+                el.pillTorqueLoop.className = 'status-pill active';
+                el.pillTorqueLoop.innerHTML = '● 扭矩闭环: <strong>运行中</strong>';
+            } else {
+                el.pillTorqueLoop.className = 'status-pill disabled';
+                el.pillTorqueLoop.innerHTML = '○ 扭矩闭环: <strong>已关闭</strong>';
+            }
+        }
+
+        if (el.pillFeedbackValid) {
+            if (feedbackValid) {
+                el.pillFeedbackValid.className = 'status-pill active';
+                el.pillFeedbackValid.innerHTML = '● 反馈就绪: <strong>正常</strong>';
+            } else {
+                el.pillFeedbackValid.className = 'status-pill warning';
+                el.pillFeedbackValid.innerHTML = '▲ 反馈就绪: <strong>未就绪</strong>';
+            }
+        }
+
+        // 更新开启/关闭闭环按钮的视觉状态
+        if (el.btnEnableTorque) {
+            el.btnEnableTorque.innerHTML = torqueEnabled ? '● 闭环运行中' : '▶ 开启闭环';
+        }
+
+        // 扭矩闭环开启时，物理级互锁手动电压控制区
+        setVoltageControlsLocked(torqueEnabled);
+        syncScopeTargets();
+    }
+
+    function syncScopeTargets() {
+        const torquePerVolt = 0.5;
+        const vFf = appliedTargetTorque > 0 ? Math.min(appliedTargetTorque / torquePerVolt, 18.0) : 0.0;
+        const vMax = appliedTargetTorque > 0 ? Math.min(vFf + 0.5, 18.0) : 0.0;
+
+        scope.setTargets({
+            mode: activeMode,
+            vTarget: appliedTargetV,
+            tTarget: appliedTargetTorque,
+            vCeiling: vMax,
+            torqueEnabled: isTorqueEnabled
+        });
+    }
+
     function handleFeedbackFrame(fb) {
         liveFpsCounter++;
         const now = performance.now();
@@ -1901,39 +3641,60 @@ select:focus, input:focus {
             currentFps = liveFpsCounter;
             liveFpsCounter = 0;
             lastFpsTime = now;
-            el.statFps.textContent = `${currentFps} Hz`;
+            if (el.statFps) el.statFps.textContent = `${currentFps} Hz`;
         }
 
-        // 更新数值大屏
-        el.dispVoltage.textContent = fb.voltage.toFixed(3);
-        el.dispTorque.textContent = fb.torque.toFixed(3);
+        // 连接后首帧有效遥测到达，自动同步下位机状态与 6 项 RAM 参数
+        if (deviceSyncPending) {
+            deviceSyncPending = false;
+            syncDeviceState();
+        }
 
-        // 极值跟踪
+        if (el.dispVoltage) el.dispVoltage.textContent = fb.voltage.toFixed(3);
+        if (el.dispTorque) el.dispTorque.textContent = fb.torque.toFixed(3);
+
+        if (el.meterBarV) {
+            const vPct = Math.max(0, Math.min(100, (fb.voltage / 18.0) * 100));
+            el.meterBarV.style.width = vPct.toFixed(1) + '%';
+        }
+        if (el.meterBarT) {
+            const tPct = Math.max(0, Math.min(100, (fb.torque / currentTorqueLimit) * 100));
+            el.meterBarT.style.width = tPct.toFixed(1) + '%';
+        }
+
         if (fb.voltage < vMinObserved) vMinObserved = fb.voltage;
         if (fb.voltage > vMaxObserved) vMaxObserved = fb.voltage;
         if (Math.abs(fb.torque) > tMaxObserved) tMaxObserved = Math.abs(fb.torque);
 
-        el.dispVoltageMin.textContent = vMinObserved === Infinity ? '--' : vMinObserved.toFixed(2);
-        el.dispVoltageMax.textContent = vMaxObserved === -Infinity ? '--' : vMaxObserved.toFixed(2);
-        el.dispTorqueMax.textContent = tMaxObserved === -Infinity ? '--' : tMaxObserved.toFixed(2);
+        if (el.dispVoltageMin) el.dispVoltageMin.textContent = vMinObserved === Infinity ? '--' : vMinObserved.toFixed(2);
+        if (el.dispVoltageMax) el.dispVoltageMax.textContent = vMaxObserved === -Infinity ? '--' : vMaxObserved.toFixed(2);
+        if (el.dispTorqueMax) el.dispTorqueMax.textContent = tMaxObserved === -Infinity ? '--' : tMaxObserved.toFixed(2);
 
-        // 推送给示波器实时绘图
         scope.pushData(fb.voltage, fb.torque, now);
 
-        // 更新统计计数
-        el.statRxFrames.textContent = unpacker.stats.validFrames;
-        el.statCrcErrors.textContent = unpacker.stats.crcErrors;
+        if (el.statRxFrames) el.statRxFrames.textContent = unpacker.stats.validFrames;
+        if (el.statCrcErrors) el.statCrcErrors.textContent = unpacker.stats.crcErrors;
 
-        // 条件打印十六进制
+        // 仅当勾选“打印周期测量帧 (0x81)”时才打印高频反馈，避免冲走关键命令与应答日志
         if (el.chkShowHex && el.chkShowHex.checked) {
             const hex = MotorProtocol.bytesToHex(fb.rawBytes);
-            log('rx', `[RX #${fb.seq}] V=${fb.voltage.toFixed(3)}V T=${fb.torque.toFixed(3)}Nm | ${hex}`);
+            log('rx', `[RX 0x81 #${fb.seq}] V=${fb.voltage.toFixed(3)}V T=${fb.torque.toFixed(3)}N·m | ${hex}`);
         }
     }
 
-    /**
-     * 记录并滚动终端日志
-     */
+    function handleResponseFrame(resp) {
+        const matchState = reqQueue.handleResponse(resp);
+        if (matchState === 'late') {
+            return;
+        }
+
+        updateLoopStatusUI(resp.torqueEnabled, resp.feedbackValid);
+
+        const hex = MotorProtocol.bytesToHex(resp.rawBytes);
+        const level = resp.result === MotorProtocol.Result.Ok ? 'info' : 'warn';
+        log(level, `[RSP 0x82 #${resp.seq}] 原命令=${resp.originalCmdName} | 结果=${resp.resultName} | 返回值=${resp.value.toFixed(4)} | 闭环=${resp.torqueEnabled ? '开启' : '关闭'} 反馈=${resp.feedbackValid ? '有效' : '未就绪'} | ${hex}`);
+    }
+
     function log(level, message) {
         if (!el.logTerminal) return;
         const now = new Date();
@@ -1952,12 +3713,13 @@ select:focus, input:focus {
 
         el.logTerminal.appendChild(entry);
 
-        // 维持最多 200 条避免内存膨胀
-        while (el.logTerminal.childNodes.length > 200) {
+        while (el.logTerminal.childNodes.length > 250) {
             el.logTerminal.removeChild(el.logTerminal.firstChild);
         }
 
-        el.logTerminal.scrollTop = el.logTerminal.scrollHeight;
+        if (!el.chkPauseLog || !el.chkPauseLog.checked) {
+            el.logTerminal.scrollTop = el.logTerminal.scrollHeight;
+        }
     }
 
     function escapeHtml(str) {
@@ -1967,208 +3729,772 @@ select:focus, input:focus {
             .replace(/>/g, '&gt;');
     }
 
-    /**
-     * 下发目标电压控制帧
-     */
-    async function sendTargetVoltage(voltage) {
-        let v = Number(voltage);
-        if (!Number.isFinite(v)) v = 0.0;
-        v = Math.max(0.0, Math.min(MotorProtocol.MAX_VOLTAGE, v));
+    // --- 业务控制层 ---
 
-        const seq = (sequenceCounter++) & 0xFF;
-        const frame = MotorProtocol.encodeSetVoltage(v, seq);
-
+    async function syncDeviceState() {
+        log('info', '正在从下位机同步当前运行状态与 6 项 RAM 参数...');
         try {
-            await serial.send(frame);
-            txFrameCount++;
-            el.statTxFrames.textContent = txFrameCount;
-            const hex = MotorProtocol.bytesToHex(frame);
-            log('tx', `[设置电压] 目标值=${v.toFixed(2)}V (seq=${seq}) | ${hex}`);
+            // 1. 读取当前扭矩目标与状态位 (GetState 0x13)
+            const stResp = await reqQueue.enqueue(MotorProtocol.CommandType.GetState, (seq) => MotorProtocol.encodeGetState(seq));
+            if (stResp.result === MotorProtocol.Result.Ok) {
+                appliedTargetTorque = Math.fround(stResp.value);
+                setTorqueTargetUI(appliedTargetTorque, false);
+                updateTorqueSyncBadge();
+            }
+
+            // 2. 逐项读取 6 个参数 (GetParameter 0x11)
+            for (let id = 1; id <= 6; id++) {
+                const pResp = await reqQueue.enqueue(MotorProtocol.CommandType.GetParameter, (seq) => MotorProtocol.encodeGetParameter(id, seq));
+                if (pResp.result === MotorProtocol.Result.Ok) {
+                    const fVal = Math.fround(pResp.value);
+                    ramParams[id] = fVal;
+                    updateParamRowUI(id, fVal);
+                    if (id === 6) {
+                        applyTorqueLimitToUI(fVal);
+                    }
+                }
+            }
+
+            log('info', '已成功同步下位机全部状态与 6 项配置参数 (RAM)');
         } catch (err) {
-            log('error', `发送失败: ${err.message}`);
+            log('warn', `同步下位机配置未完全完成: ${err.message}`);
         }
     }
 
-    // 节流实时下发 (针对滑动条拖拽时的实时同步)
+    function applyTorqueLimitToUI(limitVal) {
+        currentTorqueLimit = limitVal;
+        if (el.inputTorqueLimit) el.inputTorqueLimit.value = limitVal.toFixed(2);
+        if (el.sliderTorque) el.sliderTorque.max = limitVal;
+        if (el.pillTorqueLimit) el.pillTorqueLimit.textContent = `上限: ${limitVal.toFixed(2)} N·m`;
+        if (el.dispTorqueLimit) el.dispTorqueLimit.textContent = `${limitVal.toFixed(2)} N·m`;
+    }
+
+    function updateParamRowUI(id, val) {
+        const decimals = (id === 4 || id === 5) ? 4 : 2;
+        if (el.paramRamBadges[id]) {
+            el.paramRamBadges[id].textContent = val.toFixed(decimals);
+        }
+        if (el.paramInputs[id]) {
+            el.paramInputs[id].value = val.toFixed(decimals);
+            const card = el.paramInputs[id].closest('.param-card');
+            if (card) card.classList.remove('dirty');
+        }
+    }
+
+    function updateVoltageSyncBadge() {
+        if (el.appliedVoltageVal) {
+            el.appliedVoltageVal.textContent = `${appliedTargetV.toFixed(2)} V`;
+        }
+        if (el.voltageSyncTag) {
+            const isSynced = Math.abs(draftTargetV - appliedTargetV) < 0.005;
+            el.voltageSyncTag.className = isSynced ? 'synced-badge' : 'pending-badge';
+            el.voltageSyncTag.textContent = isSynced ? '✓ 已下发同步' : '● 待点击下发';
+        }
+        syncScopeTargets();
+    }
+
+    function updateTorqueSyncBadge() {
+        if (el.appliedTorqueVal) {
+            el.appliedTorqueVal.textContent = `${appliedTargetTorque.toFixed(3)} N·m`;
+        }
+        if (el.torqueSyncTag) {
+            const isSynced = Math.abs(draftTargetTorque - appliedTargetTorque) < 0.001;
+            el.torqueSyncTag.className = isSynced ? 'synced-badge' : 'pending-badge';
+            el.torqueSyncTag.textContent = isSynced ? '✓ 已下发同步' : '● 待下发确认';
+        }
+        updateDynamicVoltageCeilingUI(appliedTargetTorque, draftTargetTorque);
+        syncScopeTargets();
+    }
+
+    async function sendTargetVoltage(v) {
+        const fVal = Math.fround(Math.max(0.0, Math.min(MotorProtocol.MAX_VOLTAGE, Number(v) || 0.0)));
+        if (isTorqueEnabled && fVal > 0.0) {
+            log('warn', '下发被拒绝：当前扭矩闭环处于开启状态，禁止发送非零手动电压');
+            return false;
+        }
+
+        try {
+            const resp = await reqQueue.enqueue(MotorProtocol.CommandType.SetVoltage, (seq) => MotorProtocol.encodeSetVoltage(fVal, seq));
+            if (resp.result === MotorProtocol.Result.Ok) {
+                appliedTargetV = Math.fround(resp.value);
+                if (fVal === 0.0) {
+                    // 0V 软件停机同时关闭扭矩闭环
+                    updateLoopStatusUI(false, resp.feedbackValid);
+                }
+                updateVoltageSyncBadge();
+                log('info', `电压目标已生效: ${appliedTargetV.toFixed(2)} V`);
+                return true;
+            } else {
+                log('warn', `电压设置未生效: ${resp.resultName}`);
+                return false;
+            }
+        } catch (err) {
+            log('error', `设置电压异常: ${err.message}`);
+            return false;
+        }
+    }
+
+    async function sendTargetTorque(t) {
+        const fVal = Math.fround(Math.max(0.0, Number(t) || 0.0));
+        try {
+            const resp = await reqQueue.enqueue(MotorProtocol.CommandType.SetTorque, (seq) => MotorProtocol.encodeSetTorque(fVal, seq));
+            if (resp.result === MotorProtocol.Result.Ok) {
+                appliedTargetTorque = Math.fround(resp.value);
+                setTorqueTargetUI(appliedTargetTorque, false);
+                updateTorqueSyncBadge();
+                log('info', `下位机已接受目标扭矩: ${appliedTargetTorque.toFixed(3)} N·m`);
+                return true;
+            } else {
+                log('warn', `设置扭矩目标被拒绝: ${resp.resultName}`);
+                return false;
+            }
+        } catch (err) {
+            log('error', `下发扭矩目标异常: ${err.message}`);
+            return false;
+        }
+    }
+
+    async function sendSetTorqueLimit(val) {
+        const limitVal = Math.fround(parseFloat(val));
+        if (!Number.isFinite(limitVal) || limitVal <= 0) {
+            alert('扭矩上限必须为大于 0 的有效数值');
+            return;
+        }
+        try {
+            const resp = await reqQueue.enqueue(MotorProtocol.CommandType.SetParameter, (seq) => MotorProtocol.encodeSetParameter(6, limitVal, seq));
+            if (resp.result === MotorProtocol.Result.Ok) {
+                const appliedLimit = Math.fround(resp.value);
+                ramParams[6] = appliedLimit;
+                applyTorqueLimitToUI(appliedLimit);
+                updateParamRowUI(6, appliedLimit);
+
+                // 固件交接规范：降低上限会立即钳位选定目标，须调用 GetState 刷新下位机被钳位的真实目标
+                const stResp = await reqQueue.enqueue(MotorProtocol.CommandType.GetState, (seq) => MotorProtocol.encodeGetState(seq));
+                if (stResp.result === MotorProtocol.Result.Ok) {
+                    appliedTargetTorque = Math.fround(stResp.value);
+                    setTorqueTargetUI(appliedTargetTorque, false);
+                    updateTorqueSyncBadge();
+                }
+                log('info', `扭矩安全上限已更新为: ${appliedLimit.toFixed(2)} N·m，当前已接受目标: ${appliedTargetTorque.toFixed(3)} N·m`);
+            } else {
+                log('warn', `设置扭矩上限失败: ${resp.resultName}`);
+            }
+        } catch (err) {
+            log('error', `设置扭矩上限异常: ${err.message}`);
+        }
+    }
+
+    /**
+     * 开启或关闭扭矩闭环 (遵循 HANDOFF.md §6：开启前先下发用户确认的目标扭矩)
+     */
+    async function setTorqueLoopEnabled(enabled) {
+        try {
+            if (enabled) {
+                // 先下发当前用户确认的目标扭矩，等待成功应答后再开启闭环
+                const targetOk = await sendTargetTorque(draftTargetTorque);
+                if (!targetOk) {
+                    log('warn', '目标扭矩下发未成功，已中止开启扭矩闭环');
+                    return;
+                }
+            }
+
+            const resp = await reqQueue.enqueue(MotorProtocol.CommandType.SetTorqueEnabled, (seq) => MotorProtocol.encodeSetTorqueEnabled(enabled, seq));
+            if (resp.result === MotorProtocol.Result.Ok) {
+                if (!enabled) {
+                    appliedTargetV = 0.0;
+                    updateVoltageSyncBadge();
+                }
+                log('info', `扭矩闭环已成功${enabled ? '【开启】' : '【关闭】'}`);
+            } else {
+                log('warn', `扭矩闭环切换失败: ${resp.resultName}`);
+            }
+        } catch (err) {
+            log('error', `切换闭环异常: ${err.message}`);
+        }
+    }
+
+    async function executeSafeSaveFlash() {
+        if (!serial.isConnected && !serial.isMocking) {
+            alert('请先连接串口或启动仿真模式再执行保存');
+            return;
+        }
+
+        if (!confirm('【停机安全保存】将严格按交接规范执行：\n1. 发送停止指令 (0V) 关闭输出与扭矩闭环并等待应答\n2. 逐项写入已修改的 RAM 参数 (含 Kp/Ki/Kd/Q/R/Limit)\n3. 发送 SaveParameters 持久化到下位机 Flash\n\n确认立即执行吗？')) {
+            return;
+        }
+
+        if (el.btnSaveFlash) {
+            el.btnSaveFlash.disabled = true;
+            el.btnSaveFlash.textContent = '正在保存到 Flash...';
+        }
+        if (el.flashSaveBadge) {
+            el.flashSaveBadge.textContent = '保存中...';
+            el.flashSaveBadge.style.color = 'var(--accent-amber)';
+        }
+
+        let step = 'stop';
+        try {
+            // 步骤 1: 发送 SetVoltage(0) 确保不论手动电压还是扭矩闭环均彻底停机
+            log('info', '【保存流程 1/4】发送软件停止指令 (SetVoltage 0V)，等待停机应答...');
+            const stopResp = await reqQueue.enqueue(MotorProtocol.CommandType.SetVoltage, (seq) => MotorProtocol.encodeSetVoltage(0.0, seq));
+            if (stopResp.result !== MotorProtocol.Result.Ok) {
+                throw new Error(`停止输出失败: ${stopResp.resultName}`);
+            }
+            appliedTargetV = 0.0;
+            updateVoltageSyncBadge();
+
+            // 步骤 2: 逐项检查并写入全部 6 个参数中发生变化的项
+            step = 'write_ram';
+            log('info', '【保存流程 2/4】正在核对并将已修改参数逐项写入下位机 RAM...');
+            let limitChanged = false;
+            for (let id = 1; id <= 6; id++) {
+                const inputEl = el.paramInputs[id];
+                if (inputEl) {
+                    const newVal = Math.fround(parseFloat(inputEl.value));
+                    if (Number.isFinite(newVal) && Math.abs(newVal - ramParams[id]) > 1e-6) {
+                        const pResp = await reqQueue.enqueue(MotorProtocol.CommandType.SetParameter, (seq) => MotorProtocol.encodeSetParameter(id, newVal, seq));
+                        if (pResp.result !== MotorProtocol.Result.Ok) {
+                            throw new Error(`写入参数 ${MotorProtocol.ParameterNames[id].name} 失败: ${pResp.resultName}`);
+                        }
+                        const appliedVal = Math.fround(pResp.value);
+                        ramParams[id] = appliedVal;
+                        updateParamRowUI(id, appliedVal);
+                        if (id === 6) {
+                            applyTorqueLimitToUI(appliedVal);
+                            limitChanged = true;
+                        }
+                    }
+                }
+            }
+
+            if (limitChanged) {
+                const stResp = await reqQueue.enqueue(MotorProtocol.CommandType.GetState, (seq) => MotorProtocol.encodeGetState(seq));
+                if (stResp.result === MotorProtocol.Result.Ok) {
+                    appliedTargetTorque = Math.fround(stResp.value);
+                    setTorqueTargetUI(appliedTargetTorque, false);
+                    updateTorqueSyncBadge();
+                }
+            }
+
+            // 步骤 3: 发送 SaveParameters (0x12)，超时 3000ms
+            step = 'save_flash';
+            log('info', '【保存流程 3/4】发送 SaveParameters 命令擦写持久化到 Flash (超时 3s)...');
+            const saveResp = await reqQueue.enqueue(
+                MotorProtocol.CommandType.SaveParameters,
+                (seq) => MotorProtocol.encodeSaveParameters(seq),
+                3000
+            );
+
+            const storageCode = Math.round(saveResp.value);
+            const storageMsg = MotorProtocol.StorageCodeNames[storageCode] || `Code ${storageCode}`;
+
+            if (saveResp.result === MotorProtocol.Result.Ok && storageCode === 0) {
+                log('info', `【保存流程 4/4】🎉 Flash 保存成功！(存储状态: ${storageMsg})`);
+                if (el.flashSaveBadge) {
+                    el.flashSaveBadge.textContent = '✓ 已保存到下位机 Flash';
+                    el.flashSaveBadge.style.color = 'var(--color-success)';
+                }
+                alert('🎉 下位机全部 6 项参数已成功持久化保存到 Flash！');
+            } else {
+                throw new Error(`Flash 存储返回异常: Result=${saveResp.resultName}, 存储码=${storageMsg}`);
+            }
+        } catch (err) {
+            log('error', `保存中止: ${err.message}`);
+            if (el.flashSaveBadge) {
+                if (step === 'save_flash' && String(err.message).includes('Timeout')) {
+                    // 严格遵循 HANDOFF.md §6 line 201：保存应答丢失时显示“结果未知”，提示人工确认，禁止盲目重试
+                    el.flashSaveBadge.textContent = '⚠️ 结果未知 (请人工核对)';
+                    el.flashSaveBadge.style.color = 'var(--color-warning)';
+                } else {
+                    el.flashSaveBadge.textContent = '✕ 保存未完成';
+                    el.flashSaveBadge.style.color = 'var(--color-error)';
+                }
+            }
+            alert(`保存未完成: ${err.message}`);
+        } finally {
+            if (el.btnSaveFlash) {
+                el.btnSaveFlash.disabled = false;
+                el.btnSaveFlash.textContent = '💾 停机安全保存到 Flash';
+            }
+        }
+    }
+
+    // 节流实时下发 (仅当用户主动勾选“实时下发”时生效)
     let autoSyncThrottleTimer = null;
-    function triggerAutoSync(val) {
+    function triggerAutoSyncVoltage(val) {
         if (!el.chkAutoSync || !el.chkAutoSync.checked) return;
         if (autoSyncThrottleTimer) return;
         autoSyncThrottleTimer = setTimeout(() => {
             autoSyncThrottleTimer = null;
-            sendTargetVoltage(val);
-        }, 50); // 20Hz 节奏，不阻塞串口
+            sendTargetVoltage(draftTargetV);
+        }, 50); // 20Hz 节流
     }
 
-    /**
-     * 设置并同步界面的目标电压值
-     */
-    function setTargetValue(v, triggerSend = false) {
+    function setVoltageValue(v, forceSend = false) {
         let val = Number(v);
         if (!Number.isFinite(val)) val = 0.0;
         val = Math.max(0.0, Math.min(MotorProtocol.MAX_VOLTAGE, val));
-        val = Math.round(val * 100) / 100; // 两位小数
+        val = Math.round(val * 100) / 100;
 
-        currentTargetV = val;
-        el.sliderVoltage.value = val;
-        el.inputVoltage.value = val.toFixed(2);
-        el.displayTargetVal.textContent = `${val.toFixed(2)} V`;
+        draftTargetV = val;
+        if (el.sliderVoltage) el.sliderVoltage.value = val;
+        if (el.inputVoltage) el.inputVoltage.value = val.toFixed(2);
+        if (el.displayTargetVal) el.displayTargetVal.textContent = `${val.toFixed(2)} V`;
 
-        // 更新预设高亮
-        el.presetChips.forEach(chip => {
-            const pVal = Number(chip.getAttribute('data-val'));
-            if (Math.abs(pVal - val) < 0.05) {
-                chip.classList.add('active');
-            } else {
-                chip.classList.remove('active');
-            }
-        });
+        if (el.presetChips) {
+            el.presetChips.forEach(chip => {
+                const pVal = Number(chip.getAttribute('data-val'));
+                if (Math.abs(pVal - val) < 0.05) {
+                    chip.classList.add('active');
+                } else {
+                    chip.classList.remove('active');
+                }
+            });
+        }
 
-        if (triggerSend) {
+        updateVoltageSyncBadge();
+
+        if (forceSend) {
             sendTargetVoltage(val);
         } else {
-            triggerAutoSync(val);
+            triggerAutoSyncVoltage(val);
         }
     }
 
-    // 事件绑定
-    function setupEventListeners() {
-        // 串口连接/断开
-        el.btnConnect.addEventListener('click', async () => {
-            const baud = parseInt(el.baudSelect.value, 10) || 115200;
-            try {
-                await serial.connect(baud);
-            } catch (_) {}
-        });
+    /**
+     * 按下位机已接受的当前目标计算前馈 Vff 与动态电压上限 Vmax (遵循 HANDOFF.md §4 line 120)
+     */
+    function updateDynamicVoltageCeilingUI(acceptedTorque, previewDraftTorque) {
+        const torquePerVolt = 0.5;
+        const tAccepted = Math.max(0.0, Number(acceptedTorque) || 0.0);
+        const vFf = tAccepted > 0 ? Math.min(tAccepted / torquePerVolt, 18.0) : 0.0;
+        const vMax = tAccepted > 0 ? Math.min(vFf + 0.5, 18.0) : 0.0;
 
-        el.btnDisconnect.addEventListener('click', async () => {
-            await serial.disconnect();
-            el.btnMock.style.display = 'inline-flex';
-        });
+        if (el.dispTorqueVmax) {
+            el.dispTorqueVmax.textContent = `${vMax.toFixed(2)} V`;
+        }
+        if (el.dispTorqueVff) {
+            el.dispTorqueVff.textContent = `${vFf.toFixed(2)} V`;
+        }
 
-        // 模拟器切换
-        el.btnMock.addEventListener('click', () => {
-            if (serial.isMocking) {
-                serial.stopMock();
+        if (el.dispDraftCeilingHint) {
+            const tDraft = Math.max(0.0, Number(previewDraftTorque) || 0.0);
+            if (Math.abs(tDraft - tAccepted) >= 0.001) {
+                const draftVff = tDraft > 0 ? Math.min(tDraft / torquePerVolt, 18.0) : 0.0;
+                const draftVmax = tDraft > 0 ? Math.min(draftVff + 0.5, 18.0) : 0.0;
+                el.dispDraftCeilingHint.style.display = 'block';
+                el.dispDraftCeilingHint.textContent = `👉 待下发设定 (${tDraft.toFixed(3)} N·m) 预计: Vff = ${draftVff.toFixed(2)} V, Vmax = ${draftVmax.toFixed(2)} V`;
             } else {
-                serial.startMock();
+                el.dispDraftCeilingHint.style.display = 'none';
             }
-        });
+        }
+    }
 
-        // 滑块改变
-        el.sliderVoltage.addEventListener('input', (e) => {
-            setTargetValue(e.target.value, false);
-        });
+    function setTorqueTargetUI(t, forceSend = false) {
+        let val = Number(t);
+        if (!Number.isFinite(val)) val = 0.0;
+        val = Math.max(0.0, Math.min(currentTorqueLimit, val));
+        val = Math.round(val * 1000) / 1000;
 
-        el.sliderVoltage.addEventListener('change', (e) => {
-            setTargetValue(e.target.value, true);
-        });
+        draftTargetTorque = val;
+        if (el.sliderTorque) el.sliderTorque.value = val;
+        if (el.inputTorque) el.inputTorque.value = val.toFixed(3);
+        if (el.displayTargetTorque) el.displayTargetTorque.textContent = `${val.toFixed(3)} N·m`;
 
-        // 输入框改变
-        el.inputVoltage.addEventListener('change', (e) => {
-            setTargetValue(e.target.value, false);
-        });
+        if (el.torquePresetChips) {
+            el.torquePresetChips.forEach(chip => {
+                const pVal = Number(chip.getAttribute('data-val'));
+                if (Math.abs(pVal - val) < 0.05) {
+                    chip.classList.add('active');
+                } else {
+                    chip.classList.remove('active');
+                }
+            });
+        }
 
-        el.inputVoltage.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                setTargetValue(e.target.value, true);
-            }
-        });
+        updateTorqueSyncBadge();
 
-        // 步进微调按钮 (±0.1V, 按住可快速微调)
-        el.btnStepDec.addEventListener('click', () => {
-            setTargetValue(currentTargetV - 0.2, true);
-        });
+        if (forceSend) {
+            sendTargetTorque(val);
+        }
+    }
 
-        el.btnStepInc.addEventListener('click', () => {
-            setTargetValue(currentTargetV + 0.2, true);
-        });
+    function setupEventListeners() {
+        // 模式二选一切换 (手动电压 vs 扭矩闭环)
+        const modeBtns = document.querySelectorAll('.mode-toggle-btn');
+        modeBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const targetMode = btn.getAttribute('data-mode');
+                activeMode = targetMode;
+                modeBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
 
-        // 预设快捷档位
-        el.presetChips.forEach(chip => {
-            chip.addEventListener('click', () => {
-                const val = chip.getAttribute('data-val');
-                setTargetValue(val, true);
+                const card = document.getElementById('primaryControlCard');
+                const paneV = document.getElementById('mode-pane-voltage');
+                const paneT = document.getElementById('mode-pane-torque');
+
+                if (targetMode === 'voltage') {
+                    if (paneV) paneV.classList.add('active');
+                    if (paneT) paneT.classList.remove('active');
+                    if (card) {
+                        card.classList.add('group-voltage');
+                        card.classList.remove('group-torque');
+                    }
+                    log('info', '已切换到【手动电压驱动模式】');
+                } else {
+                    if (paneV) paneV.classList.remove('active');
+                    if (paneT) paneT.classList.add('active');
+                    if (card) {
+                        card.classList.remove('group-voltage');
+                        card.classList.add('group-torque');
+                    }
+                    log('info', '已切换到【扭矩闭环控制模式】');
+                }
+                syncScopeTargets();
             });
         });
 
-        // 发送按钮
-        el.btnSend.addEventListener('click', () => {
-            sendTargetVoltage(currentTargetV);
-        });
+        // 串口连接/断开
+        if (el.btnConnect) {
+            el.btnConnect.addEventListener('click', async () => {
+                const baud = parseInt(el.baudSelect.value, 10) || 115200;
+                try {
+                    await serial.connect(baud);
+                } catch (_) {}
+            });
+        }
 
-        // 一键急停 (0.0 V)
-        el.btnEstop.addEventListener('click', () => {
-            setTargetValue(0.0, true);
-            log('warn', '🚨 已触发一键急停，紧急下发目标 0.00 V');
-        });
+        if (el.btnDisconnect) {
+            el.btnDisconnect.addEventListener('click', async () => {
+                await serial.disconnect();
+                el.btnMock.style.display = 'inline-flex';
+            });
+        }
 
-        // 示波器控制
-        el.btnPauseChart.addEventListener('click', () => {
-            const paused = scope.togglePause();
-            el.btnPauseChart.innerHTML = paused ? `
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M8 5v14l11-7z"/>
-                </svg>
-                继续运行
-            ` : `
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
-                </svg>
-                暂停采样
-            `;
-            el.btnPauseChart.style.borderColor = paused ? '#ef4444' : '';
-        });
+        // 模拟器切换
+        if (el.btnMock) {
+            el.btnMock.addEventListener('click', () => {
+                if (serial.isMocking) {
+                    serial.stopMock();
+                } else {
+                    serial.startMock();
+                }
+            });
+        }
 
-        el.btnClearChart.addEventListener('click', () => {
-            scope.clear();
-            vMinObserved = Infinity;
-            vMaxObserved = -Infinity;
-            tMaxObserved = -Infinity;
-            el.dispVoltageMin.textContent = '--';
-            el.dispVoltageMax.textContent = '--';
-            el.dispTorqueMax.textContent = '--';
-            log('info', '示波器历史曲线与极值已清空');
-        });
+        // 主动查询状态 (GetState 0x13)
+        if (el.btnQueryState) {
+            el.btnQueryState.addEventListener('click', async () => {
+                try {
+                    const resp = await reqQueue.enqueue(MotorProtocol.CommandType.GetState, (seq) => MotorProtocol.encodeGetState(seq));
+                    if (resp.result === MotorProtocol.Result.Ok) {
+                        appliedTargetTorque = Math.fround(resp.value);
+                        updateTorqueSyncBadge();
+                        log('info', `[状态刷新] 当前已选定扭矩目标=${appliedTargetTorque.toFixed(3)} N·m, 闭环=${resp.torqueEnabled ? '开启' : '关闭'}, 反馈=${resp.feedbackValid ? '有效' : '未就绪'}`);
+                    }
+                } catch (err) {
+                    log('error', `查询状态失败: ${err.message}`);
+                }
+            });
+        }
 
-        el.btnExportCsv.addEventListener('click', () => {
-            const csv = scope.exportCsv();
-            if (!csv) {
-                alert('暂无记录数据可导出');
-                return;
+        // 控制组 1: 电压交互
+        if (el.sliderVoltage) {
+            el.sliderVoltage.addEventListener('input', (e) => setVoltageValue(e.target.value, false));
+            el.sliderVoltage.addEventListener('change', (e) => {
+                const autoSend = Boolean(el.chkAutoSync && el.chkAutoSync.checked);
+                setVoltageValue(e.target.value, autoSend);
+            });
+        }
+
+        if (el.inputVoltage) {
+            el.inputVoltage.addEventListener('change', (e) => {
+                const autoSend = Boolean(el.chkAutoSync && el.chkAutoSync.checked);
+                setVoltageValue(e.target.value, autoSend);
+            });
+            el.inputVoltage.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') setVoltageValue(e.target.value, true);
+            });
+        }
+
+        if (el.btnStepDec) {
+            el.btnStepDec.addEventListener('click', () => {
+                const autoSend = Boolean(el.chkAutoSync && el.chkAutoSync.checked);
+                setVoltageValue(draftTargetV - 0.2, autoSend);
+            });
+        }
+        if (el.btnStepInc) {
+            el.btnStepInc.addEventListener('click', () => {
+                const autoSend = Boolean(el.chkAutoSync && el.chkAutoSync.checked);
+                setVoltageValue(draftTargetV + 0.2, autoSend);
+            });
+        }
+
+        if (el.presetChips) {
+            el.presetChips.forEach(chip => {
+                chip.addEventListener('click', () => {
+                    const v = parseFloat(chip.getAttribute('data-val'));
+                    const autoSend = Boolean(el.chkAutoSync && el.chkAutoSync.checked);
+                    setVoltageValue(v, autoSend);
+                });
+            });
+        }
+
+        if (el.btnSend) {
+            el.btnSend.addEventListener('click', () => sendTargetVoltage(draftTargetV));
+        }
+
+        if (el.btnEstop) {
+            el.btnEstop.addEventListener('click', () => {
+                setVoltageValue(0.0, true);
+                log('warn', '【执行软件停机】下发目标电压 0.00 V');
+            });
+        }
+
+        // 控制组 2: 扭矩与限幅交互
+        if (el.sliderTorque) {
+            el.sliderTorque.addEventListener('input', (e) => setTorqueTargetUI(e.target.value, false));
+            el.sliderTorque.addEventListener('change', (e) => setTorqueTargetUI(e.target.value, false));
+        }
+
+        if (el.inputTorque) {
+            el.inputTorque.addEventListener('change', (e) => setTorqueTargetUI(e.target.value, false));
+            el.inputTorque.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') setTorqueTargetUI(e.target.value, true);
+            });
+        }
+
+        if (el.btnStepTorqueDec) {
+            el.btnStepTorqueDec.addEventListener('click', () => setTorqueTargetUI(draftTargetTorque - 0.1, false));
+        }
+        if (el.btnStepTorqueInc) {
+            el.btnStepTorqueInc.addEventListener('click', () => setTorqueTargetUI(draftTargetTorque + 0.1, false));
+        }
+
+        if (el.torquePresetChips) {
+            el.torquePresetChips.forEach(chip => {
+                chip.addEventListener('click', () => {
+                    const t = parseFloat(chip.getAttribute('data-val'));
+                    setTorqueTargetUI(t, false);
+                });
+            });
+        }
+
+        if (el.btnSetTorque) {
+            el.btnSetTorque.addEventListener('click', () => sendTargetTorque(draftTargetTorque));
+        }
+
+        if (el.btnEnableTorque) {
+            el.btnEnableTorque.addEventListener('click', () => setTorqueLoopEnabled(true));
+        }
+
+        if (el.btnDisableTorque) {
+            el.btnDisableTorque.addEventListener('click', () => setTorqueLoopEnabled(false));
+        }
+
+        if (el.btnStopTorque) {
+            el.btnStopTorque.addEventListener('click', () => {
+                sendTargetVoltage(0.0);
+                log('warn', '【执行紧急软件停机】发送 0.00V 关闭扭矩闭环并停止 PWM');
+            });
+        }
+
+        // 扭矩上限幅值交互 (与参数面板 ID 6 双向联动)
+        if (el.inputTorqueLimit) {
+            el.inputTorqueLimit.addEventListener('input', () => {
+                if (el.paramInputs[6]) {
+                    el.paramInputs[6].value = el.inputTorqueLimit.value;
+                    el.paramInputs[6].dispatchEvent(new Event('input'));
+                }
+            });
+        }
+        if (el.btnStepLimitDec) {
+            el.btnStepLimitDec.addEventListener('click', () => {
+                const cur = parseFloat(el.inputTorqueLimit.value) || currentTorqueLimit;
+                const next = Math.max(0.1, cur - 0.5);
+                sendSetTorqueLimit(next);
+            });
+        }
+        if (el.btnStepLimitInc) {
+            el.btnStepLimitInc.addEventListener('click', () => {
+                const cur = parseFloat(el.inputTorqueLimit.value) || currentTorqueLimit;
+                const next = Math.min(10.0, cur + 0.5);
+                sendSetTorqueLimit(next);
+            });
+        }
+        if (el.btnSetTorqueLimit) {
+            el.btnSetTorqueLimit.addEventListener('click', () => {
+                const val = parseFloat(el.inputTorqueLimit.value);
+                if (Number.isFinite(val) && val > 0) {
+                    sendSetTorqueLimit(val);
+                }
+            });
+        }
+
+        // 6 项完整参数面板交互
+        if (el.btnReadParams) {
+            el.btnReadParams.addEventListener('click', () => syncDeviceState());
+        }
+
+        Object.keys(el.paramInputs).forEach(idStr => {
+            const id = Number(idStr);
+            const input = el.paramInputs[id];
+            if (input) {
+                input.addEventListener('input', () => {
+                    if (id === 6 && el.inputTorqueLimit) {
+                        el.inputTorqueLimit.value = input.value;
+                    }
+                    const card = input.closest('.param-card');
+                    if (card) {
+                        const fInput = Math.fround(parseFloat(input.value));
+                        const isDiff = Number.isFinite(fInput) && Math.abs(fInput - ramParams[id]) > 1e-6;
+                        if (isDiff) {
+                            card.classList.add('dirty');
+                            if (el.flashSaveBadge) {
+                                el.flashSaveBadge.textContent = '● 存在未应用改动';
+                                el.flashSaveBadge.style.color = 'var(--accent-amber)';
+                            }
+                        } else {
+                            card.classList.remove('dirty');
+                        }
+                    }
+                });
             }
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `motor_telemetry_${new Date().toISOString().replace(/[:.]/g, '-')}.csv`;
-            a.click();
-            URL.revokeObjectURL(url);
-            log('success', '已成功导出示波器 CSV 采样记录');
         });
 
-        // 清空日志
-        el.btnClearLog.addEventListener('click', () => {
-            el.logTerminal.innerHTML = '';
-        });
-    }
+        if (el.btnApplyParams) {
+            el.btnApplyParams.addEventListener('click', async () => {
+                log('info', '正在将本地修改参数逐项写入下位机 RAM...');
+                let anyWritten = false;
+                let limitUpdated = false;
+                for (let id = 1; id <= 6; id++) {
+                    const input = el.paramInputs[id];
+                    if (input) {
+                        const val = Math.fround(parseFloat(input.value));
+                        if (Number.isFinite(val) && Math.abs(val - ramParams[id]) > 1e-6) {
+                            try {
+                                const resp = await reqQueue.enqueue(MotorProtocol.CommandType.SetParameter, (seq) => MotorProtocol.encodeSetParameter(id, val, seq));
+                                if (resp.result === MotorProtocol.Result.Ok) {
+                                    const appliedVal = Math.fround(resp.value);
+                                    ramParams[id] = appliedVal;
+                                    updateParamRowUI(id, appliedVal);
+                                    anyWritten = true;
+                                    if (id === 6) {
+                                        applyTorqueLimitToUI(appliedVal);
+                                        limitUpdated = true;
+                                    }
+                                    log('info', `参数 ${MotorProtocol.ParameterNames[id].name} 已写入 RAM: ${appliedVal}`);
+                                } else {
+                                    log('warn', `参数 ${MotorProtocol.ParameterNames[id].name} 写入失败: ${resp.resultName}`);
+                                }
+                            } catch (err) {
+                                log('error', `写入参数异常: ${err.message}`);
+                            }
+                        }
+                    }
+                }
+                if (limitUpdated) {
+                    try {
+                        const stResp = await reqQueue.enqueue(MotorProtocol.CommandType.GetState, (seq) => MotorProtocol.encodeGetState(seq));
+                        if (stResp.result === MotorProtocol.Result.Ok) {
+                            appliedTargetTorque = Math.fround(stResp.value);
+                            setTorqueTargetUI(appliedTargetTorque, false);
+                            updateTorqueSyncBadge();
+                        }
+                    } catch (_) {}
+                }
+                if (anyWritten && el.flashSaveBadge) {
+                    el.flashSaveBadge.textContent = 'RAM 已应用 (未写Flash)';
+                    el.flashSaveBadge.style.color = 'var(--accent-cyan)';
+                }
+            });
+        }
 
-    // 页面初始化
-    function init() {
-        setTargetValue(0.0, false);
-        setupEventListeners();
+        if (el.btnSaveFlash) {
+            el.btnSaveFlash.addEventListener('click', () => executeSafeSaveFlash());
+        }
 
-        log('info', '电机上位机调试台已就绪 (协议: 14字节小端 / CRC-16/CCITT-FALSE)');
-        if (!SerialManager.isSupported()) {
-            log('warn', '注意：当前浏览器不支持 Web Serial API。您可点击右上角【仿真模式】测试所有波形与交互，连接真实硬件请使用 Chrome/Edge。');
-        } else {
-            log('info', '检测到 Web Serial 支持，插上 USB-TTL 串口后点击【连接串口】即可开始。');
+        // 示波器控制交互
+        if (el.chkShowTargetRef) {
+            el.chkShowTargetRef.addEventListener('change', (e) => {
+                scope.setShowTargetRef(e.target.checked);
+            });
+        }
+
+        if (el.selectScopePoints) {
+            el.selectScopePoints.addEventListener('change', (e) => {
+                scope.setMaxPoints(e.target.value);
+                log('info', `示波器采样窗口已调整为 ${e.target.value} 点`);
+            });
+        }
+
+        if (el.btnPauseChart) {
+            el.btnPauseChart.addEventListener('click', () => {
+                const paused = scope.togglePause();
+                el.btnPauseChart.classList.toggle('btn-primary', paused);
+                el.btnPauseChart.innerHTML = paused ? `
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M8 5v14l11-7z"/>
+                    </svg>
+                    恢复采样
+                ` : `
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+                    </svg>
+                    暂停采样
+                `;
+            });
+        }
+
+        if (el.btnClearChart) {
+            el.btnClearChart.addEventListener('click', () => {
+                scope.clear();
+                vMinObserved = Infinity;
+                vMaxObserved = -Infinity;
+                tMaxObserved = -Infinity;
+                if (el.dispVoltageMin) el.dispVoltageMin.textContent = '--';
+                if (el.dispVoltageMax) el.dispVoltageMax.textContent = '--';
+                if (el.dispTorqueMax) el.dispTorqueMax.textContent = '--';
+                log('info', '示波器历史波形与统计极值已清空');
+            });
+        }
+
+        if (el.btnExportCsv) {
+            el.btnExportCsv.addEventListener('click', () => {
+                const csv = scope.exportCsv();
+                if (!csv) {
+                    alert('当前尚无波形数据可导出');
+                    return;
+                }
+                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `motor_telemetry_${new Date().toISOString().replace(/[:.]/g, '-')}.csv`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                log('info', '已导出采样数据 CSV 文件 (含目标与限幅参考列)');
+            });
+        }
+
+        if (el.btnClearLog) {
+            el.btnClearLog.addEventListener('click', () => {
+                if (el.logTerminal) el.logTerminal.innerHTML = '';
+            });
         }
     }
 
-    window.addEventListener('DOMContentLoaded', init);
+    window.addEventListener('DOMContentLoaded', () => {
+        setupEventListeners();
+        updateVoltageSyncBadge();
+        updateTorqueSyncBadge();
+        log('info', '上位机控制系统 v2.4 已就绪，等待连接硬件串口 (USART3 115200 8N1)');
+    });
 
 })();
+
     </script>
 </body>
 </html>

@@ -1,33 +1,72 @@
 /**
  * @file style.css
- * @brief 工业级暗色主题 UI 样式系统 (Cyber-Industrial Instrumentation Theme)
+ * @brief 电机测控与调试上位机 UI 样式系统 (Cleanroom White + Ice Blue 纯白与淡蓝实验室工程风)
+ * @architecture 现代高精度实验室仪器美学 · 单栏位电压/扭矩模式切换 (460px Sidebar)
+ * @version 2.3 (模式二选一切换栏位 + 下位机参数持久化组)
  */
 
 :root {
-    --bg-dark: #070a12;
-    --bg-panel: #0d1322;
-    --bg-panel-hover: #131c31;
-    --bg-card: #111827;
-    --border-subtle: #1e293b;
-    --border-bright: #334155;
-    
-    --accent-cyan: #38bdf8;
-    --accent-cyan-glow: rgba(56, 189, 248, 0.25);
-    --accent-amber: #f59e0b;
-    --accent-amber-glow: rgba(245, 158, 11, 0.25);
-    
-    --color-success: #10b981;
-    --color-success-glow: rgba(16, 185, 129, 0.3);
-    --color-error: #ef4444;
-    --color-error-glow: rgba(239, 68, 68, 0.3);
-    --color-warning: #fbbf24;
-    
-    --text-main: #f1f5f9;
-    --text-muted: #94a3b8;
-    --text-dim: #64748b;
-    
-    --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    --font-mono: "JetBrains Mono", "Fira Code", Consolas, Monaco, monospace;
+    /* 核心白与浅蓝表面阶梯 (Surfaces Hierarchy) */
+    --surface-canvas: #f1f6fb;
+    --surface-nav: #ffffff;
+    --surface-panel: #ffffff;
+    --surface-card: #f8fafc;
+    --surface-card-hover: #f0f7ff;
+    --surface-sunken: #edf2f7;
+    --surface-glass: rgba(255, 255, 255, 0.94);
+    --surface-accent-soft: #e0f2fe;
+
+    /* 精密发丝线系统 (Precision Hairlines) */
+    --hairline-subtle: #f1f5f9;
+    --hairline: #e2e8f0;
+    --hairline-bright: #cbd5e1;
+    --hairline-cyan: #7dd3fc;
+    --hairline-amber: #fde68a;
+    --hairline-danger: #fca5a5;
+
+    /* 物理倒角微高光与细腻柔和阴影 (Hardware Bevel & Soft Shadows) */
+    --bevel-top: inset 0 1px 0 #ffffff;
+    --bevel-sunken: inset 0 1px 3px rgba(15, 23, 42, 0.06);
+    --shadow-card: 0 1px 3px rgba(15, 23, 42, 0.04), 0 6px 20px -2px rgba(15, 23, 42, 0.05);
+    --shadow-dropdown: 0 4px 20px rgba(15, 23, 42, 0.12);
+    --shadow-glow-cyan: 0 0 16px rgba(2, 132, 199, 0.2);
+
+    /* 遥测通道专有色系统 (Telemetry Channels & Semantics) */
+    --accent-cyan: #0284c7;          /* 主色：电离湛蓝 (Sky 600) */
+    --accent-cyan-light: #38bdf8;    /* 亮天蓝 */
+    --accent-cyan-dark: #0369a1;
+    --accent-cyan-glow: rgba(2, 132, 199, 0.16);
+    --accent-cyan-subtle: #e0f2fe;   /* 淡蓝底色 (Sky 100) */
+    --accent-cyan-border: #bae6fd;
+
+    --accent-amber: #d97706;         /* 通道 B：机械琥珀金 (Amber 600) */
+    --accent-amber-light: #f59e0b;
+    --accent-amber-dark: #b45309;
+    --accent-amber-glow: rgba(217, 119, 6, 0.16);
+    --accent-amber-subtle: #fef3c7;
+    --accent-amber-border: #fde68a;
+
+    /* 状态与警示色 */
+    --color-success: #16a34a;        /* 翡翠绿 */
+    --color-success-subtle: #dcfce7;
+    --color-success-glow: rgba(22, 163, 74, 0.2);
+    --color-error: #dc2626;          /* 安全红 */
+    --color-error-subtle: #fee2e2;
+    --color-error-glow: rgba(220, 38, 38, 0.25);
+    --color-warning: #d97706;
+
+    /* 文字与排版阶梯 (Typography & Inks - 保证白底高对比度) */
+    --text-bright: #0f172a;          /* 最深黑蓝，清晰易读 */
+    --text-main: #1e293b;            /* 正文文字 */
+    --text-muted: #475569;           /* 次要说明 */
+    --text-dim: #64748b;             /* 标签与单位 */
+    --text-faint: #94a3b8;           /* 弱化占位 */
+
+    --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", "Helvetica Neue", Arial, sans-serif;
+    --font-mono: "JetBrains Mono", "SF Mono", "Fira Code", Menlo, Consolas, monospace;
+
+    /* 关键防抖特性：所有遥测数据强制开启等宽数字，消除 60Hz 采样下的水平文字微抖动 */
+    --tnum: tabular-nums;
 }
 
 * {
@@ -37,29 +76,41 @@
 }
 
 body {
-    background-color: var(--bg-dark);
+    background-color: var(--surface-canvas);
     color: var(--text-main);
     font-family: var(--font-sans);
     line-height: 1.5;
     min-height: 100vh;
     overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+
+    /* 现代实验室淡蓝微格蓝图背景 (Cleanroom Light Blue Blueprint) */
     background-image: 
-        radial-gradient(circle at 15% 15%, rgba(56, 189, 248, 0.05) 0%, transparent 40%),
-        radial-gradient(circle at 85% 85%, rgba(245, 158, 11, 0.04) 0%, transparent 45%);
+        linear-gradient(rgba(2, 132, 199, 0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(2, 132, 199, 0.04) 1px, transparent 1px),
+        radial-gradient(circle at 10% 5%, rgba(56, 189, 248, 0.12) 0%, transparent 45%),
+        radial-gradient(circle at 90% 95%, rgba(2, 132, 199, 0.08) 0%, transparent 45%);
+    background-size: 24px 24px, 24px 24px, 100% 100%, 100% 100%;
 }
 
-/* 顶部状态栏 */
+/* ==========================================================================
+   1. 顶部控制台中控栏 (Top Cockpit Command Bar)
+   ========================================================================== */
+
 .top-header {
-    background: linear-gradient(180deg, #0f172a 0%, #0d1322 100%);
-    border-bottom: 1px solid var(--border-subtle);
-    padding: 12px 24px;
+    background: var(--surface-nav);
+    border-bottom: 1px solid var(--hairline);
+    padding: 10px 24px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 1px 4px rgba(15, 23, 42, 0.04), 0 4px 16px rgba(15, 23, 42, 0.03);
     position: sticky;
     top: 0;
     z-index: 100;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
 }
 
 .brand-section {
@@ -69,82 +120,106 @@ body {
 }
 
 .brand-icon {
-    width: 32px;
-    height: 32px;
-    background: linear-gradient(135deg, var(--accent-cyan), var(--accent-amber));
+    width: 36px;
+    height: 36px;
+    background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
     border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
+    box-shadow: 0 2px 8px rgba(2, 132, 199, 0.25);
+    border: 1px solid rgba(2, 132, 199, 0.3);
 }
 
 .brand-icon svg {
-    width: 18px;
-    height: 18px;
-    fill: #000;
+    width: 20px;
+    height: 20px;
+    fill: #ffffff;
 }
 
 .brand-title {
-    font-size: 18px;
+    font-size: 15px;
     font-weight: 700;
-    letter-spacing: 0.5px;
-    color: #fff;
+    letter-spacing: -0.01em;
+    color: var(--text-bright);
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
 }
 
 .brand-badge {
-    font-size: 11px;
-    font-weight: 600;
-    padding: 2px 8px;
-    border-radius: 9999px;
-    background: rgba(56, 189, 248, 0.15);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    padding: 3px 8px;
+    border-radius: 4px;
+    background: var(--accent-cyan-subtle);
     color: var(--accent-cyan);
-    border: 1px solid rgba(56, 189, 248, 0.3);
+    border: 1px solid var(--hairline-cyan);
     font-family: var(--font-mono);
+    text-transform: uppercase;
+}
+
+.brand-sub {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-dim);
+    font-family: var(--font-mono);
+    letter-spacing: 0.02em;
+    margin-top: 2px;
 }
 
 .connection-toolbar {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
 }
 
 .conn-status-indicator {
     display: flex;
     align-items: center;
     gap: 8px;
-    font-size: 13px;
+    font-size: 12px;
     font-family: var(--font-mono);
     color: var(--text-muted);
-    background: rgba(15, 23, 42, 0.6);
+    background: var(--surface-sunken);
     padding: 6px 14px;
-    border-radius: 8px;
-    border: 1px solid var(--border-subtle);
+    border-radius: 6px;
+    border: 1px solid var(--hairline);
+    letter-spacing: 0.02em;
+    box-shadow: var(--bevel-sunken);
 }
 
 .status-dot {
-    width: 9px;
-    height: 9px;
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
     background: var(--color-error);
-    box-shadow: 0 0 8px var(--color-error-glow);
+    box-shadow: 0 0 6px var(--color-error-glow);
     transition: all 0.3s ease;
 }
 
 .status-dot.connected {
     background: var(--color-success);
-    box-shadow: 0 0 10px var(--color-success-glow);
+    box-shadow: 0 0 8px var(--color-success-glow);
+    animation: status-pulse 2s infinite ease-in-out;
 }
 
 .status-dot.mocking {
     background: var(--color-warning);
-    box-shadow: 0 0 10px rgba(251, 191, 36, 0.4);
+    box-shadow: 0 0 8px rgba(217, 119, 6, 0.35);
+    animation: status-pulse 1.5s infinite ease-in-out;
 }
 
-/* 按钮通用 */
+@keyframes status-pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.2); opacity: 0.85; }
+}
+
+/* ==========================================================================
+   2. 交互按钮系统 (Clean & Tactile Buttons)
+   ========================================================================== */
+
 .btn {
     display: inline-flex;
     align-items: center;
@@ -153,178 +228,318 @@ body {
     font-family: var(--font-sans);
     font-size: 13px;
     font-weight: 600;
-    padding: 8px 16px;
-    border-radius: 8px;
+    letter-spacing: -0.01em;
+    padding: 8px 14px;
+    border-radius: 6px;
     border: 1px solid transparent;
     cursor: pointer;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
     user-select: none;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
 }
 
 .btn:active {
-    transform: scale(0.97);
+    transform: translateY(1px) scale(0.985);
+}
+.btn:disabled, .btn.disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    pointer-events: none;
+    box-shadow: none !important;
+    transform: none !important;
 }
 
+input:disabled, .slider-custom:disabled, select:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    background-color: #f1f5f9;
+}
+.preset-chip:disabled, .quick-step-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+    box-shadow: none !important;
+}
+
+
 .btn-primary {
-    background: linear-gradient(180deg, #0284c7 0%, #0369a1 100%);
-    color: #fff;
-    border-color: #38bdf8;
-    box-shadow: 0 0 15px rgba(56, 189, 248, 0.3);
+    background: linear-gradient(180deg, #0ea5e9 0%, #0284c7 100%);
+    color: #ffffff;
+    border-color: #0284c7;
+    box-shadow: 0 1px 3px rgba(2, 132, 199, 0.25), 0 2px 8px rgba(2, 132, 199, 0.2);
 }
 
 .btn-primary:hover {
-    background: linear-gradient(180deg, #0369a1 0%, #075985 100%);
-    box-shadow: 0 0 20px rgba(56, 189, 248, 0.5);
+    background: linear-gradient(180deg, #0284c7 0%, #0369a1 100%);
+    box-shadow: 0 2px 10px rgba(2, 132, 199, 0.35);
+}
+
+.btn-success {
+    background: linear-gradient(180deg, #10b981 0%, #059669 100%);
+    color: #ffffff;
+    border-color: #059669;
+    box-shadow: 0 1px 3px rgba(16, 185, 129, 0.25);
+}
+
+.btn-success:hover {
+    background: linear-gradient(180deg, #059669 0%, #047857 100%);
+    box-shadow: 0 2px 10px rgba(16, 185, 129, 0.35);
 }
 
 .btn-disconnect {
-    background: rgba(239, 68, 68, 0.15);
-    color: #f87171;
-    border-color: rgba(239, 68, 68, 0.4);
+    background: var(--color-error-subtle);
+    color: #b91c1c;
+    border-color: var(--hairline-danger);
 }
 
 .btn-disconnect:hover {
-    background: rgba(239, 68, 68, 0.25);
-    color: #fff;
-    box-shadow: 0 0 15px var(--color-error-glow);
+    background: #fecaca;
+    color: #991b1b;
 }
 
 .btn-outline {
-    background: transparent;
-    border-color: var(--border-bright);
+    background: #ffffff;
+    border-color: var(--hairline);
     color: var(--text-muted);
 }
 
 .btn-outline:hover {
-    background: rgba(255, 255, 255, 0.05);
-    color: #fff;
-    border-color: var(--accent-cyan);
+    background: var(--surface-card-hover);
+    color: var(--accent-cyan);
+    border-color: var(--hairline-cyan);
 }
 
 .btn-danger {
-    background: linear-gradient(180deg, #dc2626 0%, #b91c1c 100%);
-    color: #fff;
-    border-color: #ef4444;
-    font-size: 14px;
+    background: linear-gradient(180deg, #ef4444 0%, #dc2626 100%);
+    color: #ffffff;
+    border: 1px solid #b91c1c;
+    font-size: 13px;
     font-weight: 700;
-    letter-spacing: 0.5px;
-    box-shadow: 0 0 20px rgba(239, 68, 68, 0.4);
+    letter-spacing: 0.04em;
+    box-shadow: 0 1px 3px rgba(220, 38, 38, 0.25), 0 2px 10px rgba(220, 38, 38, 0.2);
 }
 
 .btn-danger:hover {
-    background: linear-gradient(180deg, #b91c1c 0%, #991b1b 100%);
-    box-shadow: 0 0 25px rgba(239, 68, 68, 0.6);
+    background: linear-gradient(180deg, #dc2626 0%, #b91c1c 100%);
+    box-shadow: 0 3px 14px rgba(220, 38, 38, 0.4);
 }
 
-/* 下拉框与输入框 */
-select, input[type="number"], input[type="text"] {
-    background: #090e1a;
-    border: 1px solid var(--border-subtle);
-    color: var(--text-main);
-    padding: 7px 12px;
-    border-radius: 6px;
-    font-family: var(--font-mono);
-    font-size: 13px;
-    outline: none;
-    transition: border-color 0.2s, box-shadow 0.2s;
-}
+/* ==========================================================================
+   3. 主布局与宽幅控制栏 (Main Layout & 460px Sidebar)
+   ========================================================================== */
 
-select:focus, input:focus {
-    border-color: var(--accent-cyan);
-    box-shadow: 0 0 8px var(--accent-cyan-glow);
-}
-
-/* 主容器布局 */
 .main-layout {
     display: grid;
-    grid-template-columns: 360px 1fr;
+    grid-template-columns: 460px 1fr;
     gap: 20px;
     padding: 20px 24px;
-    max-width: 1720px;
+    max-width: 1780px;
     margin: 0 auto;
 }
 
-@media (max-width: 1200px) {
+@media (max-width: 1280px) {
     .main-layout {
         grid-template-columns: 1fr;
     }
 }
 
-/* 卡片容器 */
-.card-panel {
-    background: var(--bg-panel);
-    border: 1px solid var(--border-subtle);
+/* 控制卡片通则 */
+.control-group-card {
+    background: var(--surface-panel);
+    border: 1px solid var(--hairline);
     border-radius: 12px;
-    padding: 18px;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+    padding: 18px 20px;
+    box-shadow: var(--shadow-card);
     margin-bottom: 20px;
     position: relative;
     overflow: hidden;
 }
 
-.card-panel::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+/* 顶部模式切换分段开关 (Mode Toggle Strip: 电压 vs 扭矩) */
+.mode-toggle-strip {
+    display: flex;
+    background: var(--surface-sunken);
+    border: 1px solid var(--hairline);
+    border-radius: 8px;
+    padding: 4px;
+    margin-bottom: 16px;
+    gap: 4px;
+    box-shadow: var(--bevel-sunken);
 }
 
-.card-header {
+.mode-toggle-btn {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 9px 12px;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    font-family: var(--font-sans);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    user-select: none;
+}
+
+.mode-toggle-btn:hover {
+    color: var(--text-bright);
+    background: rgba(255, 255, 255, 0.6);
+}
+
+.mode-toggle-btn.active.btn-mode-voltage {
+    background: #ffffff;
+    color: var(--accent-cyan);
+    border-color: var(--hairline);
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+}
+
+.mode-toggle-btn.active.btn-mode-torque {
+    background: #ffffff;
+    color: var(--accent-amber);
+    border-color: var(--hairline);
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+}
+
+.mode-pane {
+    display: none;
+}
+
+.mode-pane.active {
+    display: block;
+}
+
+.group-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 16px;
+    margin-bottom: 14px;
     padding-bottom: 10px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid var(--hairline-subtle);
 }
 
-.card-title {
+.group-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.group-badge {
+    font-size: 10px;
+    font-weight: 800;
+    padding: 3px 8px;
+    border-radius: 4px;
+    letter-spacing: 0.08em;
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+}
+
+.group-badge.badge-v {
+    background: var(--accent-cyan-subtle);
+    color: var(--accent-cyan);
+    border: 1px solid var(--accent-cyan-border);
+}
+
+.group-badge.badge-t {
+    background: var(--accent-amber-subtle);
+    color: var(--accent-amber);
+    border: 1px solid var(--accent-amber-border);
+}
+
+.group-title {
     font-size: 14px;
     font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    color: var(--text-muted);
-    display: flex;
-    align-items: center;
-    gap: 8px;
+    color: var(--text-bright);
+    letter-spacing: -0.01em;
 }
 
-.card-title span.tag {
-    font-size: 10px;
-    padding: 2px 6px;
-    border-radius: 4px;
-    background: rgba(255, 255, 255, 0.06);
-    color: var(--text-dim);
+/* 参数块分割 */
+.param-section-box {
+    background: var(--surface-card);
+    border: 1px solid var(--hairline);
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin-bottom: 14px;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
 }
 
-/* 控制面板组件 */
-.control-row {
-    margin-bottom: 16px;
-}
-
-.control-label {
+.param-section-box .box-label {
     display: flex;
     justify-content: space-between;
+    align-items: baseline;
     font-size: 12px;
     font-weight: 600;
     color: var(--text-muted);
     margin-bottom: 8px;
 }
 
-.control-label .val-disp {
-    color: var(--accent-cyan);
-    font-family: var(--font-mono);
-    font-size: 14px;
+.param-tag {
+    font-size: 9px;
     font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 3px;
+    background: #ffffff;
+    border: 1px solid var(--hairline);
+    color: var(--text-dim);
+    font-family: var(--font-mono);
+    letter-spacing: 0.05em;
 }
 
-/* 大号滑块 */
+/* ==========================================================================
+   4. 表单、滑轨与步进微调器
+   ========================================================================== */
+
+select, input[type="number"], input[type="text"] {
+    background: #ffffff;
+    border: 1px solid var(--hairline);
+    color: var(--text-bright);
+    padding: 7px 12px;
+    border-radius: 6px;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    font-variant-numeric: var(--tnum);
+}
+
+select {
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    padding-right: 28px;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+select:focus, input:focus {
+    border-color: var(--accent-cyan);
+    box-shadow: 0 0 0 2px var(--accent-cyan-subtle);
+}
+
+.val-disp {
+    font-family: var(--font-mono);
+    font-size: 18px;
+    font-weight: 800;
+    font-variant-numeric: var(--tnum);
+    letter-spacing: -0.02em;
+}
+
+.val-disp.val-v {
+    color: var(--accent-cyan);
+}
+
+.val-disp.val-t {
+    color: var(--accent-amber);
+}
+
 .slider-container {
     position: relative;
-    padding: 4px 0;
+    padding: 10px 0;
 }
 
 .slider-custom {
@@ -333,209 +548,413 @@ select:focus, input:focus {
     width: 100%;
     height: 8px;
     border-radius: 4px;
-    background: #172338;
+    background: var(--surface-sunken);
+    border: 1px solid var(--hairline);
     outline: none;
     cursor: pointer;
-    transition: background 0.2s;
 }
 
 .slider-custom::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
-    width: 22px;
-    height: 22px;
+    width: 20px;
+    height: 20px;
     border-radius: 50%;
     background: var(--accent-cyan);
     cursor: pointer;
-    box-shadow: 0 0 14px var(--accent-cyan-glow);
-    border: 2px solid #fff;
-    transition: transform 0.1s, box-shadow 0.2s;
+    box-shadow: 0 2px 6px rgba(2, 132, 199, 0.4);
+    border: 2px solid #ffffff;
+    transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.15s;
+}
+
+.slider-custom.slider-amber::-webkit-slider-thumb {
+    background: var(--accent-amber);
+    box-shadow: 0 2px 6px rgba(217, 119, 6, 0.4);
 }
 
 .slider-custom::-webkit-slider-thumb:hover {
-    transform: scale(1.15);
-    box-shadow: 0 0 20px rgba(56, 189, 248, 0.7);
+    transform: scale(1.2);
 }
 
-/* 步进微调输入与按钮组 */
 .stepper-group {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
 }
 
 .stepper-btn {
-    width: 36px;
-    height: 36px;
-    background: #172238;
-    border: 1px solid var(--border-subtle);
-    color: #fff;
+    width: 38px;
+    height: 38px;
+    background: #ffffff;
+    border: 1px solid var(--hairline);
+    color: var(--text-bright);
     border-radius: 6px;
     font-size: 16px;
-    font-weight: bold;
+    font-weight: 700;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: background 0.2s, border-color 0.2s;
+    transition: all 0.15s;
+    user-select: none;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
 }
 
 .stepper-btn:hover {
-    background: #1e2e4a;
-    border-color: var(--accent-cyan);
+    background: var(--surface-card-hover);
+    border-color: var(--hairline-cyan);
+    color: var(--accent-cyan);
+}
+
+.stepper-btn:active {
+    transform: translateY(1px);
 }
 
 .stepper-input {
     flex: 1;
-    height: 36px;
+    height: 38px;
     text-align: center;
     font-size: 15px;
     font-weight: 700;
 }
 
-/* 预设档位胶囊按钮网格 */
 .preset-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 8px;
-    margin-top: 10px;
+    gap: 6px;
+    margin-top: 8px;
 }
 
 .preset-chip {
-    padding: 7px 4px;
-    background: #121929;
-    border: 1px solid var(--border-subtle);
+    padding: 8px 2px;
+    background: #ffffff;
+    border: 1px solid var(--hairline);
     border-radius: 6px;
     color: var(--text-muted);
     font-family: var(--font-mono);
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 600;
     cursor: pointer;
     text-align: center;
-    transition: all 0.2s;
+    transition: all 0.15s ease;
+    user-select: none;
+    font-variant-numeric: var(--tnum);
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
 }
 
 .preset-chip:hover {
-    background: #1a243a;
-    border-color: var(--accent-cyan);
-    color: #fff;
-    box-shadow: 0 0 10px rgba(56, 189, 248, 0.2);
+    background: var(--surface-card-hover);
+    border-color: var(--hairline-cyan);
+    color: var(--accent-cyan);
 }
 
 .preset-chip.active {
-    background: rgba(56, 189, 248, 0.15);
+    background: var(--accent-cyan-subtle);
     border-color: var(--accent-cyan);
     color: var(--accent-cyan);
     font-weight: 700;
+    box-shadow: 0 1px 3px rgba(2, 132, 199, 0.2);
 }
 
-/* 急停与发送操作区 */
-.action-row {
+.preset-chip.torque-chip.active {
+    background: var(--accent-amber-subtle);
+    border-color: var(--accent-amber);
+    color: var(--accent-amber);
+}
+
+.quick-step-row {
     display: flex;
+    gap: 6px;
+    margin-top: 8px;
+}
+
+.quick-step-btn {
+    flex: 1;
+    padding: 6px 0;
+    background: #ffffff;
+    border: 1px solid var(--hairline);
+    border-radius: 4px;
+    color: var(--text-dim);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: center;
+}
+
+.quick-step-btn:hover {
+    background: var(--surface-card-hover);
+    color: var(--accent-cyan);
+    border-color: var(--hairline-cyan);
+}
+
+.status-pill-strip {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.status-pill {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    background: var(--surface-sunken);
+    border: 1px solid var(--hairline);
+    border-radius: 6px;
+    padding: 6px 8px;
+    font-size: 11px;
+    font-family: var(--font-mono);
+    color: var(--text-muted);
+}
+
+.status-pill.active {
+    color: #15803d;
+    border-color: #86efac;
+    background: var(--color-success-subtle);
+    font-weight: 700;
+}
+
+.status-pill.warning {
+    color: #b45309;
+    border-color: #fde68a;
+    background: #fef3c7;
+}
+
+.status-pill.disabled {
+    color: var(--text-dim);
+}
+
+/* ==========================================================================
+   5. 下位机参数持久化卡片 (Group 02: Parameters & Flash Storage)
+   ========================================================================== */
+
+.param-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     gap: 10px;
-    margin-top: 20px;
+    margin-bottom: 14px;
 }
 
-.action-row .btn-send {
+.param-card {
+    background: var(--surface-card);
+    border: 1px solid var(--hairline);
+    border-radius: 8px;
+    padding: 10px 12px;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
+    transition: border-color 0.15s, background-color 0.15s;
+}
+
+.param-card.dirty {
+    border-color: var(--accent-cyan);
+    background: #f0f9ff;
+}
+
+.param-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+}
+
+.param-name {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-bright);
+    font-family: var(--font-mono);
+}
+
+.param-badge-ram {
+    font-size: 10px;
+    color: var(--accent-cyan);
+    background: var(--accent-cyan-subtle);
+    border: 1px solid var(--accent-cyan-border);
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-family: var(--font-mono);
+    font-variant-numeric: var(--tnum);
+    font-weight: 600;
+}
+
+.param-input-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.param-input {
     flex: 1;
-    height: 44px;
-    font-size: 14px;
+    height: 32px;
+    text-align: right;
+    font-size: 13px;
+    font-weight: 700;
+    background: #ffffff;
+    border: 1px solid var(--hairline);
+    color: var(--text-bright);
+    border-radius: 6px;
+    padding: 0 8px;
+    outline: none;
+    font-family: var(--font-mono);
+    font-variant-numeric: var(--tnum);
 }
 
-.action-row .btn-estop {
-    flex: 1;
-    height: 44px;
+.param-input:focus {
+    border-color: var(--accent-cyan);
+    box-shadow: 0 0 0 2px var(--accent-cyan-subtle);
 }
 
-/* 实时数字仪表盘网格 */
+.param-desc {
+    font-size: 10px;
+    color: var(--text-dim);
+    margin-top: 4px;
+    line-height: 1.3;
+}
+
+.btn-save-flash {
+    background: linear-gradient(180deg, #f0f9ff 0%, #e0f2fe 100%);
+    border: 1px solid var(--accent-cyan);
+    color: var(--accent-cyan);
+    width: 100%;
+    height: 42px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    box-shadow: 0 1px 3px rgba(2, 132, 199, 0.15);
+}
+
+.btn-save-flash:hover {
+    background: linear-gradient(180deg, #0ea5e9 0%, #0284c7 100%);
+    color: #ffffff;
+    box-shadow: 0 3px 12px rgba(2, 132, 199, 0.3);
+}
+
+/* ==========================================================================
+   6. 遥测大屏仪表盘 (Telemetry Gauges)
+   ========================================================================== */
+
 .gauges-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 14px;
-    margin-bottom: 20px;
+    margin-bottom: 18px;
 }
 
 .metric-gauge-card {
-    background: linear-gradient(135deg, rgba(17, 24, 39, 0.8) 0%, rgba(13, 19, 34, 0.9) 100%);
-    border: 1px solid var(--border-subtle);
-    border-radius: 10px;
-    padding: 16px;
+    background: #ffffff;
+    border: 1px solid var(--hairline);
+    border-radius: 12px;
+    padding: 16px 20px;
     position: relative;
     overflow: hidden;
+    box-shadow: var(--shadow-card);
 }
 
 .metric-gauge-card.voltage-card {
-    border-left: 4px solid var(--accent-cyan);
+    border-top: 3px solid var(--accent-cyan);
 }
 
 .metric-gauge-card.torque-card {
-    border-left: 4px solid var(--accent-amber);
+    border-top: 3px solid var(--accent-amber);
 }
 
 .metric-title {
     font-size: 11px;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.8px;
-    color: var(--text-muted);
+    letter-spacing: 0.08em;
+    color: var(--text-dim);
     display: flex;
     justify-content: space-between;
+    align-items: center;
 }
 
 .metric-value-wrap {
     margin: 8px 0;
     display: flex;
     align-items: baseline;
-    gap: 6px;
+    gap: 8px;
 }
 
 .metric-huge-val {
-    font-size: 36px;
+    font-size: 42px;
     font-weight: 800;
     font-family: var(--font-mono);
-    letter-spacing: -0.5px;
+    letter-spacing: -0.04em;
     line-height: 1;
+    font-variant-numeric: var(--tnum);
 }
 
 .voltage-card .metric-huge-val {
     color: var(--accent-cyan);
-    text-shadow: 0 0 20px var(--accent-cyan-glow);
 }
 
 .torque-card .metric-huge-val {
     color: var(--accent-amber);
-    text-shadow: 0 0 20px var(--accent-amber-glow);
 }
 
 .metric-unit {
     font-size: 14px;
-    font-weight: 600;
+    font-weight: 700;
     color: var(--text-dim);
+    font-family: var(--font-mono);
 }
 
 .metric-sub-stats {
     display: flex;
-    gap: 14px;
+    gap: 16px;
     font-size: 11px;
     font-family: var(--font-mono);
     color: var(--text-dim);
-    border-top: 1px dashed rgba(255, 255, 255, 0.06);
-    padding-top: 8px;
+    border-top: 1px solid var(--hairline-subtle);
+    padding-top: 10px;
+    font-variant-numeric: var(--tnum);
 }
 
 .metric-sub-stats span {
-    color: var(--text-muted);
+    color: var(--text-bright);
+    font-weight: 600;
 }
 
-/* 示波器区域 */
+.meter-track {
+    width: 100%;
+    height: 5px;
+    background: var(--surface-sunken);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-top: 6px;
+    border: 1px solid var(--hairline-subtle);
+}
+
+.meter-fill-v {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #38bdf8, #0284c7);
+    border-radius: 2px;
+    transition: width 0.1s ease-out;
+}
+
+.meter-fill-t {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #fbbf24, #d97706);
+    border-radius: 2px;
+    transition: width 0.1s ease-out;
+}
+
+/* ==========================================================================
+   7. 实时示波器区域 (Oscilloscope Viewport)
+   ========================================================================== */
+
 .scope-wrapper {
     position: relative;
     width: 100%;
     height: 480px;
-    background: #080c14;
-    border-radius: 8px;
-    border: 1px solid var(--border-subtle);
+    background: #f8fafc;
+    border-radius: 10px;
+    border: 1px solid var(--hairline);
     overflow: hidden;
+    box-shadow: inset 0 1px 3px rgba(15, 23, 42, 0.05);
 }
 
 .scope-canvas {
@@ -549,64 +968,233 @@ select:focus, input:focus {
     gap: 8px;
 }
 
-/* 通信统计指标小面板 */
+/* ==========================================================================
+   8. 链路指标与通信终端 (Link Status & Raw Frame Terminal)
+   ========================================================================== */
+
 .stats-strip {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 10px;
-    margin-top: 14px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    margin-top: 0;
 }
 
 .stat-item {
-    background: #090e1a;
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    background: var(--surface-sunken);
+    border: 1px solid var(--hairline);
     border-radius: 6px;
     padding: 8px 12px;
+    box-shadow: var(--bevel-sunken);
 }
 
 .stat-item .stat-lbl {
     font-size: 10px;
     color: var(--text-dim);
     text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 2px;
 }
 
 .stat-item .stat-num {
     font-size: 16px;
     font-weight: 700;
     font-family: var(--font-mono);
-    color: var(--text-main);
+    color: var(--text-bright);
+    font-variant-numeric: var(--tnum);
 }
 
-/* 报文日志区 */
 .log-terminal {
-    background: #060911;
-    border: 1px solid var(--border-subtle);
-    border-radius: 6px;
+    background: #f8fafc;
+    border: 1px solid var(--hairline);
+    border-radius: 8px;
     height: 180px;
     overflow-y: auto;
-    padding: 10px;
+    padding: 10px 14px;
     font-family: var(--font-mono);
     font-size: 11px;
     line-height: 1.6;
+    box-shadow: inset 0 1px 3px rgba(15, 23, 42, 0.05);
+}
+
+.log-terminal::-webkit-scrollbar {
+    width: 6px;
+}
+
+.log-terminal::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.log-terminal::-webkit-scrollbar-thumb {
+    background: var(--hairline-bright);
+    border-radius: 3px;
+}
+
+.log-terminal::-webkit-scrollbar-thumb:hover {
+    background: var(--text-dim);
 }
 
 .log-entry {
-    margin-bottom: 2px;
+    margin-bottom: 3px;
     display: flex;
     gap: 8px;
+    font-variant-numeric: var(--tnum);
 }
 
 .log-entry .time {
-    color: var(--text-dim);
+    color: var(--text-faint);
     user-select: none;
 }
 
-.log-entry.tx .dir { color: var(--accent-cyan); font-weight: bold; }
-.log-entry.rx .dir { color: var(--color-success); font-weight: bold; }
-.log-entry.info .dir { color: #60a5fa; }
-.log-entry.error .dir { color: var(--color-error); font-weight: bold; }
+.log-entry.tx .dir { color: var(--accent-cyan); font-weight: 700; }
+.log-entry.rx .dir { color: var(--color-success); font-weight: 700; }
+.log-entry.info .dir { color: #0284c7; }
+.log-entry.warn .dir { color: var(--color-warning); font-weight: 700; }
+.log-entry.error .dir { color: var(--color-error); font-weight: 700; }
 
 .log-entry .content {
-    color: var(--text-muted);
+    color: var(--text-main);
     word-break: break-all;
+}
+
+/* ==========================================================================
+   9. 扭矩前馈与动态电压上限提示盒 (Torque Feedforward & Dynamic Ceiling Box)
+   ========================================================================== */
+
+.dynamic-ceiling-box {
+    background: #f0f7ff;
+    border: 1px solid #bae6fd;
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin-bottom: 14px;
+}
+
+.ceiling-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.ceiling-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: #0369a1;
+}
+
+.ceiling-badge {
+    font-size: 10px;
+    font-weight: 700;
+    background: #e0f2fe;
+    color: #0284c7;
+    border: 1px solid #7dd3fc;
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-family: var(--font-mono);
+}
+
+.ceiling-val-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+.ceiling-item {
+    flex: 1;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 6px 10px;
+}
+
+.ceiling-lbl {
+    font-size: 10px;
+    color: var(--text-dim);
+    display: block;
+    margin-bottom: 2px;
+}
+
+.ceiling-num {
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--accent-cyan);
+    font-family: var(--font-mono);
+    font-variant-numeric: var(--tnum);
+}
+
+.ceiling-note {
+    font-size: 10px;
+    color: #64748b;
+    line-height: 1.4;
+    border-top: 1px dashed #cbd5e1;
+    padding-top: 6px;
+}
+
+/* ==========================================================================
+   10. 设定值 vs 下位机已生效目标对比条 (Draft vs Applied Target Strip)
+   ========================================================================== */
+
+.target-compare-strip {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--surface-sunken);
+    border: 1px solid var(--hairline);
+    border-radius: 6px;
+    padding: 6px 12px;
+    margin-bottom: 12px;
+    font-size: 11px;
+    font-family: var(--font-mono);
+    font-variant-numeric: var(--tnum);
+}
+
+.target-compare-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--text-muted);
+}
+
+.target-compare-item strong {
+    font-size: 13px;
+    color: var(--text-bright);
+}
+
+.pending-badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 4px;
+    background: #fef3c7;
+    color: #b45309;
+    border: 1px solid #fde68a;
+}
+
+.synced-badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 4px;
+    background: #dcfce7;
+    color: #15803d;
+    border: 1px solid #86efac;
+}
+
+.auto-sync-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--text-dim);
+    margin: 8px 0 12px 0;
+    padding: 4px 2px;
+}
+
+.auto-sync-row label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    user-select: none;
 }

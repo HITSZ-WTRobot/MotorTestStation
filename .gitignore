@@ -3,3 +3,8 @@ Thumbs.db
 .vscode/
 .idea/
 *.log
+node_modules/
+dist/
+src-tauri/target/
+awesome-design-md/
+串口.zip

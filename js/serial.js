@@ -1,6 +1,7 @@
 /**
  * @file serial.js
- * @brief 串口硬件适配器 (Web Serial API) 与 虚拟单片机仿真器 (Mock Motor)
+ * @brief 现代 Web Serial 硬件串口驱动与高保真虚拟电机下位机仿真器
+ * @version 0x01 (支持 0x81/0x82 协议与扭矩闭环状态机)
  */
 
 (function (global) {
@@ -8,94 +9,114 @@
 
     class SerialManager {
         constructor(options = {}) {
+            this.baudRate = options.baudRate || 115200;
+            this.onData = options.onData || (() => {});
+            this.onStatusChange = options.onStatusChange || (() => {});
+            this.onLog = options.onLog || (() => {});
+
             this.port = null;
             this.reader = null;
             this.writer = null;
             this.keepReading = false;
             this.isConnected = false;
+
+            // 虚拟硬件仿真器状态机
             this.isMocking = false;
-
-            this.onData = options.onData || (() => {});
-            this.onLog = options.onLog || (() => {});
-            this.onStatusChange = options.onStatusChange || (() => {});
-
-            this.baudRate = options.baudRate || 115200;
             this.mockTimer = null;
-            this.mockTargetV = 0.0;
-            this.mockCurrentV = 0.0;
-            this.mockTorque = 0.0;
             this.mockSeq = 0;
+
+            // 仿真参数与控制量
+            this.mockState = {
+                vTarget: 0.0,
+                vCurrent: 0.0,
+                torqueTarget: 0.0,
+                torqueCurrent: 0.0,
+                torqueEnabled: false,
+                feedbackValid: true,
+                pidIntegral: 0.0,
+                pidPrevError: 0.0,
+                ramParams: {
+                    1: 1.0,    // Kp
+                    2: 0.05,   // Ki
+                    3: 0.01,   // Kd
+                    4: 0.01,   // Q
+                    5: 0.01,   // R
+                    6: 3.0     // TorqueLimit
+                },
+                flashParams: {
+                    1: 1.0,
+                    2: 0.05,
+                    3: 0.01,
+                    4: 0.01,
+                    5: 0.01,
+                    6: 3.0
+                }
+            };
         }
 
-        /**
-         * 检测当前浏览器是否支持 Web Serial API
-         */
         static isSupported() {
-            return typeof navigator !== 'undefined' && 'serial' in navigator;
+            return 'serial' in navigator;
         }
 
-        /**
-         * 请求用户授权并连接物理串口
-         * @param {number} baudRate 波特率 (默认 115200)
-         */
-        async connect(baudRate = 115200) {
+        async connect(baudRate = this.baudRate) {
+            if (!SerialManager.isSupported()) {
+                throw new Error('当前浏览器不支持 Web Serial API，请使用 Google Chrome 或 Edge 89+');
+            }
+
             if (this.isMocking) {
                 this.stopMock();
             }
 
-            if (!SerialManager.isSupported()) {
-                throw new Error('当前浏览器不支持 Web Serial API。请使用最新版 Google Chrome、Microsoft Edge 或 Opera 浏览器。');
-            }
-
-            this.baudRate = baudRate;
             try {
                 this.port = await navigator.serial.requestPort();
                 await this.port.open({
-                    baudRate: this.baudRate,
+                    baudRate: baudRate,
                     dataBits: 8,
                     stopBits: 1,
                     parity: 'none',
                     flowControl: 'none',
                     bufferSize: 4096
                 });
+                try {
+                    if (this.port.setSignals) {
+                        await this.port.setSignals({ dataTerminalReady: true, requestToSend: true });
+                    }
+                } catch (_) {}
 
                 this.isConnected = true;
                 this.keepReading = true;
-                this.onStatusChange({ connected: true, type: 'hardware', port: this.port, baudRate: this.baudRate });
-                this.onLog('success', `串口已成功开启 (波特率: ${this.baudRate} 8N1)`);
+                this.baudRate = baudRate;
+
+                this.onStatusChange({ connected: true, baudRate: this.baudRate, type: 'hardware' });
+                this.onLog('info', `已成功连接串口 (波特率: ${this.baudRate} 8N1)`);
 
                 this._readLoop();
                 return true;
             } catch (err) {
                 this.isConnected = false;
                 this.onStatusChange({ connected: false });
-                if (err.name === 'NotFoundError') {
-                    this.onLog('info', '用户取消了串口选择');
-                } else {
+                if (err.name !== 'NotFoundError') {
                     this.onLog('error', `串口连接失败: ${err.message}`);
-                    throw err;
                 }
-                return false;
+                throw err;
             }
         }
 
-        /**
-         * 关闭串口连接
-         */
         async disconnect() {
+            this.keepReading = false;
+
             if (this.isMocking) {
                 this.stopMock();
                 return;
             }
 
-            this.keepReading = false;
             try {
                 if (this.reader) {
                     await this.reader.cancel();
                     this.reader = null;
                 }
                 if (this.writer) {
-                    await this.writer.close();
+                    this.writer.releaseLock();
                     this.writer = null;
                 }
                 if (this.port) {
@@ -112,7 +133,7 @@
         }
 
         /**
-         * 发送二进制数据
+         * 发送二进制帧数据
          * @param {Uint8Array} data 
          */
         async send(data) {
@@ -136,9 +157,6 @@
             }
         }
 
-        /**
-         * 读取循环
-         */
         async _readLoop() {
             while (this.port && this.port.readable && this.keepReading) {
                 try {
@@ -172,38 +190,65 @@
         }
 
         /**
-         * 启动虚拟硬件模拟器模式（便于脱机调试）
+         * 启动虚拟硬件仿真器
          */
         startMock() {
             if (this.isConnected) {
                 this.disconnect();
             }
             this.isMocking = true;
-            this.mockTargetV = 0.0;
-            this.mockCurrentV = 0.0;
-            this.mockTorque = 0.0;
+
+            // 复位仿真运行态
+            this.mockState.vTarget = 0.0;
+            this.mockState.vCurrent = 0.0;
+            this.mockState.torqueTarget = 0.0;
+            this.mockState.torqueCurrent = 0.0;
+            this.mockState.torqueEnabled = false;
+            this.mockState.feedbackValid = true;
+            this.mockState.pidIntegral = 0.0;
+            this.mockState.pidPrevError = 0.0;
             this.mockSeq = 0;
 
             this.onStatusChange({ connected: true, type: 'mock' });
-            this.onLog('info', '已启动【虚拟电机模拟器】模式 (仿真 20Hz 连续反馈)');
+            this.onLog('info', '已启动【虚拟电机与下位机仿真器】(支持 0x81 测量与 0x82 闭环应答)');
 
-            // 50ms 一帧 (20Hz)
+            // 50ms 一帧 (20Hz 遥测反馈)
             this.mockTimer = setInterval(() => {
-                // 一阶惯性电压过渡仿真: V_feedback 动态逼近 target
-                const alpha = 0.12;
-                this.mockCurrentV += (this.mockTargetV - this.mockCurrentV) * alpha;
+                const ms = this.mockState;
 
-                // 叠加微量传感器热噪声
-                const vNoise = (Math.random() - 0.5) * 0.008;
-                const finalV = Math.max(0, this.mockCurrentV + vNoise);
+                // 若扭矩闭环开启，执行外环扭矩前馈 + PID 计算 (最新下位机固件架构)
+                if (ms.torqueEnabled && ms.feedbackValid) {
+                    const kp = ms.ramParams[1] || 1.0;
+                    const ki = ms.ramParams[2] || 0.05;
+                    const kd = ms.ramParams[3] || 0.01;
 
-                // 扭矩物理仿真模型：阻尼扭矩 + 与电压相关的电磁扭矩 + 微量扰动
-                const targetTorque = finalV > 0.1 ? (finalV * 0.45 + Math.sin(Date.now() / 400) * 0.3) : 0.0;
-                this.mockTorque += (targetTorque - this.mockTorque) * 0.15;
-                const tNoise = (Math.random() - 0.5) * 0.03;
-                const finalT = this.mockTorque + tNoise;
+                    // 最新规范：前馈 Vff = min(T / 0.5, 18V)，动态电压上限增加 +0.5V 裕量避免电压不足
+                    const torquePerVolt = 0.5;
+                    const vff = ms.torqueTarget > 0 ? Math.min(ms.torqueTarget / torquePerVolt, MotorProtocol.MAX_VOLTAGE) : 0.0;
+                    const voltageLimit = ms.torqueTarget > 0 ? Math.min(vff + 0.5, MotorProtocol.MAX_VOLTAGE) : 0.0;
 
-                // 打包上行反馈帧
+                    const err = ms.torqueTarget - ms.torqueCurrent;
+                    ms.pidIntegral = Math.max(-voltageLimit, Math.min(voltageLimit, ms.pidIntegral + ki * err));
+                    const dErr = err - ms.pidPrevError;
+                    ms.pidPrevError = err;
+
+                    const pidOut = kp * err + ms.pidIntegral + kd * dErr + vff;
+                    ms.vTarget = Math.max(0.0, Math.min(voltageLimit, pidOut));
+                }
+
+                // 一阶惯性电压过渡仿真
+                const vAlpha = 0.15;
+                ms.vCurrent += (ms.vTarget - ms.vCurrent) * vAlpha;
+                const vNoise = (Math.random() - 0.5) * 0.006;
+                const finalV = Math.max(0.0, ms.vCurrent + vNoise);
+
+                // 扭矩物理仿真模型 (电磁扭矩 + 惯性阻尼 + ADS1220 热噪声)
+                const targetTorque = finalV > 0.05 ? (finalV * 0.42 + Math.sin(Date.now() / 500) * 0.12) : 0.0;
+                ms.torqueCurrent += (targetTorque - ms.torqueCurrent) * 0.18;
+                const tNoise = (Math.random() - 0.5) * 0.015;
+                const finalT = Math.max(0.0, ms.torqueCurrent + tNoise);
+
+                // 打包并下发 0x81 测量反馈帧
                 const frame = new Uint8Array(MotorProtocol.FRAME_SIZE);
                 frame[0] = MotorProtocol.HEADER;
                 frame[1] = MotorProtocol.VERSION;
@@ -218,41 +263,200 @@
                 frame[12] = crc & 0xFF;
                 frame[13] = (crc >>> 8) & 0xFF;
 
-                // 模拟串口流入
                 this.onData(frame);
             }, 50);
         }
 
-        /**
-         * 停止虚拟硬件模拟器
-         */
         stopMock() {
             if (!this.isMocking) return;
             if (this.mockTimer) {
                 clearInterval(this.mockTimer);
                 this.mockTimer = null;
             }
+            this.isMocking = false;
             this.onStatusChange({ connected: false });
             this.onLog('info', '已关闭虚拟模拟器');
         }
 
         /**
-         * 虚拟硬件处理上位机发送的下行控制帧
+         * 虚拟硬件处理上位机发送的下行控制帧并生成 0x82 应答
          */
         _handleMockReceive(data) {
             if (!data || data.length !== MotorProtocol.FRAME_SIZE) return;
-            if (data[0] !== MotorProtocol.HEADER || data[1] !== MotorProtocol.VERSION || data[2] !== MotorProtocol.TYPE_SET_VOLTAGE) {
-                return;
-            }
-            const expectedCrc = MotorProtocol.calcCrc16(data, 12);
-            const dv = new DataView(data.buffer, data.byteOffset, data.byteLength);
-            const actualCrc = dv.getUint16(12, true);
-            if (expectedCrc === actualCrc) {
-                const target = dv.getFloat32(4, true);
-                if (Number.isFinite(target) && target >= 0 && target <= MotorProtocol.MAX_VOLTAGE) {
-                    this.mockTargetV = target;
+            if (data[0] !== MotorProtocol.HEADER || data[1] !== MotorProtocol.VERSION) return;
+
+            // 校验 CRC
+            const crcExp = MotorProtocol.calcCrc16(data, 12);
+            const dvIn = new DataView(data.buffer, data.byteOffset, data.byteLength);
+            const crcAct = dvIn.getUint16(12, true);
+            if (crcExp !== crcAct) return;
+
+            const cmdType = data[2];
+            const seq = data[3];
+            const ms = this.mockState;
+
+            let result = MotorProtocol.Result.Ok;
+            let respVal = 0.0;
+
+            const mp = MotorProtocol;
+
+            switch (cmdType) {
+                case mp.CommandType.SetVoltage: {
+                    const reqV = dvIn.getFloat32(4, true);
+                    const reserved = dvIn.getUint32(8, true);
+                    if (reserved !== 0 || !Number.isFinite(reqV) || reqV < 0.0 || reqV > 18.0) {
+                        result = mp.Result.InvalidValue;
+                    } else if (reqV === 0.0) {
+                        // 软件停止
+                        ms.torqueEnabled = false;
+                        ms.vTarget = 0.0;
+                        ms.pidIntegral = 0.0;
+                        result = mp.Result.Ok;
+                        respVal = 0.0;
+                    } else if (ms.torqueEnabled) {
+                        // 扭矩闭环运行中，禁止非零手动电压
+                        result = mp.Result.ModeConflict;
+                        respVal = 0.0;
+                    } else {
+                        ms.vTarget = reqV;
+                        result = mp.Result.Ok;
+                        respVal = reqV;
+                    }
+                    break;
                 }
+
+                case mp.CommandType.SetTorque: {
+                    const reqT = dvIn.getFloat32(4, true);
+                    const reserved = dvIn.getUint32(8, true);
+                    const limit = ms.ramParams[6] || 3.0;
+                    if (reserved !== 0 || !Number.isFinite(reqT) || reqT < 0.0 || reqT > limit) {
+                        result = mp.Result.InvalidValue;
+                    } else {
+                        ms.torqueTarget = reqT;
+                        result = mp.Result.Ok;
+                        respVal = reqT;
+                    }
+                    break;
+                }
+
+                case mp.CommandType.SetTorqueEnabled: {
+                    const enableArg = dvIn.getUint32(4, true);
+                    const reserved = dvIn.getUint32(8, true);
+                    if (reserved !== 0 || (enableArg !== 0 && enableArg !== 1)) {
+                        result = mp.Result.InvalidValue;
+                    } else if (enableArg === 1) {
+                        if (!ms.feedbackValid) {
+                            result = mp.Result.NotReady;
+                        } else {
+                            ms.torqueEnabled = true;
+                            ms.pidIntegral = 0.0;
+                            ms.pidPrevError = 0.0;
+                            result = mp.Result.Ok;
+                            respVal = 1.0;
+                        }
+                    } else {
+                        ms.torqueEnabled = false;
+                        ms.vTarget = 0.0;
+                        ms.pidIntegral = 0.0;
+                        result = mp.Result.Ok;
+                        respVal = 0.0;
+                    }
+                    break;
+                }
+
+                case mp.CommandType.SetParameter: {
+                    const paramId = dvIn.getUint32(4, true);
+                    const val = dvIn.getFloat32(8, true);
+                    if (paramId < 1 || paramId > 6 || !Number.isFinite(val)) {
+                        result = mp.Result.InvalidValue;
+                    } else if (paramId === 5 && val <= 0) { // R > 0
+                        result = mp.Result.InvalidValue;
+                    } else if (paramId === 6 && val <= 0) { // Limit > 0
+                        result = mp.Result.InvalidValue;
+                    } else if (val < 0) {
+                        result = mp.Result.InvalidValue;
+                    } else {
+                        ms.ramParams[paramId] = val;
+                        if (paramId === 6) {
+                            ms.torqueTarget = Math.min(ms.torqueTarget, val);
+                        }
+                        // 复位 PID
+                        ms.pidIntegral = 0.0;
+                        ms.pidPrevError = 0.0;
+                        result = mp.Result.Ok;
+                        respVal = val;
+                    }
+                    break;
+                }
+
+                case mp.CommandType.GetParameter: {
+                    const paramId = dvIn.getUint32(4, true);
+                    const reserved = dvIn.getUint32(8, true);
+                    if (reserved !== 0 || paramId < 1 || paramId > 6) {
+                        result = mp.Result.InvalidValue;
+                    } else {
+                        result = mp.Result.Ok;
+                        respVal = ms.ramParams[paramId] !== undefined ? ms.ramParams[paramId] : 0.0;
+                    }
+                    break;
+                }
+
+                case mp.CommandType.SaveParameters: {
+                    const first = dvIn.getUint32(4, true);
+                    const second = dvIn.getUint32(8, true);
+                    if (first !== 0 || second !== 0) {
+                        result = mp.Result.InvalidValue;
+                    } else if (ms.torqueEnabled || ms.vTarget > 0.05) {
+                        result = mp.Result.OutputActive;
+                        respVal = 0.0;
+                    } else {
+                        // 模拟持久化到 Flash
+                        ms.flashParams = Object.assign({}, ms.ramParams);
+                        result = mp.Result.Ok;
+                        respVal = 0.0; // StorageCode.Ok = 0
+                    }
+                    break;
+                }
+
+                case mp.CommandType.GetState: {
+                    const first = dvIn.getUint32(4, true);
+                    const second = dvIn.getUint32(8, true);
+                    if (first !== 0 || second !== 0) {
+                        result = mp.Result.InvalidValue;
+                    } else {
+                        result = mp.Result.Ok;
+                        respVal = ms.torqueTarget;
+                    }
+                    break;
+                }
+
+                default:
+                    return; // 未知命令丢弃
             }
+
+            // 打包 0x82 命令应答帧
+            const respFrame = new Uint8Array(mp.FRAME_SIZE);
+            respFrame[0] = mp.HEADER;
+            respFrame[1] = mp.VERSION;
+            respFrame[2] = mp.TYPE_COMMAND_RESPONSE;
+            respFrame[3] = seq;
+
+            const dvOut = new DataView(respFrame.buffer);
+            const statusWord = (result & 0xFF) |
+                               ((ms.torqueEnabled ? 1 : 0) << 8) |
+                               ((ms.feedbackValid ? 1 : 0) << 9) |
+                               ((cmdType & 0xFF) << 16);
+            dvOut.setUint32(4, statusWord, true);
+            dvOut.setFloat32(8, respVal, true);
+
+            const crc = mp.calcCrc16(respFrame, 12);
+            respFrame[12] = crc & 0xFF;
+            respFrame[13] = (crc >>> 8) & 0xFF;
+
+            // 异步延迟 2ms 回传（模拟真实下位机应答时延）
+            setTimeout(() => {
+                this.onData(respFrame);
+            }, 2);
         }
     }
 
