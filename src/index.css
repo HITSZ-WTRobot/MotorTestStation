@@ -1,19 +1,19 @@
 @import "tailwindcss";
 
-/* Lock to light mode regardless of OS prefers-color-scheme */
+/* Disable OS prefers-color-scheme: dark automatic override so the UI stays 100% bright */
 @custom-variant dark (&:where(.theme-dark-disabled, .theme-dark-disabled *));
 
 @layer base {
   :root {
-    --font-sans: "Inter", "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
-    --font-mono: "JetBrains Mono", "SF Mono", "Geist Mono", "Cascadia Mono", Consolas, monospace;
+    --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", sans-serif;
+    --font-mono: "JetBrains Mono", "SF Mono", "Fira Code", "Cascadia Mono", Consolas, monospace;
     color-scheme: light;
   }
 
   body {
     font-family: var(--font-sans);
-    background-color: #f5f5f7;
-    color: #1d1d1f;
+    background-color: #f4f8fc;
+    color: #0f172a;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     user-select: none;
@@ -25,78 +25,87 @@
   font-feature-settings: "tnum", "zero";
 }
 
-/* Apple / Vercel Clean Range Sliders */
-input[type="range"].bento-slider-blue {
+/* Luminous Daylight Studio Surface */
+.studio-surface-bright {
+  background-color: #f4f8fc;
+  background-image:
+    radial-gradient(rgba(2, 132, 199, 0.09) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.7) 0%, rgba(240, 247, 255, 0.5) 100%);
+  background-size: 18px 18px, 100% 100%;
+}
+
+/* Tactile Bright Fader / Slider Track */
+input[type="range"].studio-fader-blue {
   -webkit-appearance: none;
   appearance: none;
-  height: 6px;
+  height: 8px;
   border-radius: 999px;
-  background: #e5e7eb;
+  background: linear-gradient(90deg, #e0f2fe 0%, #bae6fd 100%);
+  border: 1px solid #7dd3fc;
   outline: none;
-  cursor: pointer;
 }
 
-input[type="range"].bento-slider-blue::-webkit-slider-thumb {
+input[type="range"].studio-fader-blue::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: #0071e3;
-  border: 2.5px solid #ffffff;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.22);
-  cursor: pointer;
-  transition: transform 0.12s ease, background-color 0.12s ease;
+  width: 24px;
+  height: 16px;
+  border-radius: 5px;
+  background: linear-gradient(180deg, #0ea5e9 0%, #0284c7 100%);
+  border: 2px solid #ffffff;
+  box-shadow: 0 2px 6px rgba(2, 132, 199, 0.35);
+  cursor: grab;
+  transition: transform 0.1s ease, box-shadow 0.15s ease;
 }
 
-input[type="range"].bento-slider-blue::-webkit-slider-thumb:hover {
-  transform: scale(1.12);
-  background: #0066cc;
+input[type="range"].studio-fader-blue::-webkit-slider-thumb:hover {
+  transform: scale(1.08);
+  box-shadow: 0 3px 10px rgba(2, 132, 199, 0.5);
 }
 
-input[type="range"].bento-slider-amber {
+input[type="range"].studio-fader-orange {
   -webkit-appearance: none;
   appearance: none;
-  height: 6px;
+  height: 8px;
   border-radius: 999px;
-  background: #e5e7eb;
+  background: linear-gradient(90deg, #fef3c7 0%, #fde68a 100%);
+  border: 1px solid #fcd34d;
   outline: none;
-  cursor: pointer;
 }
 
-input[type="range"].bento-slider-amber::-webkit-slider-thumb {
+input[type="range"].studio-fader-orange::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: #d97706;
-  border: 2.5px solid #ffffff;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.22);
-  cursor: pointer;
-  transition: transform 0.12s ease, background-color 0.12s ease;
+  width: 24px;
+  height: 16px;
+  border-radius: 5px;
+  background: linear-gradient(180deg, #f59e0b 0%, #d97706 100%);
+  border: 2px solid #ffffff;
+  box-shadow: 0 2px 6px rgba(217, 119, 6, 0.35);
+  cursor: grab;
+  transition: transform 0.1s ease, box-shadow 0.15s ease;
 }
 
-input[type="range"].bento-slider-amber::-webkit-slider-thumb:hover {
-  transform: scale(1.12);
-  background: #b45309;
+input[type="range"].studio-fader-orange::-webkit-slider-thumb:hover {
+  transform: scale(1.08);
+  box-shadow: 0 3px 10px rgba(217, 119, 6, 0.5);
 }
 
-/* Subtle Apple-style Scrollbar */
+/* Custom Slim Bright Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: transparent;
+  background: #f1f5f9;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #d1d5db;
+  background: #cbd5e1;
   border-radius: 999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #9ca3af;
+  background: #94a3b8;
 }
