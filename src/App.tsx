@@ -82,32 +82,9 @@ import {
 
 const VOLTAGE_PRESETS = [0.0, 3.3, 5.0, 8.0, 10.0, 12.0, 15.0, 18.0];
 const TORQUE_PRESETS = [0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0];
-const BASE_WIDTH = 1680;
-const BASE_HEIGHT = 945;
-
 type BottomDockMode = 'split' | 'params' | 'bus';
 
 export function App() {
-  const [scaleState, setScaleState] = React.useState({
-    scale: 1,
-    width: BASE_WIDTH,
-    height: BASE_HEIGHT,
-  });
-
-  React.useEffect(() => {
-    const handleResize = () => {
-      const vw = window.innerWidth;
-      const vh = window.innerHeight;
-      const scaleW = vw / BASE_WIDTH;
-      const scaleH = vh / BASE_HEIGHT;
-      const scale = Math.min(scaleW, scaleH);
-      setScaleState({ scale, width: vw, height: vh });
-    };
-
-    handleResize();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
   const [mobileTab, setMobileTab] = useAtom(mobileTabAtom);
   const [platformInfo, setPlatformInfo] = useAtom(platformInfoAtom);
 
@@ -821,23 +798,12 @@ export function App() {
   const tCellsActive = Math.round((telemetry.torque / Math.max(0.1, torqueLimit)) * 16);
 
   return (
-    <div className="w-screen h-screen overflow-hidden bg-[#070b14] flex items-center justify-center select-none relative">
-      {/* 核心固定比例工作台舞台 (1680 x 945, 16:9) */}
-      <div
-        style={{
-          width: `${BASE_WIDTH}px`,
-          height: `${BASE_HEIGHT}px`,
-          transform: `scale(${scaleState.scale})`,
-          transformOrigin: 'center center',
-          flexShrink: 0,
-        }}
-        className="relative flex flex-col overflow-hidden studio-surface-bright shadow-[0_0_60px_rgba(0,0,0,0.7)] rounded-lg border border-slate-700/50 text-slate-900"
-      >
-        {/* =====================================================================
-            顶部精密仪表横梁：品牌铭牌 + 集成式双通道数字表头 + 串口与安全急停
-           ===================================================================== */}
-        <header className="shrink-0 border-b border-sky-200/80 bg-white/95 backdrop-blur-md shadow-[0_2px_12px_rgba(2,132,199,0.06)]">
-          <div className="flex items-center justify-between gap-3 px-4 py-2.5 whitespace-nowrap overflow-hidden">
+    <div className="w-screen h-screen overflow-hidden studio-surface-bright flex flex-col text-slate-900 select-none">
+      {/* =====================================================================
+          顶部精密仪表横梁：品牌铭牌 + 集成式双通道数字表头 + 串口与安全急停
+         ===================================================================== */}
+      <header className="shrink-0 border-b border-sky-200/80 bg-white/95 backdrop-blur-md shadow-[0_2px_12px_rgba(2,132,199,0.06)]">
+        <div className="flex items-center justify-between gap-4 px-4 py-2.5 whitespace-nowrap overflow-hidden">
             {/* 1. 左侧品牌与平台标签 */}
             <div className="flex items-center gap-3 pr-2 shrink-0">
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-sky-400 to-sky-600 text-white shadow-sm border border-sky-300">
@@ -1959,14 +1925,6 @@ export function App() {
             </div>
           )}
         </aside>
-      </div>
-      {/* 闭合固定比例工作台舞台 */}
-      </div>
-
-      {/* 底部悬浮固定比例锁与缩放率指示 */}
-      <div className="fixed bottom-2.5 right-3 z-50 pointer-events-none flex items-center gap-2 rounded-full bg-slate-900/85 border border-slate-700/60 px-3 py-1 font-mono text-[11px] font-bold text-slate-300 backdrop-blur-md shadow-lg">
-        <span className="h-1.5 w-1.5 rounded-full bg-sky-400 animate-pulse" />
-        <span>16:9 比例锁定 · {Math.round(scaleState.scale * 100)}% ({scaleState.width}×{scaleState.height})</span>
       </div>
     </div>
   );

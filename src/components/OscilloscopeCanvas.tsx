@@ -110,12 +110,17 @@ export const OscilloscopeCanvas = React.forwardRef<OscilloscopeHandle, Oscillosc
       const ctx = canvas.getContext('2d');
       if (!ctx) return;
 
+      let dpr = 1;
       const resizeCanvas = () => {
-        const w = canvas.parentElement?.clientWidth || canvas.offsetWidth;
-        const h = canvas.parentElement?.clientHeight || canvas.offsetHeight;
+        dpr = window.devicePixelRatio || 1;
+        const parent = canvas.parentElement;
+        const w = parent?.clientWidth || canvas.offsetWidth;
+        const h = parent?.clientHeight || canvas.offsetHeight;
         if (w > 0 && h > 0) {
-          canvas.width = w;
-          canvas.height = h;
+          canvas.width = Math.round(w * dpr);
+          canvas.height = Math.round(h * dpr);
+          canvas.style.width = `${w}px`;
+          canvas.style.height = `${h}px`;
         }
       };
 
@@ -147,14 +152,15 @@ export const OscilloscopeCanvas = React.forwardRef<OscilloscopeHandle, Oscillosc
       };
 
       const draw = () => {
-        const w = canvas.width;
-        const h = canvas.height;
+        const w = canvas.width / dpr;
+        const h = canvas.height / dpr;
         if (w > 0 && h > 0) {
+          ctx.save();
+          ctx.scale(dpr, dpr);
           const p = propsRef.current;
 
           ctx.fillStyle = palette.bg;
           ctx.fillRect(0, 0, w, h);
-
           const padLeft = 58;
           const padRight = 58;
           const padTop = 76;
@@ -490,6 +496,7 @@ export const OscilloscopeCanvas = React.forwardRef<OscilloscopeHandle, Oscillosc
               }
             }
           }
+          ctx.restore();
         }
         animId = requestAnimationFrame(draw);
       };
@@ -507,8 +514,8 @@ export const OscilloscopeCanvas = React.forwardRef<OscilloscopeHandle, Oscillosc
       if (!canvas) return;
       const rect = canvas.getBoundingClientRect();
       mouseRef.current = {
-        x: (e.clientX - rect.left) * (canvas.width / rect.width),
-        y: (e.clientY - rect.top) * (canvas.height / rect.height),
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top,
         hovering: true,
       };
     };
