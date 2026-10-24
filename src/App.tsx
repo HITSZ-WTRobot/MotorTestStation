@@ -465,16 +465,20 @@ export function App() {
   );
 
   const autoSyncTimerRef = React.useRef<number | undefined>(undefined);
+  const latestVoltageDraftRef = React.useRef(0.0);
   const updateVoltageDraft = (val: number, forceSend = false) => {
     const clamped = Math.round(Math.max(0.0, Math.min(MAX_VOLTAGE, Number(val) || 0.0)) * 100) / 100;
     setDraftVoltage(clamped);
+    latestVoltageDraftRef.current = clamped;
     if (forceSend) {
+      clearTimeout(autoSyncTimerRef.current);
+      autoSyncTimerRef.current = undefined;
       sendTargetVoltage(clamped);
     } else if (autoSyncVoltage) {
       if (autoSyncTimerRef.current === undefined) {
         autoSyncTimerRef.current = window.setTimeout(() => {
           autoSyncTimerRef.current = undefined;
-          sendTargetVoltage(clamped);
+          sendTargetVoltage(latestVoltageDraftRef.current);
         }, 50);
       }
     }
@@ -514,7 +518,9 @@ export function App() {
     }
   };
 
+  const isTogglingLoopRef = React.useRef(false);
   const handleSetTorqueLoopEnabled = async (enable: boolean) => {
+    if (isTogglingLoopRef.current) return;
     const reqQueue = reqQueueRef.current;
     if (!reqQueue) return;
     try {
@@ -539,6 +545,8 @@ export function App() {
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
       appendLog('error', `闭环切换异常: ${msg}`);
+    } finally {
+      isTogglingLoopRef.current = false;
     }
   };
 
@@ -581,6 +589,25 @@ export function App() {
   const handleApplyParamsToRam = async () => {
     const reqQueue = reqQueueRef.current;
     if (!reqQueue) return;
+
+    // 前置边界校验：防止非法数值导致下位机直接报错或异常
+    for (const meta of PARAMETER_META_LIST) {
+      const rawVal = parseFloat(draftParams[meta.id] ?? '');
+      const fVal = Math.fround(rawVal);
+      if (!Number.isFinite(fVal)) {
+        alert(`参数 ${meta.shortName} (${meta.label}) 输入非法，请输入有效数字`);
+        return;
+      }
+      if ((meta.id === 5 || meta.id === 6) && fVal <= 0) {
+        alert(`参数 ${meta.shortName} (${meta.label}) 必须严格大于 0`);
+        return;
+      }
+      if (fVal < 0) {
+        alert(`参数 ${meta.shortName} (${meta.label}) 不能为负数`);
+        return;
+      }
+    }
+
     appendLog('info', '正在将修改的参数写入下位机 RAM...');
     let anyWritten = false;
     let limitUpdated = false;
@@ -634,16 +661,36 @@ export function App() {
     }
   };
 
+  const isSavingRef = React.useRef(false);
   const handleSafeSaveFlash = async () => {
+    if (isSavingRef.current) return;
     const reqQueue = reqQueueRef.current;
     if (!reqQueue || !connStatus.connected) {
       alert('请先连接硬件串口或启动仿真模式');
       return;
     }
 
+    // 前置参数边界检查
+    for (const meta of PARAMETER_META_LIST) {
+      const rawVal = parseFloat(draftParams[meta.id] ?? '');
+      const fVal = Math.fround(rawVal);
+      if (!Number.isFinite(fVal)) {
+        alert(`参数 ${meta.shortName} (${meta.label}) 输入非法，请输入有效数字`);
+        return;
+      }
+      if ((meta.id === 5 || meta.id === 6) && fVal <= 0) {
+        alert(`参数 ${meta.shortName} (${meta.label}) 必须严格大于 0`);
+        return;
+      }
+      if (fVal < 0) {
+        alert(`参数 ${meta.shortName} (${meta.label}) 不能为负数`);
+        return;
+      }
+    }
+
+    isSavingRef.current = true;
     setFlashSaveStatus({ text: '正在写入 Flash...', tone: 'saving' });
     let step = 'stop';
-
     try {
       appendLog('info', '[Flash 1/4] 下发 0V 停机指令并关闭闭环...');
       const stopResp = await reqQueue.enqueue(CommandType.SetVoltage, (seq) =>
@@ -716,6 +763,8 @@ export function App() {
       } else {
         setFlashSaveStatus({ text: '✕ 保存失败', tone: 'error' });
       }
+    } finally {
+      isSavingRef.current = false;
     }
   };
 

@@ -737,16 +737,39 @@
         }
     }
 
+    let isExecutingSave = false;
     async function executeSafeSaveFlash() {
+        if (isExecutingSave) return;
         if (!serial.isConnected && !serial.isMocking) {
             alert('请先连接串口或启动仿真模式再执行保存');
             return;
+        }
+
+        // 参数合法性前置检查
+        for (let id = 1; id <= 6; id++) {
+            const inputEl = el.paramInputs[id];
+            if (inputEl) {
+                const fVal = Math.fround(parseFloat(inputEl.value));
+                if (!Number.isFinite(fVal)) {
+                    alert(`参数 ${MotorProtocol.ParameterNames[id].label} 输入非法，请输入有效数字`);
+                    return;
+                }
+                if ((id === 5 || id === 6) && fVal <= 0) {
+                    alert(`参数 ${MotorProtocol.ParameterNames[id].label} 必须严格大于 0`);
+                    return;
+                }
+                if (fVal < 0) {
+                    alert(`参数 ${MotorProtocol.ParameterNames[id].label} 不能为负数`);
+                    return;
+                }
+            }
         }
 
         if (!confirm('【停机安全保存】将严格按交接规范执行：\n1. 发送停止指令 (0V) 关闭输出与扭矩闭环并等待应答\n2. 逐项写入已修改的 RAM 参数 (含 Kp/Ki/Kd/Q/R/Limit)\n3. 发送 SaveParameters 持久化到下位机 Flash\n\n确认立即执行吗？')) {
             return;
         }
 
+        isExecutingSave = true;
         if (el.btnSaveFlash) {
             el.btnSaveFlash.disabled = true;
             el.btnSaveFlash.textContent = '正在保存到 Flash...';
@@ -836,6 +859,7 @@
             }
             alert(`保存未完成: ${err.message}`);
         } finally {
+            isExecutingSave = false;
             if (el.btnSaveFlash) {
                 el.btnSaveFlash.disabled = false;
                 el.btnSaveFlash.textContent = '💾 停机安全保存到 Flash';
@@ -845,12 +869,14 @@
 
     // 节流实时下发 (仅当用户主动勾选“实时下发”时生效)
     let autoSyncThrottleTimer = null;
+    let latestAutoSyncTarget = 0.0;
     function triggerAutoSyncVoltage(val) {
         if (!el.chkAutoSync || !el.chkAutoSync.checked) return;
+        latestAutoSyncTarget = val;
         if (autoSyncThrottleTimer) return;
         autoSyncThrottleTimer = setTimeout(() => {
             autoSyncThrottleTimer = null;
-            sendTargetVoltage(draftTargetV);
+            sendTargetVoltage(latestAutoSyncTarget);
         }, 50); // 20Hz 节流
     }
 
@@ -879,12 +905,15 @@
         updateVoltageSyncBadge();
 
         if (forceSend) {
+            if (autoSyncThrottleTimer) {
+                clearTimeout(autoSyncThrottleTimer);
+                autoSyncThrottleTimer = null;
+            }
             sendTargetVoltage(val);
         } else {
             triggerAutoSyncVoltage(val);
         }
     }
-
     /**
      * 按下位机已接受的当前目标计算前馈 Vff 与动态电压上限 Vmax (遵循 HANDOFF.md §4 line 120)
      */

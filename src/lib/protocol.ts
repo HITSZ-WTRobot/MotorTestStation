@@ -393,10 +393,18 @@ export class StreamUnpacker {
     if (!chunk || chunk.length === 0) return;
 
     if (this.length + chunk.length > this.buffer.length) {
-      const newCap = Math.max(this.buffer.length * 2, this.length + chunk.length + 512);
-      const newBuf = new Uint8Array(newCap);
-      newBuf.set(this.buffer.subarray(0, this.length), 0);
-      this.buffer = newBuf;
+      if (this.buffer.length >= 8192) {
+        const keep = Math.min(this.length, 14);
+        if (keep > 0) {
+          this.buffer.copyWithin(0, this.length - keep, this.length);
+        }
+        this.length = keep;
+      } else {
+        const newCap = Math.min(8192, Math.max(this.buffer.length * 2, this.length + chunk.length + 512));
+        const newBuf = new Uint8Array(newCap);
+        newBuf.set(this.buffer.subarray(0, this.length), 0);
+        this.buffer = newBuf;
+      }
     }
 
     this.buffer.set(chunk, this.length);
