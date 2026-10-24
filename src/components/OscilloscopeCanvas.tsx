@@ -157,8 +157,8 @@ export const OscilloscopeCanvas = React.forwardRef<OscilloscopeHandle, Oscillosc
 
           const padLeft = 58;
           const padRight = 58;
-          const padTop = 26;
-          const padBottom = 28;
+          const padTop = 52;
+          const padBottom = 30;
           const plotW = w - padLeft - padRight;
           const plotH = h - padTop - padBottom;
 
@@ -203,7 +203,7 @@ export const OscilloscopeCanvas = React.forwardRef<OscilloscopeHandle, Oscillosc
 
               const vVal = vMax - (vMax - vMin) * (r / gridRows);
               ctx.fillStyle = palette.vLine;
-              ctx.font = '700 10px "JetBrains Mono", Consolas, monospace';
+              ctx.font = '700 11px "JetBrains Mono", Consolas, monospace';
               ctx.textAlign = 'right';
               ctx.textBaseline = 'middle';
               ctx.fillText(`${vVal.toFixed(1)}V`, padLeft - 8, y);
@@ -243,27 +243,27 @@ export const OscilloscopeCanvas = React.forwardRef<OscilloscopeHandle, Oscillosc
 
             // 顶栏图例
             ctx.save();
-            ctx.font = '600 11px "JetBrains Mono", "PingFang SC", "Microsoft YaHei", sans-serif';
+            ctx.font = '600 12px "JetBrains Mono", "PingFang SC", "Microsoft YaHei", sans-serif';
             ctx.textAlign = 'left';
             ctx.textBaseline = 'top';
             ctx.fillStyle = palette.vLine;
-            ctx.fillRect(padLeft, 7, 8, 8);
+            ctx.fillRect(padLeft, 20, 9, 9);
             ctx.fillStyle = '#334155';
-            ctx.fillText('CH-A: 实测电压 (0 ~ 20V)', padLeft + 13, 5);
+            ctx.fillText('CH-A: 实测电压 (0 ~ 20V)', padLeft + 14, 18);
 
             ctx.fillStyle = palette.tLine;
-            ctx.fillRect(padLeft + 180, 7, 8, 8);
+            ctx.fillRect(padLeft + 195, 20, 9, 9);
             ctx.fillStyle = '#334155';
             ctx.fillText(
               `CH-B: 实测扭矩 (${tMin.toFixed(1)} ~ ${tMax.toFixed(1)} N·m)`,
-              padLeft + 193,
-              5
+              padLeft + 209,
+              18
             );
 
             if (p.isPaused) {
               ctx.fillStyle = '#dc2626';
               ctx.textAlign = 'right';
-              ctx.fillText('[ ⏸ HOLD / 已暂停 ]', w - padRight, 5);
+              ctx.fillText('[ ⏸ HOLD / 已暂停 ]', w - padRight, 18);
             }
             ctx.restore();
 

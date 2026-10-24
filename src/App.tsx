@@ -753,14 +753,14 @@ export function App() {
             </div>
             <div>
               <div className="flex items-center gap-1.5">
-                <span className="font-mono text-xs font-black tracking-wider uppercase text-slate-900">
+                <span className="font-mono text-sm font-black tracking-wider uppercase text-slate-900">
                   MOTOR TEST STATION
                 </span>
-                <span className="rounded-md bg-sky-100 border border-sky-200 px-1.5 py-0.5 font-mono text-[9px] font-bold text-sky-700">
+                <span className="rounded-md bg-sky-100 border border-sky-200 px-1.5 py-0.5 font-mono text-[11px] font-bold text-sky-700">
                   {platformInfo.isTauri ? platformInfo.os.toUpperCase() : 'WEB'}
                 </span>
               </div>
-              <div className="font-mono text-[10px] text-slate-500">
+              <div className="font-mono text-xs text-slate-500">
                 TIM3 100Hz · 14B CRC16 · Vmax = Vff + 1.5V
               </div>
             </div>
@@ -771,15 +771,15 @@ export function App() {
             {/* CH-A：实测电压表头 */}
             <div className="flex items-center gap-3 rounded-xl border border-sky-200/90 bg-gradient-to-br from-sky-50/90 via-white to-sky-50/40 px-3.5 py-1.5 shadow-2xs">
               <div>
-                <div className="flex items-center gap-1.5 font-mono text-[10px] font-extrabold text-sky-700">
-                  <span className="h-1.5 w-1.5 rounded-full bg-sky-500" />
+                <div className="flex items-center gap-1.5 font-mono text-xs font-extrabold text-sky-700">
+                  <span className="h-2 w-2 rounded-full bg-sky-500" />
                   CH-A · 实测电压
                 </div>
                 <div className="flex items-baseline gap-1 font-mono tnum">
-                  <span className="text-2xl font-black tracking-tight text-sky-700">
+                  <span className="text-[26px] leading-tight font-black tracking-tight text-sky-700">
                     {telemetry.voltage.toFixed(3)}
                   </span>
-                  <span className="text-xs font-bold text-sky-500">V</span>
+                  <span className="text-sm font-bold text-sky-500">V</span>
                 </div>
               </div>
               <div className="hidden sm:flex flex-col gap-1 border-l border-sky-100 pl-3">
@@ -797,7 +797,7 @@ export function App() {
                     />
                   ))}
                 </div>
-                <div className="flex gap-2 font-mono text-[9.5px] text-slate-500 tnum">
+                <div className="flex gap-2.5 font-mono text-xs text-slate-500 tnum">
                   <span>MIN:{telemetry.vMin === null ? '--' : telemetry.vMin.toFixed(2)}</span>
                   <span>MAX:{telemetry.vMax === null ? '--' : telemetry.vMax.toFixed(2)}</span>
                   <span className="text-sky-700 font-bold">
@@ -810,15 +810,15 @@ export function App() {
             {/* CH-B：实测扭矩表头 */}
             <div className="flex items-center gap-3 rounded-xl border border-amber-200/90 bg-gradient-to-br from-amber-50/90 via-white to-orange-50/40 px-3.5 py-1.5 shadow-2xs">
               <div>
-                <div className="flex items-center gap-1.5 font-mono text-[10px] font-extrabold text-amber-700">
-                  <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
+                <div className="flex items-center gap-1.5 font-mono text-xs font-extrabold text-amber-700">
+                  <span className="h-2 w-2 rounded-full bg-amber-500" />
                   CH-B · 实测扭矩
                 </div>
                 <div className="flex items-baseline gap-1 font-mono tnum">
-                  <span className="text-2xl font-black tracking-tight text-amber-600">
+                  <span className="text-[26px] leading-tight font-black tracking-tight text-amber-600">
                     {telemetry.torque.toFixed(3)}
                   </span>
-                  <span className="text-xs font-bold text-amber-500">
+                  <span className="text-sm font-bold text-amber-500">
                     N·m
                   </span>
                 </div>
@@ -838,7 +838,7 @@ export function App() {
                     />
                   ))}
                 </div>
-                <div className="flex gap-2 font-mono text-[9.5px] text-slate-500 tnum">
+                <div className="flex gap-2.5 font-mono text-xs text-slate-500 tnum">
                   <span>PEAK:{telemetry.tMax === null ? '--' : telemetry.tMax.toFixed(2)}</span>
                   <span>LIM:{torqueLimit.toFixed(2)}</span>
                   <span
@@ -853,7 +853,7 @@ export function App() {
             </div>
 
             {/* 通信统计胶囊 */}
-            <div className="hidden xl:grid grid-cols-2 gap-x-3 gap-y-0.5 rounded-xl border border-slate-200 bg-slate-50/80 px-3 py-1.5 font-mono text-[10px] tnum">
+            <div className="hidden xl:grid grid-cols-2 gap-x-3.5 gap-y-0.5 rounded-xl border border-slate-200 bg-slate-50/80 px-3.5 py-1.5 font-mono text-xs tnum">
               <span className="text-slate-500">
                 RX: <strong className="text-emerald-600">{telemetry.rxFrames}</strong>
               </span>
@@ -875,7 +875,7 @@ export function App() {
           {/* 3. 右侧硬件连接与安全急停操作台 */}
           <div className="flex flex-wrap items-center gap-1.5">
             <div
-              className={`flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 font-mono text-[11px] font-bold tnum ${
+              className={`flex items-center gap-1.5 rounded-lg border px-3 py-1.5 font-mono text-xs font-bold tnum ${
                 connStatus.warning
                   ? 'border-red-300 bg-red-50 text-red-700'
                   : connStatus.connected
@@ -1007,10 +1007,10 @@ export function App() {
             <div className="flex flex-wrap items-center justify-between gap-2 border-b border-sky-100 bg-gradient-to-r from-sky-50/80 via-white to-sky-50/50 px-3.5 py-1.5">
               <div className="flex items-center gap-2">
                 <Activity className="h-4 w-4 text-sky-600" />
-                <span className="text-xs font-extrabold tracking-wide text-slate-800">
+                <span className="text-[13px] font-extrabold tracking-wide text-slate-800">
                   双通道实时动态示波器
                 </span>
-                <span className="rounded-md bg-emerald-100 border border-emerald-200 px-1.5 py-0.5 font-mono text-[10px] font-bold text-emerald-700">
+                <span className="rounded-md bg-emerald-100 border border-emerald-200 px-2 py-0.5 font-mono text-[11px] font-bold text-emerald-700">
                   60 FPS
                 </span>
               </div>
@@ -1024,7 +1024,7 @@ export function App() {
                       onClick={() =>
                         setScopeConfig((prev) => ({ ...prev, maxPoints: pts }))
                       }
-                      className={`rounded-md px-2 py-0.5 font-mono text-[10px] font-bold cursor-pointer transition-colors ${
+                      className={`rounded-md px-2.5 py-0.5 font-mono text-xs font-bold cursor-pointer transition-colors ${
                         scopeConfig.maxPoints === pts
                           ? 'bg-sky-600 text-white shadow-2xs'
                           : 'text-slate-600 hover:text-sky-700'
@@ -1043,7 +1043,7 @@ export function App() {
                       showTargetRef: !prev.showTargetRef,
                     }))
                   }
-                  className={`rounded-lg border px-2.5 py-1 text-[11px] font-bold cursor-pointer transition-colors ${
+                  className={`rounded-lg border px-2.5 py-1 text-xs font-bold cursor-pointer transition-colors ${
                     scopeConfig.showTargetRef
                       ? 'border-sky-300 bg-sky-100/80 text-sky-800'
                       : 'border-slate-200 bg-white text-slate-500'
@@ -1057,7 +1057,7 @@ export function App() {
                   onClick={() =>
                     setScopeConfig((prev) => ({ ...prev, isPaused: !prev.isPaused }))
                   }
-                  className={`flex items-center gap-1 rounded-lg border px-2.5 py-1 text-[11px] font-bold cursor-pointer ${
+                  className={`flex items-center gap-1 rounded-lg border px-2.5 py-1 text-xs font-bold cursor-pointer ${
                     scopeConfig.isPaused
                       ? 'border-amber-400 bg-amber-500 text-white'
                       : 'border-slate-200 bg-white text-slate-700 hover:border-sky-300 hover:text-sky-700'
@@ -1085,7 +1085,7 @@ export function App() {
                       tMax: null,
                     }));
                   }}
-                  className="flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-[11px] font-bold text-slate-600 hover:border-red-300 hover:text-red-600 cursor-pointer"
+                  className="flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-xs font-bold text-slate-600 hover:border-red-300 hover:text-red-600 cursor-pointer"
                 >
                   <Trash2 className="h-3 w-3" /> 清空
                 </button>
@@ -1093,7 +1093,7 @@ export function App() {
                 <button
                   type="button"
                   onClick={handleExportCsv}
-                  className="flex items-center gap-1 rounded-lg border border-sky-200 bg-sky-50/70 px-2.5 py-1 font-mono text-[11px] font-bold text-sky-700 hover:bg-sky-100 cursor-pointer"
+                  className="flex items-center gap-1 rounded-lg border border-sky-200 bg-sky-50/70 px-2.5 py-1 font-mono text-xs font-bold text-sky-700 hover:bg-sky-100 cursor-pointer"
                 >
                   <Download className="h-3 w-3" /> CSV
                 </button>
