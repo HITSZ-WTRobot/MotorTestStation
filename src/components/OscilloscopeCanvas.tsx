@@ -126,24 +126,24 @@ export const OscilloscopeCanvas = React.forwardRef<OscilloscopeHandle, Oscillosc
 
       let animId = 0;
 
-      // 柔和不刺眼的护眼浅灰蓝实验室调色板 (Soft Matte Daylight Palette)
+      // Vercel / Apple Clean Light Oscilloscope Palette
       const palette = {
-        bg: '#f1f5f9',                              // 外框柔和冷灰白 (Slate-100)
-        plotBg: '#e8eff7',                          // 内部波形视口微沉浅冰灰蓝 (不刺眼，对比度舒适)
-        gridMajor: 'rgba(15, 23, 42, 0.085)',       // 主网格线
-        border: 'rgba(2, 132, 199, 0.28)',          // 视口边界线
-        text: '#475569',                            // 底部说明文字 (Slate-600)
-        vLine: '#0284c7',                           // CH-A 湛蓝
-        vRefLine: 'rgba(2, 132, 199, 0.75)',
-        vFillTop: 'rgba(14, 165, 233, 0.22)',
-        vFillBottom: 'rgba(14, 165, 233, 0.02)',
-        tLine: '#d97706',                           // CH-B 琥珀橙
-        tRefLine: 'rgba(217, 119, 6, 0.75)',
-        tFillTop: 'rgba(245, 158, 11, 0.20)',
-        tFillBottom: 'rgba(245, 158, 11, 0.02)',
-        crosshair: 'rgba(15, 23, 42, 0.45)',
-        tooltipBg: 'rgba(255, 255, 255, 0.96)',
-        tooltipBorder: 'rgba(2, 132, 199, 0.45)',
+        bg: '#fafafa',
+        plotBg: '#ffffff',
+        gridMajor: '#f0f0f3',
+        border: '#e4e4e7',
+        text: '#71717a',
+        vLine: '#0071e3',
+        vRefLine: 'rgba(0, 113, 227, 0.65)',
+        vFillTop: 'rgba(0, 113, 227, 0.14)',
+        vFillBottom: 'rgba(0, 113, 227, 0.0)',
+        tLine: '#d97706',
+        tRefLine: 'rgba(217, 119, 6, 0.65)',
+        tFillTop: 'rgba(217, 119, 6, 0.14)',
+        tFillBottom: 'rgba(217, 119, 6, 0.0)',
+        crosshair: 'rgba(24, 24, 27, 0.35)',
+        tooltipBg: 'rgba(255, 255, 255, 0.98)',
+        tooltipBorder: '#e4e4e7',
       };
 
       const draw = () => {
@@ -155,9 +155,9 @@ export const OscilloscopeCanvas = React.forwardRef<OscilloscopeHandle, Oscillosc
           ctx.fillStyle = palette.bg;
           ctx.fillRect(0, 0, w, h);
 
-          const padLeft = 64;
-          const padRight = 64;
-          const padTop = 32;
+          const padLeft = 62;
+          const padRight = 62;
+          const padTop = 34;
           const padBottom = 34;
           const plotW = w - padLeft - padRight;
           const plotH = h - padTop - padBottom;
@@ -187,7 +187,7 @@ export const OscilloscopeCanvas = React.forwardRef<OscilloscopeHandle, Oscillosc
               tMax = Math.ceil((maxT + span * 0.18) * 10) / 10;
             }
 
-            // 1. 绘制网格与放大后的清晰刻度字号 (12px)
+            // 1. 绘制网格与清晰刻度 (12px)
             ctx.lineWidth = 1;
             const gridRows = 5;
             const gridCols = 10;
@@ -203,15 +203,15 @@ export const OscilloscopeCanvas = React.forwardRef<OscilloscopeHandle, Oscillosc
 
               const vVal = vMax - (vMax - vMin) * (r / gridRows);
               ctx.fillStyle = palette.vLine;
-              ctx.font = 'bold 12px "JetBrains Mono", Consolas, monospace';
+              ctx.font = '600 12px "JetBrains Mono", Consolas, monospace';
               ctx.textAlign = 'right';
               ctx.textBaseline = 'middle';
-              ctx.fillText(`${vVal.toFixed(1)}V`, padLeft - 8, y);
+              ctx.fillText(`${vVal.toFixed(1)}V`, padLeft - 10, y);
 
               const tVal = tMax - (tMax - tMin) * (r / gridRows);
               ctx.fillStyle = palette.tLine;
               ctx.textAlign = 'left';
-              ctx.fillText(`${tVal.toFixed(1)}`, w - padRight + 8, y);
+              ctx.fillText(`${tVal.toFixed(1)}`, w - padRight + 10, y);
             }
 
             for (let c = 0; c <= gridCols; c++) {
@@ -224,59 +224,46 @@ export const OscilloscopeCanvas = React.forwardRef<OscilloscopeHandle, Oscillosc
               ctx.stroke();
             }
 
-            // 中心十字细微刻度线
-            const midY = Math.round(padTop + plotH / 2) + 0.5;
-            const midX = Math.round(padLeft + plotW / 2) + 0.5;
-            ctx.strokeStyle = palette.border;
-            ctx.beginPath();
-            for (let s = 1; s < gridCols * 5; s++) {
-              const sx = padLeft + (plotW / (gridCols * 5)) * s;
-              ctx.moveTo(sx, midY - 3);
-              ctx.lineTo(sx, midY + 3);
-            }
-            for (let s = 1; s < gridRows * 4; s++) {
-              const sy = padTop + (plotH / (gridRows * 4)) * s;
-              ctx.moveTo(midX - 3, sy);
-              ctx.lineTo(midX + 3, sy);
-            }
-            ctx.stroke();
-
-            // 顶栏图例 (12.5px 清晰字号)
+            // 顶栏图例
             ctx.save();
-            ctx.font = 'bold 12.5px "JetBrains Mono", "PingFang SC", "Microsoft YaHei", sans-serif';
+            ctx.font = '600 12.5px "Inter", "PingFang SC", sans-serif';
             ctx.textAlign = 'left';
             ctx.textBaseline = 'top';
             ctx.fillStyle = palette.vLine;
-            ctx.fillRect(padLeft, 9, 10, 10);
-            ctx.fillStyle = '#1e293b';
-            ctx.fillText('CH-A: 实测电压 (0 ~ 20V)', padLeft + 15, 7);
+            ctx.beginPath();
+            ctx.arc(padLeft + 5, 14, 4, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#1d1d1f';
+            ctx.fillText('CH-A 实测电压 (0 ~ 20V)', padLeft + 15, 8);
 
             ctx.fillStyle = palette.tLine;
-            ctx.fillRect(padLeft + 210, 9, 10, 10);
-            ctx.fillStyle = '#1e293b';
+            ctx.beginPath();
+            ctx.arc(padLeft + 200, 14, 4, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#1d1d1f';
             ctx.fillText(
-              `CH-B: 实测扭矩 (${tMin.toFixed(1)} ~ ${tMax.toFixed(1)} N·m)`,
-              padLeft + 225,
-              7
+              `CH-B 实测扭矩 (${tMin.toFixed(1)} ~ ${tMax.toFixed(1)} N·m)`,
+              padLeft + 210,
+              8
             );
 
             if (p.isPaused) {
               ctx.fillStyle = '#dc2626';
               ctx.textAlign = 'right';
-              ctx.fillText('[ ⏸ HOLD / 已暂停 ]', w - padRight, 7);
+              ctx.fillText('⏸ 已暂停采样', w - padRight, 8);
             }
             ctx.restore();
 
-            let timeSpanText = `Window: ${p.maxPoints} pts · 等待数据流...`;
+            let timeSpanText = `窗口容量: ${p.maxPoints} pts · 等待数据流`;
             if (pts.length > 1) {
               const spanSec = ((pts[pts.length - 1].time - pts[0].time) / 1000).toFixed(2);
-              timeSpanText = `Span: ${spanSec}s (${pts.length} / ${p.maxPoints} pts)`;
+              timeSpanText = `时间跨度: ${spanSec}s (${pts.length} / ${p.maxPoints} pts)`;
             }
             ctx.fillStyle = palette.text;
-            ctx.font = 'bold 12px "JetBrains Mono", "PingFang SC", sans-serif';
+            ctx.font = '500 12px "Inter", "PingFang SC", sans-serif';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'top';
-            ctx.fillText(timeSpanText, padLeft + plotW / 2, h - padBottom + 9);
+            ctx.fillText(timeSpanText, padLeft + plotW / 2, h - padBottom + 10);
 
             const getY_V = (v: number) => {
               const ratio = (v - vMin) / (vMax - vMin);
@@ -288,7 +275,7 @@ export const OscilloscopeCanvas = React.forwardRef<OscilloscopeHandle, Oscillosc
               return padTop + plotH * (1 - Math.max(0, Math.min(1, ratio)));
             };
 
-            // 2. 绘制目标与动态上限参考虚线 (12px 清晰字号)
+            // 2. 绘制目标与动态上限参考虚线
             if (p.showTargetRef) {
               ctx.save();
               ctx.beginPath();
@@ -299,7 +286,7 @@ export const OscilloscopeCanvas = React.forwardRef<OscilloscopeHandle, Oscillosc
               if (activeVRef > 0.01) {
                 const yVRef = Math.round(getY_V(activeVRef)) + 0.5;
                 ctx.strokeStyle = palette.vRefLine;
-                ctx.lineWidth = 1.6;
+                ctx.lineWidth = 1.5;
                 ctx.setLineDash([6, 4]);
                 ctx.beginPath();
                 ctx.moveTo(padLeft, yVRef);
@@ -307,7 +294,7 @@ export const OscilloscopeCanvas = React.forwardRef<OscilloscopeHandle, Oscillosc
                 ctx.stroke();
 
                 ctx.setLineDash([]);
-                ctx.font = 'bold 12px "JetBrains Mono", "PingFang SC", monospace';
+                ctx.font = '600 11.5px "JetBrains Mono", monospace';
                 ctx.fillStyle = palette.vLine;
                 ctx.textAlign = 'left';
                 ctx.textBaseline = 'bottom';
@@ -320,7 +307,7 @@ export const OscilloscopeCanvas = React.forwardRef<OscilloscopeHandle, Oscillosc
               if (p.tTarget > 0.005) {
                 const yTRef = Math.round(getY_T(p.tTarget)) + 0.5;
                 ctx.strokeStyle = palette.tRefLine;
-                ctx.lineWidth = 1.6;
+                ctx.lineWidth = 1.5;
                 ctx.setLineDash([6, 4]);
                 ctx.beginPath();
                 ctx.moveTo(padLeft, yTRef);
@@ -328,7 +315,7 @@ export const OscilloscopeCanvas = React.forwardRef<OscilloscopeHandle, Oscillosc
                 ctx.stroke();
 
                 ctx.setLineDash([]);
-                ctx.font = 'bold 12px "JetBrains Mono", "PingFang SC", monospace';
+                ctx.font = '600 11.5px "JetBrains Mono", monospace';
                 ctx.fillStyle = palette.tLine;
                 ctx.textAlign = 'right';
                 ctx.textBaseline = 'bottom';
@@ -374,7 +361,7 @@ export const OscilloscopeCanvas = React.forwardRef<OscilloscopeHandle, Oscillosc
                 ctx.lineTo(offsetX + i * stepX, getY_V(pts[i].voltage));
               }
               ctx.strokeStyle = palette.vLine;
-              ctx.lineWidth = 2.4;
+              ctx.lineWidth = 2.2;
               ctx.lineJoin = 'round';
               ctx.stroke();
 
@@ -400,11 +387,10 @@ export const OscilloscopeCanvas = React.forwardRef<OscilloscopeHandle, Oscillosc
                 ctx.lineTo(offsetX + i * stepX, getY_T(pts[i].torque));
               }
               ctx.strokeStyle = palette.tLine;
-              ctx.lineWidth = 2.4;
+              ctx.lineWidth = 2.2;
               ctx.lineJoin = 'round';
               ctx.stroke();
 
-              // 最新采样点实时指示头
               const lastPt = pts[count - 1];
               const lastX = offsetX + (count - 1) * stepX;
               const lastVy = getY_V(lastPt.voltage);
@@ -412,17 +398,17 @@ export const OscilloscopeCanvas = React.forwardRef<OscilloscopeHandle, Oscillosc
 
               ctx.fillStyle = palette.vLine;
               ctx.beginPath();
-              ctx.arc(lastX, lastVy, 4.5, 0, Math.PI * 2);
+              ctx.arc(lastX, lastVy, 4, 0, Math.PI * 2);
               ctx.fill();
 
               ctx.fillStyle = palette.tLine;
               ctx.beginPath();
-              ctx.arc(lastX, lastTy, 4.5, 0, Math.PI * 2);
+              ctx.arc(lastX, lastTy, 4, 0, Math.PI * 2);
               ctx.fill();
 
               ctx.restore();
 
-              // 4. 十字探针光标与测量浮窗 (放大至 12px/13px)
+              // 4. 十字探针浮窗
               const m = mouseRef.current;
               if (
                 m.hovering &&
@@ -432,7 +418,7 @@ export const OscilloscopeCanvas = React.forwardRef<OscilloscopeHandle, Oscillosc
               ) {
                 ctx.save();
                 ctx.strokeStyle = palette.crosshair;
-                ctx.lineWidth = 1.2;
+                ctx.lineWidth = 1;
                 ctx.setLineDash([4, 4]);
                 ctx.beginPath();
                 ctx.moveTo(m.x, padTop);
@@ -450,16 +436,16 @@ export const OscilloscopeCanvas = React.forwardRef<OscilloscopeHandle, Oscillosc
                   ctx.setLineDash([]);
                   ctx.fillStyle = palette.vLine;
                   ctx.beginPath();
-                  ctx.arc(ptX, ptVy, 5, 0, Math.PI * 2);
+                  ctx.arc(ptX, ptVy, 4.5, 0, Math.PI * 2);
                   ctx.fill();
 
                   ctx.fillStyle = palette.tLine;
                   ctx.beginPath();
-                  ctx.arc(ptX, ptTy, 5, 0, Math.PI * 2);
+                  ctx.arc(ptX, ptTy, 4.5, 0, Math.PI * 2);
                   ctx.fill();
 
-                  const tipW = 204;
-                  const tipH = 76;
+                  const tipW = 196;
+                  const tipH = 74;
                   let tipX = m.x + 14;
                   if (tipX + tipW > w - padRight) tipX = m.x - tipW - 14;
                   let tipY = Math.min(ptVy, ptTy) - 26;
@@ -468,23 +454,23 @@ export const OscilloscopeCanvas = React.forwardRef<OscilloscopeHandle, Oscillosc
 
                   ctx.fillStyle = palette.tooltipBg;
                   ctx.strokeStyle = palette.tooltipBorder;
-                  ctx.lineWidth = 1.5;
+                  ctx.lineWidth = 1;
                   ctx.beginPath();
-                  ctx.roundRect(tipX, tipY, tipW, tipH, 8);
+                  ctx.roundRect(tipX, tipY, tipW, tipH, 10);
                   ctx.fill();
                   ctx.stroke();
 
                   const relSec = ((pt.time - pts[0].time) / 1000).toFixed(2);
                   ctx.textAlign = 'left';
                   ctx.textBaseline = 'top';
-                  ctx.font = 'bold 11.5px "JetBrains Mono", Consolas, monospace';
+                  ctx.font = '600 11px "JetBrains Mono", monospace';
                   ctx.fillStyle = palette.text;
                   ctx.fillText(`T+${relSec}s [#${pointIdx}]`, tipX + 12, tipY + 9);
-                  ctx.font = 'bold 13px "JetBrains Mono", Consolas, monospace';
+                  ctx.font = 'bold 12.5px "JetBrains Mono", monospace';
                   ctx.fillStyle = palette.vLine;
-                  ctx.fillText(`CH-A: ${pt.voltage.toFixed(3)} V`, tipX + 12, tipY + 29);
+                  ctx.fillText(`CH-A: ${pt.voltage.toFixed(3)} V`, tipX + 12, tipY + 28);
                   ctx.fillStyle = palette.tLine;
-                  ctx.fillText(`CH-B: ${pt.torque.toFixed(3)} N·m`, tipX + 12, tipY + 50);
+                  ctx.fillText(`CH-B: ${pt.torque.toFixed(3)} N·m`, tipX + 12, tipY + 48);
                 }
                 ctx.restore();
               }
@@ -518,7 +504,7 @@ export const OscilloscopeCanvas = React.forwardRef<OscilloscopeHandle, Oscillosc
     };
 
     return (
-      <div className="relative w-full h-full min-h-[260px] overflow-hidden bg-[#f1f5f9]">
+      <div className="relative w-full h-[380px] xl:h-[420px] rounded-xl border border-[#ebebeb] overflow-hidden bg-[#fafafa]">
         <canvas
           ref={canvasRef}
           onMouseMove={handleMouseMove}

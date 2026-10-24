@@ -312,7 +312,7 @@ export class TransportManager {
     });
     this.callbacks.onLog(
       'info',
-      '已启动【高保真 STM32 虚拟下位机仿真器】(支持前馈 Vff=T/0.5、动态上限 Vmax=Vff+0.5V 与 6 参数读写)'
+      '已启动【高保真 STM32 虚拟下位机仿真器】(支持前馈 Vff=T/0.5、动态上限 Vmax=Vff+1.5V 与 6 参数读写)'
     );
 
     this.mockTimer = window.setInterval(() => {
@@ -330,7 +330,7 @@ export class TransportManager {
 
           const torquePerVolt = 0.5;
           const vff = Math.min(ms.torqueTarget / torquePerVolt, MAX_VOLTAGE);
-          const voltageLimit = Math.min(vff + 0.5, MAX_VOLTAGE);
+          const voltageLimit = Math.min(vff + 1.5, MAX_VOLTAGE);
 
           const err = ms.torqueTarget - ms.torqueCurrent;
           ms.pidIntegral = Math.max(-voltageLimit, Math.min(voltageLimit, ms.pidIntegral + ki * err));

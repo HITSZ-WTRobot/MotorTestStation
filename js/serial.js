@@ -222,10 +222,10 @@
                     const ki = ms.ramParams[2] || 0.05;
                     const kd = ms.ramParams[3] || 0.01;
 
-                    // 最新规范：前馈 Vff = min(T / 0.5, 18V)，动态电压上限增加 +0.5V 裕量避免电压不足
+                    // 最新规范：前馈 Vff = min(T / 0.5, 18V)，动态电压上限增加 +1.5V 裕量避免电压不足
                     const torquePerVolt = 0.5;
                     const vff = ms.torqueTarget > 0 ? Math.min(ms.torqueTarget / torquePerVolt, MotorProtocol.MAX_VOLTAGE) : 0.0;
-                    const voltageLimit = ms.torqueTarget > 0 ? Math.min(vff + 0.5, MotorProtocol.MAX_VOLTAGE) : 0.0;
+                    const voltageLimit = ms.torqueTarget > 0 ? Math.min(vff + 1.5, MotorProtocol.MAX_VOLTAGE) : 0.0;
 
                     const err = ms.torqueTarget - ms.torqueCurrent;
                     ms.pidIntegral = Math.max(-voltageLimit, Math.min(voltageLimit, ms.pidIntegral + ki * err));

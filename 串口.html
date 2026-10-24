@@ -1223,7 +1223,7 @@ select:focus, input:focus {
                     MOTOR TEST STATION
                     <span class="brand-badge">v2.4 · CLEANROOM AZURE</span>
                 </div>
-                <div class="brand-sub">STM32 实验室电机测控工作台 · 双向 14B · 模式二选一 · 前馈与动态限幅 (+0.5V)</div>
+                <div class="brand-sub">STM32 实验室电机测控工作台 · 双向 14B · 模式二选一 · 前馈与动态限幅 (+1.5V)</div>
             </div>
         </div>
 
@@ -1353,7 +1353,7 @@ select:focus, input:focus {
                         <div class="quick-step-row">
                             <button type="button" class="quick-step-btn" onclick="document.getElementById('inputVoltage').value = Math.max(0, parseFloat(document.getElementById('inputVoltage').value || 0) - 1.0).toFixed(2); document.getElementById('inputVoltage').dispatchEvent(new Event('change'));">-1.0V</button>
                             <button type="button" class="quick-step-btn" onclick="document.getElementById('inputVoltage').value = Math.max(0, parseFloat(document.getElementById('inputVoltage').value || 0) - 0.5).toFixed(2); document.getElementById('inputVoltage').dispatchEvent(new Event('change'));">-0.5V</button>
-                            <button type="button" class="quick-step-btn" onclick="document.getElementById('inputVoltage').value = Math.min(18, parseFloat(document.getElementById('inputVoltage').value || 0) + 0.5).toFixed(2); document.getElementById('inputVoltage').dispatchEvent(new Event('change'));">+0.5V</button>
+                            <button type="button" class="quick-step-btn" onclick="document.getElementById('inputVoltage').value = Math.min(18, parseFloat(document.getElementById('inputVoltage').value || 0) + 0.5).toFixed(2); document.getElementById('inputVoltage').dispatchEvent(new Event('change'));">+1.5V</button>
                             <button type="button" class="quick-step-btn" onclick="document.getElementById('inputVoltage').value = Math.min(18, parseFloat(document.getElementById('inputVoltage').value || 0) + 1.0).toFixed(2); document.getElementById('inputVoltage').dispatchEvent(new Event('change'));">+1.0V</button>
                         </div>
                     </div>
@@ -1437,7 +1437,7 @@ select:focus, input:focus {
                     <div class="dynamic-ceiling-box">
                         <div class="ceiling-header">
                             <span class="ceiling-title">⚡ 扭矩前馈与动态电压上限 (基于已接受目标)</span>
-                            <span class="ceiling-badge">1 V ⇋ 0.5 N·m (+0.5V 裕量)</span>
+                            <span class="ceiling-badge">1 V ⇋ 0.5 N·m (+1.5V 裕量)</span>
                         </div>
                         <div class="ceiling-val-row">
                             <div class="ceiling-item">
@@ -1451,7 +1451,7 @@ select:focus, input:focus {
                         </div>
                         <div id="dispDraftCeilingHint" style="display: none; font-size: 11px; color: #b45309; background: #fef3c7; border: 1px solid #fde68a; border-radius: 4px; padding: 4px 8px; margin-bottom: 6px; font-family: var(--font-mono);"></div>
                         <div class="ceiling-note">
-                            * 依据交接文档规范：按设备已接受目标计算前馈 Vff = min(T/0.5, 18V)，非零目标叠加 +0.5V 裕量作为动态限幅 Vmax = min(Vff + 0.5, 18V)；此为理论限幅提示，非实测电压。
+                            * 依据交接文档规范：按设备已接受目标计算前馈 Vff = min(T/0.5, 18V)，非零目标叠加 +1.5V 裕量作为动态限幅 Vmax = min(Vff + 1.5, 18V)；此为理论限幅提示，非实测电压。
                         </div>
                     </div>
 
@@ -2430,10 +2430,10 @@ select:focus, input:focus {
                     const ki = ms.ramParams[2] || 0.05;
                     const kd = ms.ramParams[3] || 0.01;
 
-                    // 最新规范：前馈 Vff = min(T / 0.5, 18V)，动态电压上限增加 +0.5V 裕量避免电压不足
+                    // 最新规范：前馈 Vff = min(T / 0.5, 18V)，动态电压上限增加 +1.5V 裕量避免电压不足
                     const torquePerVolt = 0.5;
                     const vff = ms.torqueTarget > 0 ? Math.min(ms.torqueTarget / torquePerVolt, MotorProtocol.MAX_VOLTAGE) : 0.0;
-                    const voltageLimit = ms.torqueTarget > 0 ? Math.min(vff + 0.5, MotorProtocol.MAX_VOLTAGE) : 0.0;
+                    const voltageLimit = ms.torqueTarget > 0 ? Math.min(vff + 1.5, MotorProtocol.MAX_VOLTAGE) : 0.0;
 
                     const err = ms.torqueTarget - ms.torqueCurrent;
                     ms.pidIntegral = Math.max(-voltageLimit, Math.min(voltageLimit, ms.pidIntegral + ki * err));
@@ -3623,7 +3623,7 @@ select:focus, input:focus {
     function syncScopeTargets() {
         const torquePerVolt = 0.5;
         const vFf = appliedTargetTorque > 0 ? Math.min(appliedTargetTorque / torquePerVolt, 18.0) : 0.0;
-        const vMax = appliedTargetTorque > 0 ? Math.min(vFf + 0.5, 18.0) : 0.0;
+        const vMax = appliedTargetTorque > 0 ? Math.min(vFf + 1.5, 18.0) : 0.0;
 
         scope.setTargets({
             mode: activeMode,
@@ -4068,7 +4068,7 @@ select:focus, input:focus {
         const torquePerVolt = 0.5;
         const tAccepted = Math.max(0.0, Number(acceptedTorque) || 0.0);
         const vFf = tAccepted > 0 ? Math.min(tAccepted / torquePerVolt, 18.0) : 0.0;
-        const vMax = tAccepted > 0 ? Math.min(vFf + 0.5, 18.0) : 0.0;
+        const vMax = tAccepted > 0 ? Math.min(vFf + 1.5, 18.0) : 0.0;
 
         if (el.dispTorqueVmax) {
             el.dispTorqueVmax.textContent = `${vMax.toFixed(2)} V`;
@@ -4081,7 +4081,7 @@ select:focus, input:focus {
             const tDraft = Math.max(0.0, Number(previewDraftTorque) || 0.0);
             if (Math.abs(tDraft - tAccepted) >= 0.001) {
                 const draftVff = tDraft > 0 ? Math.min(tDraft / torquePerVolt, 18.0) : 0.0;
-                const draftVmax = tDraft > 0 ? Math.min(draftVff + 0.5, 18.0) : 0.0;
+                const draftVmax = tDraft > 0 ? Math.min(draftVff + 1.5, 18.0) : 0.0;
                 el.dispDraftCeilingHint.style.display = 'block';
                 el.dispDraftCeilingHint.textContent = `👉 待下发设定 (${tDraft.toFixed(3)} N·m) 预计: Vff = ${draftVff.toFixed(2)} V, Vmax = ${draftVmax.toFixed(2)} V`;
             } else {

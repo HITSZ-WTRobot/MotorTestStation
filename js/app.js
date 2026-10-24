@@ -447,7 +447,7 @@
     function syncScopeTargets() {
         const torquePerVolt = 0.5;
         const vFf = appliedTargetTorque > 0 ? Math.min(appliedTargetTorque / torquePerVolt, 18.0) : 0.0;
-        const vMax = appliedTargetTorque > 0 ? Math.min(vFf + 0.5, 18.0) : 0.0;
+        const vMax = appliedTargetTorque > 0 ? Math.min(vFf + 1.5, 18.0) : 0.0;
 
         scope.setTargets({
             mode: activeMode,
@@ -892,7 +892,7 @@
         const torquePerVolt = 0.5;
         const tAccepted = Math.max(0.0, Number(acceptedTorque) || 0.0);
         const vFf = tAccepted > 0 ? Math.min(tAccepted / torquePerVolt, 18.0) : 0.0;
-        const vMax = tAccepted > 0 ? Math.min(vFf + 0.5, 18.0) : 0.0;
+        const vMax = tAccepted > 0 ? Math.min(vFf + 1.5, 18.0) : 0.0;
 
         if (el.dispTorqueVmax) {
             el.dispTorqueVmax.textContent = `${vMax.toFixed(2)} V`;
@@ -905,7 +905,7 @@
             const tDraft = Math.max(0.0, Number(previewDraftTorque) || 0.0);
             if (Math.abs(tDraft - tAccepted) >= 0.001) {
                 const draftVff = tDraft > 0 ? Math.min(tDraft / torquePerVolt, 18.0) : 0.0;
-                const draftVmax = tDraft > 0 ? Math.min(draftVff + 0.5, 18.0) : 0.0;
+                const draftVmax = tDraft > 0 ? Math.min(draftVff + 1.5, 18.0) : 0.0;
                 el.dispDraftCeilingHint.style.display = 'block';
                 el.dispDraftCeilingHint.textContent = `👉 待下发设定 (${tDraft.toFixed(3)} N·m) 预计: Vff = ${draftVff.toFixed(2)} V, Vmax = ${draftVmax.toFixed(2)} V`;
             } else {
