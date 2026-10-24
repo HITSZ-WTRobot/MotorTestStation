@@ -14,10 +14,10 @@
     "windows": [
       {
         "title": "STM32 电机测控与闭环调优工作台 | Motor Test Station Pro v2.4",
-        "width": 1540,
-        "height": 940,
-        "minWidth": 375,
-        "minHeight": 580,
+        "width": 1680,
+        "height": 945,
+        "minWidth": 960,
+        "minHeight": 540,
         "resizable": true,
         "center": true
       }

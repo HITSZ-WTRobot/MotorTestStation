@@ -82,10 +82,32 @@ import {
 
 const VOLTAGE_PRESETS = [0.0, 3.3, 5.0, 8.0, 10.0, 12.0, 15.0, 18.0];
 const TORQUE_PRESETS = [0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0];
+const BASE_WIDTH = 1680;
+const BASE_HEIGHT = 945;
 
 type BottomDockMode = 'split' | 'params' | 'bus';
 
 export function App() {
+  const [scaleState, setScaleState] = React.useState({
+    scale: 1,
+    width: BASE_WIDTH,
+    height: BASE_HEIGHT,
+  });
+
+  React.useEffect(() => {
+    const handleResize = () => {
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+      const scaleW = vw / BASE_WIDTH;
+      const scaleH = vh / BASE_HEIGHT;
+      const scale = Math.min(scaleW, scaleH);
+      setScaleState({ scale, width: vw, height: vh });
+    };
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
   const [mobileTab, setMobileTab] = useAtom(mobileTabAtom);
   const [platformInfo, setPlatformInfo] = useAtom(platformInfoAtom);
 
@@ -799,15 +821,26 @@ export function App() {
   const tCellsActive = Math.round((telemetry.torque / Math.max(0.1, torqueLimit)) * 16);
 
   return (
-    <div className="min-h-screen lg:h-screen lg:overflow-hidden flex flex-col studio-surface-bright text-slate-900">
-      {/* =====================================================================
-          顶部精密仪表横梁：品牌铭牌 + 集成式双通道数字表头 + 串口与安全急停
-         ===================================================================== */}
-      <header className="shrink-0 border-b border-sky-200/80 bg-white/95 backdrop-blur-md shadow-[0_2px_12px_rgba(2,132,199,0.06)]">
-        <div className="flex flex-wrap items-center justify-between gap-2.5 px-4 py-2.5">
-          {/* 1. 左侧品牌与平台标签 */}
-          <div className="flex items-center gap-3 pr-2">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-sky-400 to-sky-600 text-white shadow-sm border border-sky-300">
+    <div className="w-screen h-screen overflow-hidden bg-[#070b14] flex items-center justify-center select-none relative">
+      {/* 核心固定比例工作台舞台 (1680 x 945, 16:9) */}
+      <div
+        style={{
+          width: `${BASE_WIDTH}px`,
+          height: `${BASE_HEIGHT}px`,
+          transform: `scale(${scaleState.scale})`,
+          transformOrigin: 'center center',
+          flexShrink: 0,
+        }}
+        className="relative flex flex-col overflow-hidden studio-surface-bright shadow-[0_0_60px_rgba(0,0,0,0.7)] rounded-lg border border-slate-700/50 text-slate-900"
+      >
+        {/* =====================================================================
+            顶部精密仪表横梁：品牌铭牌 + 集成式双通道数字表头 + 串口与安全急停
+           ===================================================================== */}
+        <header className="shrink-0 border-b border-sky-200/80 bg-white/95 backdrop-blur-md shadow-[0_2px_12px_rgba(2,132,199,0.06)]">
+          <div className="flex items-center justify-between gap-3 px-4 py-2.5 whitespace-nowrap overflow-hidden">
+            {/* 1. 左侧品牌与平台标签 */}
+            <div className="flex items-center gap-3 pr-2 shrink-0">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-sky-400 to-sky-600 text-white shadow-sm border border-sky-300">
               <Cpu className="h-5.5 w-5.5" />
             </div>
             <div>
@@ -826,7 +859,7 @@ export function App() {
           </div>
 
           {/* 2. 中央集成式双通道数字表头与16段光柱 */}
-          <div className="flex flex-1 flex-wrap items-center justify-center gap-2 lg:gap-3">
+          <div className="flex items-center justify-center gap-3 shrink-0">
             {/* CH-A：实测电压表头 */}
             <div className="flex items-center gap-3.5 rounded-xl border border-sky-200/90 bg-gradient-to-br from-sky-50/90 via-white to-sky-50/40 px-4 py-2 shadow-2xs">
               <div>
@@ -932,7 +965,7 @@ export function App() {
           </div>
 
           {/* 3. 右侧硬件连接与安全急停操作台 */}
-          <div className="flex flex-wrap items-center gap-1.5">
+          <div className="flex items-center gap-1.5 shrink-0">
             <div
               className={`flex items-center gap-2 rounded-lg border px-3.5 py-2 font-mono text-xs font-extrabold tnum ${
                 connStatus.warning
@@ -1059,21 +1092,15 @@ export function App() {
       {/* =====================================================================
           主工作台：中央全画幅示波器 + 底部参数/报文双舱 + 右侧推子主控舱
          ===================================================================== */}
-      <div className="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-[1fr_400px] xl:grid-cols-[1fr_430px] pb-14 lg:pb-0">
+      <div className="flex-1 min-h-0 grid grid-cols-[1fr_420px] overflow-hidden">
         {/* -------------------------------------------------------------------
             左/中主舞台：全画幅示波器 + 底部参数与报文双联舱
            ------------------------------------------------------------------- */}
         <div className="flex flex-col min-h-0 border-r border-sky-200/80">
           {/* A. 中央舞台：双通道数字示波器 */}
-          <div
-            className={`flex-1 min-h-[300px] flex flex-col bg-white ${
-              mobileTab === 'control' || mobileTab === 'params' || mobileTab === 'terminal'
-                ? 'hidden lg:flex'
-                : 'flex'
-            }`}
-          >
+          <div className="flex-1 min-h-0 flex flex-col bg-white">
             {/* 示波器工具横条 */}
-            <div className="flex flex-wrap items-center justify-between gap-2.5 border-b border-sky-100 bg-gradient-to-r from-sky-50/90 via-white to-sky-50/60 px-4 py-2">
+            <div className="flex items-center justify-between gap-2.5 border-b border-sky-100 bg-gradient-to-r from-sky-50/90 via-white to-sky-50/60 px-4 py-2 whitespace-nowrap overflow-hidden">
               <div className="flex items-center gap-2.5">
                 <Activity className="h-4.5 w-4.5 text-sky-600" />
                 <span className="text-sm font-black tracking-wide text-slate-800">
@@ -1084,7 +1111,7 @@ export function App() {
                 </span>
               </div>
 
-              <div className="flex flex-wrap items-center gap-2">
+              <div className="flex items-center gap-2 shrink-0">
                 <div className="flex rounded-lg border border-sky-200 bg-sky-50/60 p-0.5">
                   {[250, 500, 1000, 2000].map((pts) => (
                     <button
@@ -1186,20 +1213,14 @@ export function App() {
           </div>
 
           {/* B. 底部双联机架舱：6 参数调优 (RAM / Flash) + 14B 报文流 */}
-          <div
-            className={`shrink-0 lg:h-[255px] border-t border-sky-200/80 bg-[#f4f8fc] flex flex-col ${
-              mobileTab === 'control' || mobileTab === 'scope'
-                ? 'hidden lg:flex'
-                : 'flex'
-            }`}
-          >
+          <div className="shrink-0 h-[255px] border-t border-sky-200/80 bg-[#f4f8fc] flex flex-col">
             {/* 机架顶部切换与保存栏 */}
-            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-sky-100 bg-white px-3.5 py-1.5">
+            <div className="flex items-center justify-between gap-2 border-b border-sky-100 bg-white px-3.5 py-1.5 whitespace-nowrap overflow-hidden">
               <div className="flex items-center gap-1.5">
                 <button
                   type="button"
                   onClick={() => setBottomDock('split')}
-                  className={`hidden xl:inline-flex items-center gap-1 rounded-md px-2.5 py-1 text-[11px] font-bold cursor-pointer transition-colors ${
+                  className={`inline-flex items-center gap-1 rounded-md px-2.5 py-1 text-[11px] font-bold cursor-pointer transition-colors ${
                     bottomDock === 'split'
                       ? 'bg-sky-600 text-white shadow-2xs'
                       : 'bg-slate-100 text-slate-600 hover:bg-sky-50 hover:text-sky-700'
@@ -1435,13 +1456,7 @@ export function App() {
         {/* -------------------------------------------------------------------
             右侧推子主控舱：二选一模式切换 + 双参数推子控制
            ------------------------------------------------------------------- */}
-        <aside
-          className={`flex flex-col min-h-0 bg-white overflow-y-auto ${
-            mobileTab === 'scope' || mobileTab === 'params' || mobileTab === 'terminal'
-              ? 'hidden lg:flex'
-              : 'flex'
-          }`}
-        >
+        <aside className="flex flex-col min-h-0 bg-white overflow-y-auto">
           {/* 1. 顶部模式二选一切换器 */}
           <div className="border-b border-sky-100 bg-gradient-to-b from-sky-50/60 to-white p-3.5">
             <div className="mb-2 flex items-center justify-between text-[11px] font-bold text-slate-500">
@@ -1945,58 +1960,14 @@ export function App() {
           )}
         </aside>
       </div>
+      {/* 闭合固定比例工作台舞台 */}
+      </div>
 
-      {/* =====================================================================
-          窄窗 / 移动端底部四栏导航条 (< 1024px)
-         ===================================================================== */}
-      <nav className="fixed bottom-0 left-0 right-0 z-50 flex items-center justify-around border-t border-sky-200 bg-white/95 px-2 py-1.5 backdrop-blur-md lg:hidden">
-        <button
-          type="button"
-          onClick={() => setMobileTab('control')}
-          className={`flex flex-1 flex-col items-center gap-0.5 py-1 text-[11px] font-bold cursor-pointer ${
-            mobileTab === 'control' ? 'text-sky-600' : 'text-slate-500'
-          }`}
-        >
-          <Sliders className="h-4 w-4" />
-          <span>控制</span>
-        </button>
-        <button
-          type="button"
-          onClick={() => setMobileTab('scope')}
-          className={`flex flex-1 flex-col items-center gap-0.5 py-1 text-[11px] font-bold cursor-pointer ${
-            mobileTab === 'scope' ? 'text-sky-600' : 'text-slate-500'
-          }`}
-        >
-          <Monitor className="h-4 w-4" />
-          <span>示波器</span>
-        </button>
-        <button
-          type="button"
-          onClick={() => {
-            setMobileTab('params');
-            setBottomDock('params');
-          }}
-          className={`flex flex-1 flex-col items-center gap-0.5 py-1 text-[11px] font-bold cursor-pointer ${
-            mobileTab === 'params' ? 'text-sky-600' : 'text-slate-500'
-          }`}
-        >
-          <Settings2 className="h-4 w-4" />
-          <span>参数</span>
-        </button>
-        <button
-          type="button"
-          onClick={() => {
-            setMobileTab('terminal');
-            setBottomDock('bus');
-          }}
-          className={`flex flex-1 flex-col items-center gap-0.5 py-1 text-[11px] font-bold cursor-pointer ${
-            mobileTab === 'terminal' ? 'text-sky-600' : 'text-slate-500'
-          }`}
-        >
-          <Terminal className="h-4 w-4" />
-          <span>报文</span>
-        </button>
-      </nav>
+      {/* 底部悬浮固定比例锁与缩放率指示 */}
+      <div className="fixed bottom-2.5 right-3 z-50 pointer-events-none flex items-center gap-2 rounded-full bg-slate-900/85 border border-slate-700/60 px-3 py-1 font-mono text-[11px] font-bold text-slate-300 backdrop-blur-md shadow-lg">
+        <span className="h-1.5 w-1.5 rounded-full bg-sky-400 animate-pulse" />
+        <span>16:9 比例锁定 · {Math.round(scaleState.scale * 100)}% ({scaleState.width}×{scaleState.height})</span>
+      </div>
     </div>
   );
 }

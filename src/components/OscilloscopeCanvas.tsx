@@ -111,11 +111,11 @@ export const OscilloscopeCanvas = React.forwardRef<OscilloscopeHandle, Oscillosc
       if (!ctx) return;
 
       const resizeCanvas = () => {
-        const dpr = window.devicePixelRatio || 1;
-        const rect = canvas.getBoundingClientRect();
-        if (rect.width > 0 && rect.height > 0) {
-          canvas.width = Math.round(rect.width * dpr);
-          canvas.height = Math.round(rect.height * dpr);
+        const w = canvas.parentElement?.clientWidth || canvas.offsetWidth;
+        const h = canvas.parentElement?.clientHeight || canvas.offsetHeight;
+        if (w > 0 && h > 0) {
+          canvas.width = w;
+          canvas.height = h;
         }
       };
 
