@@ -1,9 +1,8 @@
 # 电机测控与调试上位机 (Motor Test Station Pro v2.4)
 
-面向 STM32 电机测控与外环扭矩闭环系统的**跨平台桌面级 & Web 双栖上位机**。提供两种即开即用的交付形态：
-1. **原生桌面可执行程序（`.exe` / macOS / Linux 三端跨平台版）**：基于 **Tauri v2 + Rust (`serialport`) + React 19 + TypeScript + Tailwind CSS v4 + shadcn/ui + Jotai** 构建，支持系统底层串口枚举、热插拔扫描、多尺寸响应式（桌面大屏/平板/窄窗伴侣）及极客白/深空暗双主题切换。
-2. **单文件免安装网页版（`串口.html`）**：零依赖单文件内嵌架构，使用 Chrome / Edge 直接双击即可运行。
-
+面向 STM32 电机测控与外环扭矩闭环系统的**跨平台桌面级 & 网页端解耦双栖上位机**。工程已彻底解耦为两大独立形态：
+1. **原生桌面可执行程序（Desktop Workstation - `.exe` / macOS / Linux）**：位于项目根目录，基于 **Tauri v2 + Rust (`serialport`) + React 19 + TypeScript + Tailwind CSS v4 + Jotai** 构建。支持系统底层串口枚举、热插拔扫描、全屏/窗口化弹性自适应与高刷 60FPS 示波器。
+2. **纯前端零依赖独立网页版（Web Standalone - `web/`）**：位于 `web/` 独立目录，采用原生 HTML5 + Web Serial API + 原生 Canvas，无需任何 Node.js/Rust 编译环境，Chromium 内核浏览器双击 `web/index.html` 即可直连。
 ---
 
 ## 一、核心架构与技术栈
@@ -54,10 +53,9 @@
 
 ## 三、快速运行与构建指南
 
-### 1. 直接运行编译好的桌面可执行文件 (`.exe`)
-- **根目录便携版**：直接双击运行项目根目录下的 **`MotorTestStation.exe`**（或 `src-tauri/target/release/motor-test-station.exe`）。
-- **单文件网页版**：直接用浏览器打开根目录下的 **`串口.html`**。
-
+### 1. 两种形态的运行方式
+- **形态 A (原生桌面端)**：直接双击运行根目录下的 **`MotorTestStation.exe`**。
+- **形态 B (免安装网页版)**：直接用 Chrome / Edge 打开 **`web/index.html`**（或 `web/串口.html`）。
 ### 2. 开发者本地调试与构建命令
 ```bash
 # 1. 安装前端依赖
@@ -66,12 +64,11 @@ npm install
 # 2. 启动桌面端热重载开发模式 (Tauri + Vite)
 npm run tauri dev
 
-# 3. 仅编译前端生产包
-npm run build
+# 3. 编译前端生产包 (Web 部署)
+npm run build:web
 
-# 4. 编译生成独立原生可执行程序 (.exe / .dmg / .AppImage)
-npx tauri build --no-bundle
-```
+# 4. 编译独立原生桌面程序 (Windows .exe / macOS .dmg / Linux .AppImage)
+npm run build:desktop
 
 ---
 
@@ -79,28 +76,39 @@ npx tauri build --no-bundle
 
 ```text
 D:\omp\stm32dbg\motor test debug/
-├── MotorTestStation.exe           # 编译生成的 Windows 原生独立可执行程序 (.exe)
-├── 串口.html                      # 单文件免安装 Web 版上位机（内嵌完整样式与脚本）
-├── DESIGN.md                      # 实验室 Cleanroom 纯白+淡蓝设计系统规范
-├── package.json                   # 前端与 Tauri 依赖配置
+├── MotorTestStation.exe           # Windows 原生独立可执行程序 (.exe)
+├── DESIGN.md                      # 实验室精密设计系统规范
+├── package.json                   # 解耦编译脚本与依赖配置
 ├── vite.config.ts                 # Vite + React + Tailwind v4 构建配置
-├── src/                           # React + TypeScript + Tailwind v4 + shadcn + Jotai 源码
-│   ├── App.tsx                    # 三端自适应主工作台视图
+├── index.html                     # 桌面与现代 Web 客户端 HTML 模板
+├── src/                           # 桌面主工程源码 (React 19 + TypeScript + Tailwind v4 + Jotai)
+│   ├── App.tsx                    # 全屏与窗口化弹性响应主工作台
 │   ├── index.css                  # Tailwind v4 主题与精密控件样式
 │   ├── components/
-│   │   ├── OscilloscopeCanvas.tsx # 60FPS 双通道示波器组件 (支持参考虚线与双主题)
-│   │   └── ui/                    # shadcn/ui 基础组件 (Button, Card, Badge)
+│   │   ├── OscilloscopeCanvas.tsx # 60FPS 高清 High-DPI 双通道示波器
+│   │   └── ui/                    # shadcn/ui 工业级交互控件
 │   ├── lib/
 │   │   ├── protocol.ts            # 14字节小端协议编解码器与流式解包器
-│   │   └── transport.ts           # 三端传输抽象层 (Tauri Native / WebSerial / Mock) + 请求队列
+│   │   └── transport.ts           # 跨平台传输抽象 (Tauri IPC / WebSerial / Mock) + 请求队列
 │   └── store/
-│       └── atoms.ts               # Jotai 原子状态仓库
-├── src-tauri/                     # Tauri v2 + Rust 跨平台后端源码
+│       └── atoms.ts               # Jotai 全局响应式状态机
+├── src-tauri/                     # Tauri v2 + Rust 跨平台桌面端后端
 │   ├── Cargo.toml                 # Rust 依赖 (tauri v2, serialport 4.7)
-│   ├── tauri.conf.json            # 桌面窗口与跨平台打包配置
+│   ├── tauri.conf.json            # 窗口自适应、跨平台打包配置
 │   └── src/
-│       ├── lib.rs                 # 跨平台串口枚举、读写线程、DTR/RTS 置位与事件推送
-│       └── main.rs                # 桌面端二进制入口
+│       ├── lib.rs                 # 底层串口枚举、非阻塞读写、DTR/RTS 控制与事件推送
+│       └── main.rs                # 桌面端程序主入口
+├── web/                           # 【解耦独立网页端】零依赖纯前端免安装版
+│   ├── index.html                 # 纯网页端入口 (双击 Chrome/Edge 直接运行)
+│   ├── 串口.html                  # 中文别名入口
+│   ├── README.md                  # 网页端专项使用说明
+│   ├── css/
+│   │   └── style.css              # 网页端样式源码
+│   └── js/                        # 网页端核心 JavaScript 脚本
+│       ├── protocol.js            # 协议解包与 CRC 校验
+│       ├── serial.js              # Web Serial API 驱动与仿真器
+│       ├── chart.js               # Canvas 示波器引擎
+│       └── app.js                 # 网页端主调度逻辑
 └── .github/workflows/
-    └── release.yml                # Windows / macOS / Linux 三端自动化打包工作流
+    └── release.yml                # Windows / macOS / Linux 三端自动化云端构建与发布流水线
 ```

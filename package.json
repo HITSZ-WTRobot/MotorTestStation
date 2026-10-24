@@ -7,6 +7,9 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "build:web": "tsc && vite build",
+    "build:desktop": "tauri build --no-bundle",
+    "build:all": "npm run build:web && npm run build:desktop",
     "preview": "vite preview",
     "tauri": "tauri"
   },
