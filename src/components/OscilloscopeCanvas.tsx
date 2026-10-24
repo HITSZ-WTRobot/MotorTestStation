@@ -95,7 +95,7 @@ export const OscilloscopeCanvas = React.forwardRef<OscilloscopeHandle, Oscillosc
         const pts = dataRef.current;
         if (pts.length === 0) return null;
         const t0 = pts[0].time;
-        let csv = '序号,相对时间(秒),实测电压(V),实测扭矩(N·m),目标或上限电压(V),目标扭矩(N·m)\n';
+        let csv = 'Index,RelTimeSec,Voltage_V,Torque_Nm,VoltageRef_V,TorqueRef_Nm\n';
         pts.forEach((pt, idx) => {
           const relSec = ((pt.time - t0) / 1000).toFixed(4);
           csv += `${idx},${relSec},${pt.voltage.toFixed(4)},${pt.torque.toFixed(4)},${pt.vRef.toFixed(4)},${pt.tRef.toFixed(4)}\n`;
@@ -241,39 +241,39 @@ export const OscilloscopeCanvas = React.forwardRef<OscilloscopeHandle, Oscillosc
             }
             ctx.stroke();
 
-            // 顶栏中文图例
+            // 顶栏图例
             ctx.save();
-            ctx.font = '600 11px "PingFang SC", "Microsoft YaHei", sans-serif';
+            ctx.font = '600 11px "JetBrains Mono", "PingFang SC", "Microsoft YaHei", sans-serif';
             ctx.textAlign = 'left';
             ctx.textBaseline = 'top';
             ctx.fillStyle = palette.vLine;
             ctx.fillRect(padLeft, 7, 8, 8);
             ctx.fillStyle = '#334155';
-            ctx.fillText('通道 A: 实测输出电压 (0 ~ 20V)', padLeft + 13, 5);
+            ctx.fillText('CH-A: 实测电压 (0 ~ 20V)', padLeft + 13, 5);
 
             ctx.fillStyle = palette.tLine;
-            ctx.fillRect(padLeft + 195, 7, 8, 8);
+            ctx.fillRect(padLeft + 180, 7, 8, 8);
             ctx.fillStyle = '#334155';
             ctx.fillText(
-              `通道 B: 实测机械扭矩 (${tMin.toFixed(1)} ~ ${tMax.toFixed(1)} N·m)`,
-              padLeft + 208,
+              `CH-B: 实测扭矩 (${tMin.toFixed(1)} ~ ${tMax.toFixed(1)} N·m)`,
+              padLeft + 193,
               5
             );
 
             if (p.isPaused) {
               ctx.fillStyle = '#dc2626';
               ctx.textAlign = 'right';
-              ctx.fillText('[ ⏸ 波形采样已暂停 ]', w - padRight, 5);
+              ctx.fillText('[ ⏸ HOLD / 已暂停 ]', w - padRight, 5);
             }
             ctx.restore();
 
-            let timeSpanText = `时间窗口容量: ${p.maxPoints} 点 · 等待遥测数据流...`;
+            let timeSpanText = `Window: ${p.maxPoints} pts · 等待数据流...`;
             if (pts.length > 1) {
               const spanSec = ((pts[pts.length - 1].time - pts[0].time) / 1000).toFixed(2);
-              timeSpanText = `实时时间跨度: ${spanSec} 秒 (已采样 ${pts.length} / ${p.maxPoints} 点)`;
+              timeSpanText = `Span: ${spanSec}s (${pts.length} / ${p.maxPoints} pts)`;
             }
             ctx.fillStyle = palette.text;
-            ctx.font = '600 10.5px "PingFang SC", "Microsoft YaHei", sans-serif';
+            ctx.font = '600 10.5px "JetBrains Mono", "PingFang SC", sans-serif';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'top';
             ctx.fillText(timeSpanText, padLeft + plotW / 2, h - padBottom + 7);
@@ -307,13 +307,13 @@ export const OscilloscopeCanvas = React.forwardRef<OscilloscopeHandle, Oscillosc
                 ctx.stroke();
 
                 ctx.setLineDash([]);
-                ctx.font = 'bold 10px "PingFang SC", "Microsoft YaHei", monospace';
+                ctx.font = 'bold 10px "JetBrains Mono", "PingFang SC", monospace';
                 ctx.fillStyle = palette.vLine;
                 ctx.textAlign = 'left';
                 ctx.textBaseline = 'bottom';
                 const vLabel = p.torqueEnabled
-                  ? `▲ 动态电压上限 Vmax: ${activeVRef.toFixed(2)}V`
-                  : `▸ 目标电压: ${activeVRef.toFixed(2)}V`;
+                  ? `▲ Vmax: ${activeVRef.toFixed(2)}V`
+                  : `▸ V_target: ${activeVRef.toFixed(2)}V`;
                 ctx.fillText(vLabel, padLeft + 8, Math.max(padTop + 14, yVRef - 3));
               }
 
@@ -328,12 +328,12 @@ export const OscilloscopeCanvas = React.forwardRef<OscilloscopeHandle, Oscillosc
                 ctx.stroke();
 
                 ctx.setLineDash([]);
-                ctx.font = 'bold 10px "PingFang SC", "Microsoft YaHei", monospace';
+                ctx.font = 'bold 10px "JetBrains Mono", "PingFang SC", monospace';
                 ctx.fillStyle = palette.tLine;
                 ctx.textAlign = 'right';
                 ctx.textBaseline = 'bottom';
                 ctx.fillText(
-                  `◂ 目标扭矩: ${p.tTarget.toFixed(3)} N·m`,
+                  `◂ T_target: ${p.tTarget.toFixed(3)} N·m`,
                   w - padRight - 8,
                   Math.max(padTop + 14, yTRef - 3)
                 );
@@ -352,7 +352,7 @@ export const OscilloscopeCanvas = React.forwardRef<OscilloscopeHandle, Oscillosc
               ctx.rect(padLeft, padTop, plotW, plotH);
               ctx.clip();
 
-              // 通道 A 电压曲线
+              // CH-A 电压曲线
               const gradV = ctx.createLinearGradient(0, padTop, 0, padTop + plotH);
               gradV.addColorStop(0, palette.vFillTop);
               gradV.addColorStop(1, palette.vFillBottom);
@@ -378,7 +378,7 @@ export const OscilloscopeCanvas = React.forwardRef<OscilloscopeHandle, Oscillosc
               ctx.lineJoin = 'round';
               ctx.stroke();
 
-              // 通道 B 扭矩曲线
+              // CH-B 扭矩曲线
               const gradT = ctx.createLinearGradient(0, padTop, 0, padTop + plotH);
               gradT.addColorStop(0, palette.tFillTop);
               gradT.addColorStop(1, palette.tFillBottom);
@@ -422,7 +422,7 @@ export const OscilloscopeCanvas = React.forwardRef<OscilloscopeHandle, Oscillosc
 
               ctx.restore();
 
-              // 4. 十字探针光标与中文测量浮窗
+              // 4. 十字探针光标与测量浮窗
               const m = mouseRef.current;
               if (
                 m.hovering &&
@@ -458,8 +458,8 @@ export const OscilloscopeCanvas = React.forwardRef<OscilloscopeHandle, Oscillosc
                   ctx.arc(ptX, ptTy, 4.5, 0, Math.PI * 2);
                   ctx.fill();
 
-                  const tipW = 196;
-                  const tipH = 70;
+                  const tipW = 186;
+                  const tipH = 68;
                   let tipX = m.x + 14;
                   if (tipX + tipW > w - padRight) tipX = m.x - tipW - 14;
                   let tipY = Math.min(ptVy, ptTy) - 24;
@@ -477,14 +477,14 @@ export const OscilloscopeCanvas = React.forwardRef<OscilloscopeHandle, Oscillosc
                   const relSec = ((pt.time - pts[0].time) / 1000).toFixed(2);
                   ctx.textAlign = 'left';
                   ctx.textBaseline = 'top';
-                  ctx.font = '600 10px "PingFang SC", "Microsoft YaHei", monospace';
+                  ctx.font = '600 10px "JetBrains Mono", Consolas, monospace';
                   ctx.fillStyle = palette.text;
-                  ctx.fillText(`探针时刻 T+${relSec}秒 [点 #${pointIdx}]`, tipX + 10, tipY + 8);
-                  ctx.font = 'bold 11px "JetBrains Mono", "PingFang SC", monospace';
+                  ctx.fillText(`T+${relSec}s [#${pointIdx}]`, tipX + 10, tipY + 8);
+                  ctx.font = 'bold 11px "JetBrains Mono", Consolas, monospace';
                   ctx.fillStyle = palette.vLine;
-                  ctx.fillText(`● 实测电压: ${pt.voltage.toFixed(3)} V`, tipX + 10, tipY + 26);
+                  ctx.fillText(`CH-A: ${pt.voltage.toFixed(3)} V`, tipX + 10, tipY + 26);
                   ctx.fillStyle = palette.tLine;
-                  ctx.fillText(`● 实测扭矩: ${pt.torque.toFixed(3)} N·m`, tipX + 10, tipY + 45);
+                  ctx.fillText(`CH-B: ${pt.torque.toFixed(3)} N·m`, tipX + 10, tipY + 45);
                 }
                 ctx.restore();
               }
