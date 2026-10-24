@@ -1,4 +1,4 @@
-# 电机测控与调试上位机 (Motor Test Station Pro v2.4)
+# 电机测控与调试上位机 (Motor Test Station Pro v2.4.1)
 
 面向 STM32 电机测控与外环扭矩闭环系统的**跨平台桌面级 & 网页端解耦双栖上位机**。工程已彻底解耦为两大独立形态：
 1. **原生桌面可执行程序（Desktop Workstation - `.exe` / macOS / Linux）**：位于项目根目录，基于 **Tauri v2 + Rust (`serialport`) + React 19 + TypeScript + Tailwind CSS v4 + Jotai** 构建。支持系统底层串口枚举、热插拔扫描、全屏/窗口化弹性自适应与高刷 60FPS 示波器。

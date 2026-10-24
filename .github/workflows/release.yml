@@ -1,4 +1,4 @@
-name: Cross-Platform Desktop Release (Windows / macOS / Linux)
+name: Release Portable Binaries & Web HTML
 
 on:
   push:
@@ -6,26 +6,35 @@ on:
       - 'v*'
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
-  build-tauri:
-    permissions:
-      contents: write
+  build-binaries:
     strategy:
       fail-fast: false
       matrix:
         include:
-          - platform: 'windows-latest'
-            args: ''
-          - platform: 'macos-latest'
-            args: '--target universal-apple-darwin'
-          - platform: 'ubuntu-22.04'
-            args: ''
+          - platform: windows-latest
+            artifact_name: MotorTestStation-Windows-x64.exe
+            build_cmd: npm run build:desktop
+            binary_src: src-tauri/target/release/motor-test-station.exe
+
+          - platform: ubuntu-22.04
+            artifact_name: MotorTestStation-Linux-x64
+            build_cmd: npm run build:desktop
+            binary_src: src-tauri/target/release/motor-test-station
+
+          - platform: macos-latest
+            artifact_name: MotorTestStation-macOS
+            build_cmd: npm run build:desktop
+            binary_src: src-tauri/target/release/motor-test-station
 
     runs-on: ${{ matrix.platform }}
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install Linux system dependencies (WebKitGTK & libudev for serialport)
+      - name: Install Linux system dependencies
         if: matrix.platform == 'ubuntu-22.04'
         run: |
           sudo apt-get update
@@ -39,25 +48,75 @@ jobs:
 
       - name: Setup Rust stable
         uses: dtolnay/rust-toolchain@stable
-        with:
-          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
-
-      - name: Rust cache
-        uses: swatinem/rust-cache@v2
-        with:
-          workspaces: './src-tauri -> target'
 
       - name: Install frontend dependencies
         run: npm ci
 
-      - name: Build Tauri application
-        uses: tauri-apps/tauri-action@v0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build standalone portable binary
+        run: ${{ matrix.build_cmd }}
+
+      - name: Prepare binary artifact
+        shell: bash
+        run: |
+          mkdir -p artifacts
+          cp "${{ matrix.binary_src }}" "artifacts/${{ matrix.artifact_name }}"
+          if [ "${{ matrix.platform }}" != "windows-latest" ]; then
+            chmod +x "artifacts/${{ matrix.artifact_name }}"
+          fi
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
         with:
-          tagName: v__VERSION__
-          releaseName: 'Motor Test Station Pro v__VERSION__'
-          releaseBody: 'Cross-platform STM32 Motor Test & Torque Closed-Loop Workstation (Windows .exe / macOS .dmg / Linux .AppImage)'
-          releaseDraft: true
+          name: binary-${{ matrix.platform }}
+          path: artifacts/*
+
+  publish-release:
+    needs: build-binaries
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: Install dependencies & build modern web dist
+        run: |
+          npm ci
+          npm run build:web
+          cd dist && zip -r ../MotorTestStation-Web-Dist.zip . && cd ..
+
+      - name: Download all platform binaries
+        uses: actions/download-artifact@v4
+        with:
+          path: downloaded_artifacts
+          merge-multiple: true
+
+      - name: Prepare release assets
+        run: |
+          mkdir -p release_assets
+          cp downloaded_artifacts/* release_assets/ || true
+          cp web/index.html release_assets/MotorTestStation-Web-Standalone.html
+          cp "web/串口.html" release_assets/串口.html
+          cp MotorTestStation-Web-Dist.zip release_assets/
+          ls -la release_assets/
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: "Motor Test Station Pro ${{ github.ref_name }} (免安装绿色便携版)"
+          body: |
+            ### 🚀 Motor Test Station Pro ${{ github.ref_name }} 免安装直接运行版
+
+            本版本所有产物均为**打开即用、无需安装向导的独立便携版 (Portable)**：
+
+            - 🪟 **Windows 绿色独立版**：`MotorTestStation-Windows-x64.exe`（直接双击即可运行，无需安装，无捆绑）
+            - 🐧 **Linux 便携独立版**：`MotorTestStation-Linux-x64`（赋予执行权限 `chmod +x` 后直接运行）
+            - 🍎 **macOS 便携独立版**：`MotorTestStation-macOS`（直接运行）
+            - 🌐 **纯网页独立版**：`MotorTestStation-Web-Standalone.html` / `串口.html`（零依赖，直接用 Chrome / Edge 打开即可连机）
+            - 📦 **现代 Web 静态站点压缩包**：`MotorTestStation-Web-Dist.zip`（可直接解压部署到静态服务器或 GitHub Pages）
+          draft: false
           prerelease: false
-          args: ${{ matrix.args }}
+          files: release_assets/*

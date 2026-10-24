@@ -1,7 +1,7 @@
 {
   "name": "motor-test-station",
   "private": true,
-  "version": "2.4.0",
+  "version": "2.4.1",
   "description": "STM32 Motor Test & Closed-Loop Torque Telemetry Workstation (Tauri v2 + React + TS + Tailwind v4 + shadcn/ui + Jotai)",
   "type": "module",
   "scripts": {
