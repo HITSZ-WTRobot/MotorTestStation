@@ -1285,13 +1285,13 @@ select:focus, input:focus {
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
                             <path d="M7 2v11h3v9l7-12h-4l4-8z"/>
                         </svg>
-                        ⚡ 手动电压模式
+                        手动电压模式
                     </button>
                     <button type="button" class="mode-toggle-btn btn-mode-torque" data-mode="torque">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
                             <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14h2v2h-2v-2zm0-10h2v8h-2V6z"/>
                         </svg>
-                        🎯 扭矩闭环模式
+                        扭矩闭环模式
                     </button>
                 </div>
 
@@ -1436,7 +1436,7 @@ select:focus, input:focus {
                     <!-- 扭矩前馈与动态电压上限提示盒 (按下位机已接受目标计算) -->
                     <div class="dynamic-ceiling-box">
                         <div class="ceiling-header">
-                            <span class="ceiling-title">⚡ 扭矩前馈与动态电压上限 (基于已接受目标)</span>
+                            <span class="ceiling-title">扭矩前馈与动态电压上限 (基于已接受目标)</span>
                             <span class="ceiling-badge">1 V ⇋ 0.5 N·m (+1.5V 裕量)</span>
                         </div>
                         <div class="ceiling-val-row">
@@ -1586,7 +1586,7 @@ select:focus, input:focus {
 
                 <div style="margin-top: 10px;">
                     <button type="button" id="btnSaveFlash" class="btn btn-save-flash">
-                        💾 停机安全保存到 Flash
+                        停机安全保存到 Flash
                     </button>
                     <div style="font-size: 11px; color: var(--text-dim); margin-top: 6px; line-height: 1.4;">
                         * 严格遵循 HANDOFF.md 停机保存规范：先发送 0V 停止输出，逐项写入 6 项 RAM 参数，再擦写持久化到板载 Flash。
@@ -4038,7 +4038,7 @@ select:focus, input:focus {
             isExecutingSave = false;
             if (el.btnSaveFlash) {
                 el.btnSaveFlash.disabled = false;
-                el.btnSaveFlash.textContent = '💾 停机安全保存到 Flash';
+                el.btnSaveFlash.textContent = '停机安全保存到 Flash';
             }
         }
     }

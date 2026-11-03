@@ -136,21 +136,21 @@ export const OscilloscopeCanvas = React.forwardRef<OscilloscopeHandle, Oscillosc
       // 亮色高对比度实验室调色板
       const palette = {
         bg: '#ffffff',
-        plotBg: '#f8fbff',
-        gridMajor: 'rgba(2, 132, 199, 0.09)',
-        border: 'rgba(14, 165, 233, 0.24)',
+        plotBg: '#fafbfc',
+        gridMajor: 'rgba(15, 23, 42, 0.07)',
+        border: 'rgba(15, 23, 42, 0.1)',
         text: '#64748b',
         vLine: '#0284c7',
-        vRefLine: 'rgba(2, 132, 199, 0.65)',
-        vFillTop: 'rgba(14, 165, 233, 0.18)',
-        vFillBottom: 'rgba(14, 165, 233, 0.01)',
-        tLine: '#ea580c',
-        tRefLine: 'rgba(234, 88, 12, 0.65)',
-        tFillTop: 'rgba(249, 115, 22, 0.16)',
-        tFillBottom: 'rgba(249, 115, 22, 0.01)',
-        crosshair: 'rgba(2, 132, 199, 0.45)',
-        tooltipBg: 'rgba(255, 255, 255, 0.97)',
-        tooltipBorder: 'rgba(14, 165, 233, 0.45)',
+        vRefLine: 'rgba(2, 132, 199, 0.55)',
+        vFillTop: 'rgba(2, 132, 199, 0.12)',
+        vFillBottom: 'rgba(2, 132, 199, 0.01)',
+        tLine: '#d97706',
+        tRefLine: 'rgba(217, 119, 6, 0.55)',
+        tFillTop: 'rgba(217, 119, 6, 0.12)',
+        tFillBottom: 'rgba(217, 119, 6, 0.01)',
+        crosshair: 'rgba(15, 23, 42, 0.35)',
+        tooltipBg: '#ffffff',
+        tooltipBorder: 'rgba(15, 23, 42, 0.12)',
       };
 
       const draw = () => {
@@ -251,20 +251,20 @@ export const OscilloscopeCanvas = React.forwardRef<OscilloscopeHandle, Oscillosc
 
             // 顶栏图例
             ctx.save();
-            ctx.font = 'bold 13px "JetBrains Mono", "PingFang SC", "Microsoft YaHei", sans-serif';
+            ctx.font = '600 12px "JetBrains Mono", sans-serif';
             ctx.textAlign = 'left';
             ctx.textBaseline = 'top';
             ctx.fillStyle = palette.vLine;
-            ctx.fillRect(padLeft, 26, 11, 11);
-            ctx.fillStyle = '#1e293b';
-            ctx.fillText('CH-A: 实测电压 (0 ~ 20V)', padLeft + 18, 24);
+            ctx.fillRect(padLeft, 26, 10, 10);
+            ctx.fillStyle = '#334155';
+            ctx.fillText('CH-A 实测电压 (0 ~ 20V)', padLeft + 16, 24);
 
             ctx.fillStyle = palette.tLine;
-            ctx.fillRect(padLeft + 225, 26, 11, 11);
-            ctx.fillStyle = '#1e293b';
+            ctx.fillRect(padLeft + 215, 26, 10, 10);
+            ctx.fillStyle = '#334155';
             ctx.fillText(
-              `CH-B: 实测扭矩 (${tMin.toFixed(1)} ~ ${tMax.toFixed(1)} N·m)`,
-              padLeft + 243,
+              `CH-B 实测扭矩 (${tMin.toFixed(1)} ~ ${tMax.toFixed(1)} N·m)`,
+              padLeft + 231,
               24
             );
 

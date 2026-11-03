@@ -862,7 +862,7 @@
             isExecutingSave = false;
             if (el.btnSaveFlash) {
                 el.btnSaveFlash.disabled = false;
-                el.btnSaveFlash.textContent = '💾 停机安全保存到 Flash';
+                el.btnSaveFlash.textContent = '停机安全保存到 Flash';
             }
         }
     }
